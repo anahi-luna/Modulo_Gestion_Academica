@@ -1,18 +1,62 @@
-# Entorno virtual Python
-backend/.venv/
-
+# ==========================
 # Python
+# ==========================
+
+# Entorno virtual
+backend/.venv/
+backend/venv/
+.venv/
+venv/
+
+# Caché de Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 
+# ==========================
 # Variables de entorno
-.env
+# ==========================
 
-# SQLite
+.env
+*.env
+
+# ==========================
+# Base de datos
+# ==========================
+
 *.sqlite
+*.sqlite3
 *.db
 
-# Frontend
+# ==========================
+# Logs
+# ==========================
 
-# Sistema
+*.log
+
+# ==========================
+# Pytest
+# ==========================
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ==========================
+# VS Code
+# ==========================
+
+.vscode/
+
+# ==========================
+# JetBrains (PyCharm)
+# ==========================
+
+.idea/
+
+# ==========================
+# Sistema Operativo
+# ==========================
+
 .DS_Store
+Thumbs.db
