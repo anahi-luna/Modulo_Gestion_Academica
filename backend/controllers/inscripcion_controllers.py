@@ -1,14 +1,17 @@
 from flask import request
 from services.inscripcion_service import *
-from utils.response import *
+from utils.response import success_response,error_response
 from exceptions import BusinessError
+from schemas.inscripcion_schema import *
+from marshmallow import ValidationError
 
 def get_lista_de_inscripciones():
     inscripciones = obtener_lista_de_inscripciones()
 
+    resultado = inscripciones_schema.dump(inscripciones)
     return success_response(
-        data=inscripciones,
-        total=len(inscripciones),
+        data=resultado,
+        total=len(resultado),
         message="Listado de inscripciones."
     )
 
@@ -19,23 +22,37 @@ def get_inscripcion(id_inscripcion):
             "Inscripción no encontrada",
             status_code=404
         )
+    
+    resultado = inscripcion_schema.dump(inscripcion)
+
     return success_response(
-        data=inscripcion,
+        data=resultado,
         message="Inscripción encontrada."
     )
 
 def agregar_inscripciones():
     try:
-        body = request.get_json()
-        lista = body.get("inscripciones", [])
-        nuevas = crear_inscripciones(lista)
+        data = lista_inscripciones_schema.load(
+            request.get_json()
+        )
+        nuevas = crear_inscripciones(data["inscripciones"])
+
+        resultado = inscripciones_schema.dump(nuevas)
 
         return success_response(
-            data=nuevas,
-            total=len(nuevas),
+            data=resultado,
+            total=len(resultado),
             message="Solicitud recibida correctamente.",
             status_code=201
         )
+    
+    except ValidationError as err:
+        return error_response(
+            message="Error de validación.",
+            errors= err.messages,
+            status_code=400
+        )
+
     except BusinessError as e:
         return error_response(
             message=e.message,
@@ -55,8 +72,10 @@ def actualizar_inscripcion(id_inscripcion):
                 status_code=404
             )
     
+        resultado = inscripcion_schema.dump(actualizada) 
+
         return success_response(
-            data=actualizada,
+            data=resultado,
             message=f"Inscripción {id_inscripcion} actualizada."
         )
     except BusinessError as e:
@@ -66,14 +85,23 @@ def actualizar_inscripcion(id_inscripcion):
         )
 
 def inscripcion_eliminada(id_inscripcion):
-    eliminado = eliminar_inscripcion(id_inscripcion)
+    try:
 
-    if not eliminado:
-        return error_response(
-            "Inscripción no encontrada",
-            status_code=404
+        eliminado = eliminar_inscripcion(id_inscripcion)
+
+        if not eliminado:
+            return error_response(
+                "Inscripción no encontrada",
+                status_code=404
+            )
+    
+        return success_response(
+            message=f"Inscripción {id_inscripcion} eliminada."
         )
     
-    return success_response(
-        message=f"Inscripción {id_inscripcion} eliminada."
-    )
+    except BusinessError as e:
+        
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )

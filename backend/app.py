@@ -3,6 +3,8 @@ from flask_cors import CORS
 from config.config import Config
 from extensions import db, ma
 from routes.inscripcion_routes import inscripcion_bp
+from seed_data import cargar_datos_iniciales
+from models import *
 
 #Crea y configura la aplicación Flask.
 def create_app():
@@ -37,6 +39,7 @@ app = create_app()
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        cargar_datos_iniciales()
     
     app.run(
         host="0.0.0.0",
