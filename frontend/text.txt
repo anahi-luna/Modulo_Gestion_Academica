@@ -1,2 +1,0 @@
-Deje este archivo text solo para q se suba la carpeta front
-Igual cuando inician el proyecto lo pueden borrar
