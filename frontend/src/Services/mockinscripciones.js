@@ -72,7 +72,7 @@ let INSCRIPCIONES = [
     id_legajo: "000124",
     id_comision: 2,
     fecha_inscripcion: "2026-15-03 10:30:00",
-    estado: "Aceptada",
+    estado: "PENDIENTE",
   },
 ];
 
@@ -182,9 +182,10 @@ export async function postInscripcion({ nro_legajo, id_comision }) {
   const nueva = {
     id: INSCRIPCIONES.length + 1,
     id_legajo: nro_legajo,
+    nombre: `${legajoData.nombre} ${legajoData.apellido}`,
     id_comision,
     fecha_inscripcion: new Date().toISOString(),
-    estado: "Aceptada",
+    estado: "PENDIENTE",
   };
   INSCRIPCIONES.push(nueva);
   comision.cupo_ocupado += 1; // Actualizamos el cupo 
@@ -234,6 +235,7 @@ function _respuestaRechazada(nro_legajo, id_comision, motivo) {
   const rechazada = {
     id: INSCRIPCIONES.length + 1,
     id_legajo: nro_legajo,
+    nombre: `${legajoData.nombre} ${legajoData.apellido}`,
     id_comision,
     fecha_inscripcion: new Date().toISOString(),
     estado: "Rechazada",
@@ -250,4 +252,51 @@ function _respuestaRechazada(nro_legajo, id_comision, motivo) {
     },
     message: `Inscripción rechazada: ${motivo}`,
   };
+}
+
+export async function getInscripciones() {
+
+  await delay();
+
+  const resultado = INSCRIPCIONES.map((i)=> {
+    const com = COMISIONES.find((c)=> c.id === i.id_comision);
+
+    return{
+      ...i,
+      comision: com?.codigo || "-",
+      comisionmateria: com?.materia || "-",
+      horario: com?.horario || "-",
+    };
+  });
+
+  return {
+    status: "success",
+    data: resultado,
+    total: resultado.length,
+    message: "Listado de inscripciones obtenido",
+  };
+}
+
+export async function aceptarInscripcion(id) {
+  await delay();
+
+  const inscripcion = INSCRIPCIONES.find(i => i.id === id);
+
+  if (inscripcion) {
+    inscripcion.estado = "Aceptada";
+  }
+
+  return inscripcion;
+}
+
+export async function rechazarInscripcion(id) {
+  await delay();
+
+  const inscripcion = INSCRIPCIONES.find(i => i.id === id);
+
+  if (inscripcion) {
+    inscripcion.estado = "Rechazada";
+  }
+
+  return inscripcion;
 }

@@ -1,3 +1,5 @@
+//Mock de usuarios admin y user comun provisorios, para cambiar entre vistas
+
 export const adminMock = {
   id: 1,
   nombre: "Administrador",
