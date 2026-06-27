@@ -66,16 +66,15 @@ Los Controllers no deben contener reglas del negocio.
 
 Los **Services** implementan la lógica del negocio.
 
-Ejemplos de reglas implementadas:
+Actualmente el módulo implementa las siguientes reglas de negocio:
 
-- Validar existencia del legajo.
-- Validar existencia de la comisión.
-- Validar cupo disponible.
-- Validar usuario.
-- Validar estados.
-- Crear la inscripción.
-- Modificar una inscripción.
-- Eliminar una inscripción.
+- Verificar existencia del legajo.
+- Verificar que el legajo se encuentre activo.
+- Verificar existencia de la comisión.
+- Verificar disponibilidad de cupo.
+- Verificar existencia del usuario que registra la inscripción.
+- Verificar que el alumno no posea otra inscripción activa.
+- Asignar automáticamente el estado inicial "Pendiente".
 
 Toda regla del negocio debe implementarse en esta capa.
 

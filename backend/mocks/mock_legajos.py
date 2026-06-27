@@ -2,23 +2,32 @@ LEGAJOS = [
 
     {
         "id_legajo": 1,
+        "numero_legajo": "000123",
         "apellido": "Pérez",
         "nombre": "Juan",
-        "activo": True
+        "activo": True,
+        "rango": "Bombero",
+        "materias_aprobadas": []
     },
 
     {
         "id_legajo": 2,
+        "numero_legajo": "000124",
         "apellido": "Gómez",
         "nombre": "Ana",
-        "activo": True
+        "activo": True,
+        "rango": "Suboficial Mayor",
+        "materias_aprobadas": [1]
     },
 
     {
         "id_legajo": 3,
+        "numero_legajo": "000125",
         "apellido": "López",
         "nombre": "Carlos",
-        "activo": False
+        "activo": False,
+        "rango": "Cabo",
+        "materias_aprobadas": [1, 2]
     }
 
 ]

@@ -6,9 +6,19 @@ from schemas.inscripcion_schema import *
 from marshmallow import ValidationError
 
 def get_lista_de_inscripciones():
-    inscripciones = obtener_lista_de_inscripciones()
+
+    id_estado = request.args.get("id_estado", type=int)
+    id_legajo = request.args.get("id_legajo", type=int)
+    id_comision = request.args.get("id_comision", type=int)
+
+    inscripciones = obtener_lista_de_inscripciones(
+        id_estado= id_estado,
+        id_legajo=id_legajo,
+        id_comision = id_comision
+    )
 
     resultado = inscripciones_schema.dump(inscripciones)
+
     return success_response(
         data=resultado,
         total=len(resultado),
@@ -30,19 +40,18 @@ def get_inscripcion(id_inscripcion):
         message="Inscripción encontrada."
     )
 
-def agregar_inscripciones():
+def agregar_inscripcion():
     try:
-        data = lista_inscripciones_schema.load(
+        data = inscripcion_request_schema.load(
             request.get_json()
         )
-        nuevas = crear_inscripciones(data["inscripciones"])
+        nueva = crear_inscripcion(data)
 
-        resultado = inscripciones_schema.dump(nuevas)
+        resultado = inscripcion_schema.dump(nueva)
 
         return success_response(
             data=resultado,
-            total=len(resultado),
-            message="Solicitud recibida correctamente.",
+            message="Solicitud de inscripción enviada correctamente",
             status_code=201
         )
     
@@ -62,7 +71,9 @@ def agregar_inscripciones():
 def actualizar_inscripcion(id_inscripcion):
     try:
 
-        datos = request.get_json()
+        datos = modificar_inscripcion_schema.load(
+            request.get_json()
+        )
 
         actualizada = modificar_inscripcion(id_inscripcion,datos)
 
@@ -78,6 +89,13 @@ def actualizar_inscripcion(id_inscripcion):
             data=resultado,
             message=f"Inscripción {id_inscripcion} actualizada."
         )
+    except ValidationError as err:
+        return error_response(
+            message="Error de validación.",
+            errors=err.messages,
+            status_code=400
+        )
+
     except BusinessError as e:
         return error_response(
             message=e.message,

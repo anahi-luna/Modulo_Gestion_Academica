@@ -6,19 +6,19 @@ Este documento describe los endpoints disponibles del Microservicio de Gestión 
 
 # Convenciones
 
-- URL Base
+## URL Base
 
 ```text
 http://localhost:5000/api
 ```
 
-- Formato de intercambio de datos
+## Formato de intercambio
 
 ```text
 JSON
 ```
 
-- Codificación
+## Codificación
 
 ```text
 UTF-8
@@ -30,120 +30,190 @@ UTF-8
 
 ---
 
-## Obtener todas las inscripciones
+# Obtener todas las inscripciones
 
-### Endpoint
+## Endpoint
 
 ```http
 GET /api/inscripciones
 ```
 
-### Descripción
+## Descripción
 
-Obtiene el listado completo de inscripciones registradas.
+Obtiene el listado de inscripciones registradas.
 
-### Respuesta exitosa
+También permite aplicar filtros mediante parámetros de consulta.
+
+## Parámetros opcionales
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| id_estado | Integer | Filtra por estado |
+| id_legajo | Integer | Filtra por legajo |
+| id_comision | Integer | Filtra por comisión |
+
+### Ejemplos
+
+```http
+GET /api/inscripciones
+```
+
+```http
+GET /api/inscripciones?id_estado=1
+```
+
+```http
+GET /api/inscripciones?id_legajo=10
+```
+
+```http
+GET /api/inscripciones?id_comision=3
+```
+
+## Respuesta
 
 ```json
 {
-    "status": "success",
     "data": [
         {
+            "estado": {
+                "id_estado": 2,
+                "nombre": "Aceptada"
+            },
+            "fecha_inscripcion": "2026-06-27T18:51:57.756703",
+            "id_comision": 2,
+            "id_estado": 2,
             "id_inscripcion": 1,
             "id_legajo": 1,
-            "id_comision": 1,
-            "id_estado": 1,
-            "fecha_inscripcion": "2026-06-27T15:30:00",
             "id_usuario_registro": 100,
-            "ts_creacion": "2026-06-27T15:30:00",
+            "ts_creacion": "2026-06-27T18:51:57.756703",
+            "ts_modificacion": "2026-06-27T18:58:58.686973"
+        },
+        {
+            "estado": {
+                "id_estado": 1,
+                "nombre": "Pendiente"
+            },
+            "fecha_inscripcion": "2026-06-27T18:55:25.093686",
+            "id_comision": 2,
+            "id_estado": 1,
+            "id_inscripcion": 2,
+            "id_legajo": 2,
+            "id_usuario_registro": 100,
+            "ts_creacion": "2026-06-27T18:55:25.093686",
             "ts_modificacion": null
         }
     ],
-    "total": 1,
-    "message": "Listado de inscripciones."
+    "message": "Listado de inscripciones.",
+    "status": "success",
+    "total": 2
 }
 ```
 
 ---
 
-## Obtener una inscripción
+# Obtener una inscripción
 
-### Endpoint
+## Endpoint
 
 ```http
 GET /api/inscripciones/{id}
 ```
 
-### Parámetros
+## Descripción
 
-| Parámetro | Tipo | Descripción |
-|-----------|------|-------------|
-| id | Integer | Identificador de la inscripción |
+Obtiene una inscripción según su identificador.
 
-### Descripción
-
-Obtiene una inscripción específica.
+## Respuesta
+```json
+{
+    "data": {
+        "estado": {
+            "id_estado": 2,
+            "nombre": "Aceptada"
+        },
+        "fecha_inscripcion": "2026-06-27T18:51:57.756703",
+        "id_comision": 2,
+        "id_estado": 2,
+        "id_inscripcion": 1,
+        "id_legajo": 1,
+        "id_usuario_registro": 100,
+        "ts_creacion": "2026-06-27T18:51:57.756703",
+        "ts_modificacion": "2026-06-27T18:58:58.686973"
+    },
+    "message": "Inscripción encontrada.",
+    "status": "success"
+}
+```
 
 ---
 
-## Registrar inscripciones
+# Registrar una inscripción
 
-### Endpoint
+## Endpoint
 
 ```http
 POST /api/inscripciones
 ```
 
-### Descripción
+## Descripción
 
-Registra un lote de solicitudes de inscripción enviadas desde otro microservicio.
+Registra una nueva solicitud de inscripción.
 
-### Request
+El estado inicial siempre será **Pendiente**.
+
+## Request
 
 ```json
 {
-    "inscripciones": [
-        {
-            "id_legajo": 1,
-            "id_comision": 1
-        },
-        {
-            "id_legajo": 2,
-            "id_comision": 1
-        }
-    ]
+    "id_legajo": 1,
+    "id_comision": 2
 }
 ```
 
-### Respuesta
+## Respuesta exitosa
 
 ```json
 {
     "status": "success",
-    "data": [],
-    "total": 2,
-    "message": "Solicitud recibida correctamente."
+    "data": {
+        "id_inscripcion": 1,
+        "id_legajo": 1,
+        "id_comision": 2,
+        "id_estado": 1,
+        "estado": {
+            "id_estado": 1,
+            "nombre": "Pendiente"
+        },
+        "fecha_inscripcion": "2026-06-27T18:55:25",
+        "id_usuario_registro": 100,
+        "ts_creacion": "2026-06-27T18:55:25",
+        "ts_modificacion": null
+    },
+    "message": "Solicitud de inscripción enviada correctamente"
 }
 ```
 
 ---
 
-## Actualizar inscripción
+# Actualizar inscripción
 
-### Endpoint
+## Endpoint
 
 ```http
 PUT /api/inscripciones/{id}
 ```
 
-### Descripción
+## Descripción
 
 Permite modificar únicamente:
 
 - Estado de la inscripción.
 - Comisión asignada.
 
-### Ejemplo Request
+## Ejemplo
+
+Cambiar estado
 
 ```json
 {
@@ -151,7 +221,7 @@ Permite modificar únicamente:
 }
 ```
 
-o
+Cambiar comisión
 
 ```json
 {
@@ -159,39 +229,65 @@ o
 }
 ```
 
+También pueden enviarse ambos campos simultáneamente.
+
 ---
 
-## Eliminar inscripción
+# Eliminar inscripción
 
-### Endpoint
+## Endpoint
 
 ```http
 DELETE /api/inscripciones/{id}
 ```
 
-### Descripción
+## Descripción
 
 Elimina una inscripción registrada.
 
 ---
 
-# Estados de Inscripción
+# Códigos de respuesta
 
-Actualmente el sistema administra los siguientes estados:
+| Código | Descripción |
+|---------|-------------|
+|200|Operación realizada correctamente|
+|201|Inscripción creada correctamente|
+|400|Error de validación o regla de negocio|
+|404|Recurso no encontrado|
+|500|Error interno del servidor|
+
+---
+
+# Estados de inscripción
 
 | ID | Estado |
 |----|---------|
-| 1 | Pendiente |
-| 2 | Aceptada |
-| 3 | Rechazada |
-| 4 | Cancelada |
-| 5 | Finalizada |
+|1|Pendiente|
+|2|Aceptada|
+|3|Rechazada|
+|4|Cancelada|
+|5|Finalizada|
+
+---
+
+# Observaciones
+
+Actualmente el microservicio utiliza **Mocks** para simular la comunicación con otros microservicios.
+
+Los datos simulados corresponden a:
+
+- Legajos
+- Comisiones
+- Usuarios
+
+En futuras etapas estos Mocks serán reemplazados por llamadas HTTP a los microservicios correspondientes, sin modificar los endpoints documentados.
 
 ---
 
 # Próximos módulos
 
-Este documento irá incorporando nuevos endpoints a medida que avance el desarrollo del microservicio.
+Este documento irá incorporando nuevos endpoints correspondientes a:
 
 - Asistencias
 - Calificaciones

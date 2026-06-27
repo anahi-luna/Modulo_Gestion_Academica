@@ -12,10 +12,10 @@ inscripcion_bp.route("/", methods =["GET"])(get_lista_de_inscripciones)
 inscripcion_bp.route("/<int:id_inscripcion>", methods =["GET"])(get_inscripcion)
 
 # Crear una o varias inscripciones
-inscripcion_bp.route("/", methods =["POST"])(agregar_inscripciones)
+inscripcion_bp.route("/", methods =["POST"])(agregar_inscripcion)
 
 # Actualizar inscripción
-inscripcion_bp.route("/<int:id_inscripcion>", methods =["PATCH"])(actualizar_inscripcion)
+inscripcion_bp.route("/<int:id_inscripcion>", methods =["PUT"])(actualizar_inscripcion)
 
 # Eliminar inscripción
 inscripcion_bp.route("/<int:id_inscripcion>", methods =["DELETE"])(inscripcion_eliminada)

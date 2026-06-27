@@ -17,7 +17,7 @@ class InscripcionSchema(ma.SQLAlchemyAutoSchema):
         load_instance = False
         include_fk = True
 
-#Valida una inscripcion del POST (es decir la lista de inscripciones que envian desde otro sistema)
+#Valida una inscripcion del POST "osea el request"
 class InscripcionRequestSchema(ma.Schema):
     id_legajo = fields.Integer(
         required=True,
@@ -33,14 +33,14 @@ class InscripcionRequestSchema(ma.Schema):
         }
     )
 
-#Valida el lote osea la lista
-class ListaInscripcionesSchema(ma.Schema):
-    inscripciones = fields.List(
-        fields.Nested(InscripcionRequestSchema),
-        required=True,
-        validate=validate.Length(
-            min=1, error="Debe enviar al menos una inscripción."
-        )
+class ModificarInscripcionSchema(ma.Schema):
+
+    id_estado = fields.Integer(
+        required=False
+    )
+
+    id_comision = fields.Integer(
+        required=False
     )
 
 # Instancias del schema
@@ -49,4 +49,4 @@ inscripciones_schema = InscripcionSchema(many=True) # Lista de objetos
 
 # Instancias para validar requests
 inscripcion_request_schema = InscripcionRequestSchema()
-lista_inscripciones_schema= ListaInscripcionesSchema()
+modificar_inscripcion_schema = ModificarInscripcionSchema()

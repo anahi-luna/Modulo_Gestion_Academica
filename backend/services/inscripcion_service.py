@@ -19,12 +19,12 @@ def existe_inscripcion(id_legajo):
         is not None
     )
 
-def preparar_datos_inscripcion(item,id_estado):
+def preparar_datos_inscripcion(inscripcion_data,id_estado):
     ahora = datetime.now()
 
     return {
-        "id_legajo": item["id_legajo"],
-        "id_comision": item["id_comision"],
+        "id_legajo": inscripcion_data["id_legajo"],
+        "id_comision": inscripcion_data["id_comision"],
         "id_estado": id_estado,
         "fecha_inscripcion": ahora,
         "id_usuario_registro": ID_USUARIO_SIMULADO,
@@ -33,8 +33,28 @@ def preparar_datos_inscripcion(item,id_estado):
     }
 
 
-def obtener_lista_de_inscripciones():
-    return Inscripcion.query.all()
+def obtener_lista_de_inscripciones(
+        id_estado=None,
+        id_legajo=None,
+        id_comision=None
+):
+    query = Inscripcion.query
+
+    if id_estado is not None:
+        query = query.filter_by(
+            id_estado = id_estado
+        )
+    if id_legajo is not None:
+        query = query.filter_by(
+            id_legajo=id_legajo
+        )
+
+    if id_comision is not None:
+        query = query.filter_by(
+            id_comision=id_comision
+        )
+    
+    return query.all()
 
 def obtener_inscripcion_por_id(id_inscripcion):
     return db.session.get(
@@ -42,9 +62,7 @@ def obtener_inscripcion_por_id(id_inscripcion):
         id_inscripcion
     )
 
-def crear_inscripciones(lista_inscripciones):
-    
-    nuevas = []
+def crear_inscripcion(datos):
 
     # Obtener el estado Pendiente desde la BD
     estado = obtener_estado_por_nombre("Pendiente")
@@ -52,41 +70,40 @@ def crear_inscripciones(lista_inscripciones):
     if not estado:
         raise BusinessError("No existe el estado Pendiente.",500)
 
-    for item in lista_inscripciones:
+    
         #Validamos si existe legajo
-        legajo = obtener_legajo(item["id_legajo"])
-        if not legajo:
-            raise BusinessError("El legajo no existe.",404)
-        if not legajo["activo"]:
-            raise BusinessError("El legajo se encuentra inactivo.",400)
+    legajo = obtener_legajo(datos["id_legajo"])
+    if not legajo:
+        raise BusinessError("El legajo no existe.",404)
+    if not legajo["activo"]:
+        raise BusinessError("El legajo se encuentra inactivo.",400)
         
-        #Validamos si existe la comision
-        comision = obtener_comision(item["id_comision"])
-        if not comision:
-            raise BusinessError("La comisión no existe.",404)
-        #Validamos cupo de comision
-        if comision["inscriptos"] >= comision["cupo"]:
-            raise BusinessError("La comision no posee cupo disponible.",400)
+    #Validamos si existe la comision
+    comision = obtener_comision(datos["id_comision"])
+    if not comision:
+        raise BusinessError("La comisión no existe.",404)
+    #Validamos cupo de comision
+    if comision["inscriptos"] >= comision["cupo"]:
+        raise BusinessError("La comision no posee cupo disponible.",400)
         
-        #Validamos si existe usuario
-        usuario = obtener_usuario(ID_USUARIO_SIMULADO)
-        if not usuario:
-            raise BusinessError("El usuario no existe.",404)
+    #Validamos si existe usuario
+    usuario = obtener_usuario(ID_USUARIO_SIMULADO)
+    if not usuario:
+        raise BusinessError("El usuario no existe.",404)
 
-        #Validamos si una inscripcion ya existe 
-        if existe_inscripcion(item["id_legajo"]):
-            raise BusinessError("El alumno ya posee una inscripción.",400)
+    #Validamos si una inscripcion ya existe 
+    if existe_inscripcion(datos["id_legajo"]):
+        raise BusinessError("El alumno ya posee una inscripción.",400)
 
-        datos = preparar_datos_inscripcion(item, estado.id_estado)
+    datos_inscripcion = preparar_datos_inscripcion(datos, estado.id_estado)
 
-        # Crear inscripción
-        inscripcion=Inscripcion(**datos)
+    # Crear inscripción
+    inscripcion=Inscripcion(**datos_inscripcion)
 
-        db.session.add(inscripcion)
-        nuevas.append(inscripcion)
+    db.session.add(inscripcion)
 
-        # Simulacion Aumentar inscriptos
-        comision["inscriptos"]+=1
+    # Simulacion Aumentar inscriptos
+    comision["inscriptos"]+=1
 
     try:
         db.session.commit()
@@ -97,7 +114,7 @@ def crear_inscripciones(lista_inscripciones):
             500
         )
 
-    return nuevas
+    return inscripcion
     
 def modificar_inscripcion(id_inscripcion, datos):
     inscripcion = obtener_inscripcion_por_id(id_inscripcion)
@@ -128,6 +145,7 @@ def modificar_inscripcion(id_inscripcion, datos):
             raise BusinessError("La comisión no posee cupo disponible.", 400)
         
         inscripcion.id_comision = datos["id_comision"]
+        # Pendiente:Actualizar cupos cuando el microservicio de comisiones exponga su API.
 
     inscripcion.ts_modificacion = datetime.now()
     
