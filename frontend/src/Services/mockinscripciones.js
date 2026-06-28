@@ -73,7 +73,7 @@ let INSCRIPCIONES = [
     nombre: "Juan Pablo González",   
     id_comision: 2,
     fecha_inscripcion: "2026-15-03 10:30:00",
-    estado: "Aceptada",
+    estado: "PENDIENTE",
   },
 ];
 

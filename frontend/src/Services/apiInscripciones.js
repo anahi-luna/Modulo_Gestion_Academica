@@ -19,7 +19,7 @@ export async function getInscripcionesPorLegajo(idLegajo) {
 //Registrar una inscripcion
 
 export async function postInscripcion(idLegajo, idComision) {
-    const response = await fetch (`${API_URL}/inscripciones`, {
+    const response = await fetch (`${API_URL}/inscripciones/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

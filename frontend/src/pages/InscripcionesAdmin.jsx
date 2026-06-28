@@ -12,6 +12,8 @@ export default function InscripcionesAdmin() {
 
   async function cargarInscripciones() {
     const res = await getInscripcionesPorEstado(1);
+
+    console.log(res.data);
     // Solo muestra las PENDIENTES
     setInscripciones(res.data)
   }
