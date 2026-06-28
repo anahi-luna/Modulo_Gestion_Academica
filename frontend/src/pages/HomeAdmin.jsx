@@ -20,7 +20,7 @@ export default function HomeAdmin() {
     setHistorial(res.data);
 }
     const historialVisible = historial.filter(
-  i => i.estado === "PENDIENTE" || i.estado === "Aceptada"
+        i => i.estado === "PENDIENTE" || i.estado === "Aceptada"
     );
 
     return (

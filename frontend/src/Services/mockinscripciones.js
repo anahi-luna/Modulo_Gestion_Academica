@@ -51,6 +51,7 @@ const RANGOS = [
   "Oficial",
 ];
 
+
 // Materias aprobadas (para validar correlativas)
 const MATERIAS_APROBADAS_POR_LEGAJO = {
   "000125": [1],        // Aprobó Matafuegos I
@@ -68,13 +69,22 @@ const RANGO_POR_LEGAJO = {
 // Inscripciones ya registradas (para mostrar historial)
 let INSCRIPCIONES = [
   {
-    id: 1,
-    id_legajo: "000124",
-    nombre: "Juan Pablo González",   
+    id_inscripcion: 1,
+    id_legajo: 124,
     id_comision: 2,
-    fecha_inscripcion: "2026-15-03 10:30:00",
-    estado: "PENDIENTE",
-  },
+    id_estado: 1,
+    estado: {
+      id_estado: 1,
+      nombre: "Pendiente",
+    },
+    fecha_inscripcion: "2026-03-15T10:30:00",
+    id_usuario_registro: 100,
+    ts_creacion: "2026-03-15T10:30:00",
+    ts_modificacion: null,
+
+    // Solo para el mock
+    nombre: "Juan Pablo González",
+  }
 ];
 
 // -------------------------------------------------------
@@ -182,26 +192,25 @@ export async function postInscripcion({ nro_legajo, id_comision }) {
   }
 
   // Todo OK, aceptada
+  const ahora = new Date().toISOString();
+
   const nueva = {
-    id: INSCRIPCIONES.length + 1,
+    id_inscripcion: INSCRIPCIONES.length + 1,
     id_legajo: nro_legajo,
     nombre: `${legajoData.nombre} ${legajoData.apellido}`,
-    id_comision,
-    fecha_inscripcion: new Date().toISOString(),
-    estado: "PENDIENTE",
-  };
-  INSCRIPCIONES.push(nueva);
-  comision.cupo_ocupado += 1; // Actualizamos el cupo 
 
-  return {
-    status: "success",
-    data: {
-      ...nueva,
-      comision: comision.codigo,
-      materia: comision.materia,
-      motivo: null,
+    id_comision,
+
+    id_estado: 1,
+    estado: {
+      id_estado: 1,
+      nombre: "Pendiente",
     },
-    message: "Inscripción aceptada correctamente",
+
+    fecha_inscripcion: ahora,
+    id_usuario_registro: 100,
+    ts_creacion: ahora,
+    ts_modificacion: null,
   };
 }
 
@@ -241,7 +250,11 @@ function _respuestaRechazada(nro_legajo, id_comision, motivo, legajoData) {
     nombre: `${legajoData.nombre} ${legajoData.apellido}`,
     id_comision,
     fecha_inscripcion: new Date().toISOString(),
-    estado: "Rechazada",
+    estado: {
+      id_estado: 3,
+      nombre: "Rechazada",
+    },
+    id_estado: 3,
   };
   INSCRIPCIONES.push(rechazada);
 
@@ -280,25 +293,39 @@ export async function getInscripciones() {
   };
 }
 
-export async function aceptarInscripcion(id) {
+export async function aceptarInscripcion(id_inscripcion) {
   await delay();
 
-  const inscripcion = INSCRIPCIONES.find(i => i.id === id);
+  const inscripcion = INSCRIPCIONES.find(i => i.id_inscripcion === id);
 
   if (inscripcion) {
-    inscripcion.estado = "Aceptada";
+    inscripcion.id_estado = 2;
+
+    inscripcion.estado = {
+      id_estado: 2,
+      nombre: "Aceptada",
+    };
+
+    inscripcion.ts_modificacion = new Date().toISOString();
   }
 
   return inscripcion;
 }
 
-export async function rechazarInscripcion(id) {
+export async function rechazarInscripcion(id_inscripcion) {
   await delay();
 
-  const inscripcion = INSCRIPCIONES.find(i => i.id === id);
+  const inscripcion = INSCRIPCIONES.find(i => i.id_inscripcion === id);
 
   if (inscripcion) {
-    inscripcion.estado = "Rechazada";
+    inscripcion.id_estado = 3;
+
+    inscripcion.estado = {
+      id_estado: 3,
+      nombre: "Rechazada",
+    };
+
+    inscripcion.ts_modificacion = new Date().toISOString();
   }
 
   return inscripcion;
@@ -321,9 +348,9 @@ export async function getTodasInscripciones() {
 
 
 //no se si se usara pero puede volver a pendiente una inscripcion
-export async function ponerPendienteInscripcion(id) {
+export async function ponerPendienteInscripcion(id_inscripcion) {
   await delay();
-  const inscripcion = INSCRIPCIONES.find(i => i.id === id);
+  const inscripcion = INSCRIPCIONES.find(i => i.id_inscripcion === id);
   if (inscripcion) {
     inscripcion.estado = "PENDIENTE";
   }
