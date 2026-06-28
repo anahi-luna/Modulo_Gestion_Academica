@@ -6,7 +6,7 @@ import API_URL from "./api";
 // Historial de un legajo para ambos usuarios (USER) (ADMIN)
 export async function getInscripcionesPorLegajo(idLegajo) {
   const response = await fetch(
-    `${API_URL}/inscripciones/?id_legajo=${idLegajo}`
+    `${API_URL}/inscripciones?id_legajo=${idLegajo}`
   );
 
   if (!response.ok) {
@@ -19,7 +19,7 @@ export async function getInscripcionesPorLegajo(idLegajo) {
 //Registrar una inscripcion
 
 export async function postInscripcion(idLegajo, idComision) {
-    const response = await fetch (`${API_URL}/inscripciones/`, {
+    const response = await fetch (`${API_URL}/inscripciones`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export async function postInscripcion(idLegajo, idComision) {
 //Obtener todas las inscripciones
 
 export async function getInscripciones() {
-    const response = await fetch(`${API_URL}/inscripciones/`);
+    const response = await fetch(`${API_URL}/inscripciones`);
 
     if (!response.ok) {
         throw new Error("Error al obtener las inscripciones");
@@ -57,7 +57,7 @@ export async function getInscripciones() {
 
 export async function getInscripcion(id) {
 
-    const response = await fetch(`${API_URL}/inscripciones/${id}/`);
+    const response = await fetch(`${API_URL}/inscripciones${id}/`);
 
     if (!response.ok){
         throw new Error("Inscripcion no encontrada")
@@ -71,7 +71,7 @@ export async function getInscripcion(id) {
 //Filtrar por estado
 
 export async function getInscripcionesPorEstado(idEstado) {
-    const response = await fetch(`${API_URL}/inscripciones/?id_estado=${idEstado}`);
+    const response = await fetch(`${API_URL}/inscripciones?id_estado=${idEstado}`);
 
     if (!response.ok){
         throw new Error("Error al obtener las inscripciones")
@@ -84,7 +84,7 @@ export async function getInscripcionesPorEstado(idEstado) {
 //Filtrar por comision
 
 export async function getInscripcionesPorComision(isComision) {
-    const response = await fetch(`${API_URL}/inscripciones/?id_comision=${isComision}`);
+    const response = await fetch(`${API_URL}/inscripciones?id_comision=${isComision}`);
 
     if (!response.ok){
         throw new Error("Error al obtener las inscripciones")
@@ -99,7 +99,7 @@ export async function getInscripcionesPorComision(isComision) {
 //Aceptar Inscripcion
 
 export async function aceptarInscripcion(id) {
-    const response = await fetch(`${API_URL}/inscripciones/${id}/`, {
+    const response = await fetch(`${API_URL}/inscripciones${id}/`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -119,7 +119,7 @@ export async function aceptarInscripcion(id) {
 //Rechazar Inscripcion
 
 export async function rechazarInscripcion(id) {
-    const response = await fetch(`${API_URL}/inscripciones/${id}/`, {
+    const response = await fetch(`${API_URL}/inscripciones${id}/`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -139,7 +139,7 @@ export async function rechazarInscripcion(id) {
 //Cambiar comision
 
 export async function cambiarComision(id, id_comision) {
-    const response = await fetch(`${API_URL}/inscripciones/${id}/`, {
+    const response = await fetch(`${API_URL}/inscripciones${id}/`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -159,7 +159,7 @@ export async function cambiarComision(id, id_comision) {
 
 //Eliminar inscripcion
 export async function eliminarInscripcion(id) {
-    const response = await fetch(`${API_URL}/inscripciones/${id}/`, {
+    const response = await fetch(`${API_URL}/inscripciones${id}/`, {
         method: "DELETE",
     });
     
