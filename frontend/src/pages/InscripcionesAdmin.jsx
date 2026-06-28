@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import EstadoBadge from "../components/EstadoBadge";
-import { getInscripciones, aceptarInscripcion, rechazarInscripcion } from "../Services/mockInscripciones";
+import { getInscripciones, aceptarInscripcion, rechazarInscripcion, getInscripcionesPorEstado } from "../Services/apiInscripciones";
 
 export default function InscripcionesAdmin() {
   const [inscripciones, setInscripciones] = useState([]);
@@ -11,20 +11,18 @@ export default function InscripcionesAdmin() {
   }, []);
 
   async function cargarInscripciones() {
-    const res = await getInscripciones();
+    const res = await getInscripcionesPorEstado(1);
     // Solo muestra las PENDIENTES
-    setInscripciones(res.data.filter(i => i.estado === "PENDIENTE"));
+    setInscripciones(res.data)
   }
 
-  async function aprobar(id, nombre) {
+  async function aprobar(id) {
     await aceptarInscripcion(id);
-    setUltimaAccion({ nombre, accion: "aceptada" });
     cargarInscripciones(); // recarga → desaparece de la lista
   }
 
-  async function rechazar(id, nombre) {
+  async function rechazar(id) {
     await rechazarInscripcion(id);
-    setUltimaAccion({ nombre, accion: "rechazada" });
     cargarInscripciones();
   }
 
@@ -49,22 +47,22 @@ export default function InscripcionesAdmin() {
       ) : (
         <ul className="divide-y divide-gray-100 rounded-xl bg-white shadow">
           {inscripciones.map((ins) => (
-            <li key={ins.id} className="flex items-center justify-between px-6 py-4 gap-4">
+            <li key={ins.id_inscripcion} className="flex items-center justify-between px-6 py-4 gap-4">
               <div>
-                <p className="font-semibold text-gray-800">{ins.nombre}</p>
+                {/*<p className="font-semibold text-gray-800">{ins.nombre}</p>*/}
                 <p className="text-sm text-gray-500">Legajo: {ins.id_legajo}</p>
-                <p className="text-xs text-gray-400">{ins.materia} · {ins.comision}</p>
+                <p className="text-xs text-gray-400">{/*ins.materia*/} · {ins.comision}</p>
               </div>
-              <EstadoBadge estado={ins.estado} />
+              <EstadoBadge estado={ins.estado.nombre.toUpperCase()} />
               <div className="flex gap-2">
                 <button
-                  onClick={() => aprobar(ins.id, ins.nombre)}
+                  onClick={() => aprobar(ins.id_inscripcion)}
                   className="rounded-md bg-green-600 px-4 py-2 text-white text-sm hover:bg-green-700"
                 >
                   Aceptar
                 </button>
                 <button
-                  onClick={() => rechazar(ins.id, ins.nombre)}
+                  onClick={() => rechazar(ins.id_inscripcion)}
                   className="rounded-md bg-red-600 px-4 py-2 text-white text-sm hover:bg-red-700"
                 >
                   Rechazar

@@ -8,14 +8,17 @@
 // ============================================================
 
 import { useState, useEffect } from "react";
+import API_URL from "../Services/api";
 
 import {
-  generarNroLegajoAleatorio,
-  getLegajo,
-  getComisiones,
   postInscripcion,
   getInscripcionesPorLegajo,
-} from "../Services/mockInscripciones";
+} from "../Services/apiInscripciones";
+
+import{
+  getLegajo,
+  getComisiones,} 
+  from "../Services/mockinscripciones"
 
 import ComisionCard          from "../components/ComisionCard";
 import ResultadoInscripcion  from "../components/ResultadoInscripcion";
@@ -88,10 +91,11 @@ export default function Inscripciones() {
 
     try {
       // Enviamos la solicitud al mock (simula POST /inscripciones)
-      const res = await postInscripcion({
-        nro_legajo:   nroLegajo.trim(),
-        id_comision:  comisionElegida.id,
-      });
+      const res = await postInscripcion(
+        nroLegajo.trim(),
+        comisionElegida.id,
+
+      );
       setResultado(res.data);
       setPaso(3); // Pasamos a mostrar el resultado
     } catch (err) {
