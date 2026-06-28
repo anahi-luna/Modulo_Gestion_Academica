@@ -70,9 +70,10 @@ let INSCRIPCIONES = [
   {
     id: 1,
     id_legajo: "000124",
+    nombre: "Juan Pablo González",   
     id_comision: 2,
     fecha_inscripcion: "2026-15-03 10:30:00",
-    estado: "PENDIENTE",
+    estado: "Aceptada",
   },
 ];
 
@@ -149,7 +150,7 @@ export async function postInscripcion({ nro_legajo, id_comision }) {
   // Paso 1: ¿Hay cupo disponible?
   const hayCupo = comision.cupo_ocupado < comision.cupo_maximo;
   if (!hayCupo) {
-    return _respuestaRechazada(nro_legajo, id_comision, "Sin cupo disponible");
+    return _respuestaRechazada(nro_legajo, id_comision, "Sin cupo disponible", legajoData);
   }
 
   // Paso 2: ¿Cumple el rango mínimo?
@@ -300,5 +301,31 @@ export async function rechazarInscripcion(id) {
     inscripcion.estado = "Rechazada";
   }
 
+  return inscripcion;
+}
+
+// Devuelve TODAS las inscripciones (para el historial del admin)
+export async function getTodasInscripciones() {
+  await delay(300);
+  const resultado = INSCRIPCIONES.map((i) => {
+    const com = COMISIONES.find((c) => c.id === i.id_comision);
+    return {
+      ...i,
+      comision: com?.codigo || "-",
+      materia: com?.materia || "-",
+      horario: com?.horario || "-",
+    };
+  });
+  return { status: "success", data: resultado };
+}
+
+
+//no se si se usara pero puede volver a pendiente una inscripcion
+export async function ponerPendienteInscripcion(id) {
+  await delay();
+  const inscripcion = INSCRIPCIONES.find(i => i.id === id);
+  if (inscripcion) {
+    inscripcion.estado = "PENDIENTE";
+  }
   return inscripcion;
 }

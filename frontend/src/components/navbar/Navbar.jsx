@@ -48,7 +48,7 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
             {/* Links de navegación */}
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               <div className="flex space-x-2">
-                <NavLink to="/" className={linkClass} end>Inscripción</NavLink>
+                <NavLink to="/" className={linkClass} end>Home</NavLink>
                 {/* aca metemos cuando tengamos mas modulos*/}
               </div>
             </div>
@@ -116,7 +116,7 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
       {/* Menú mobile desplegable */}
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
-          <NavLink to="/" className={linkClass} end>Inscripción</NavLink>
+          <NavLink to="/" className={linkClass} end>Home</NavLink>
         </div>
       </DisclosurePanel>
     </Disclosure>
