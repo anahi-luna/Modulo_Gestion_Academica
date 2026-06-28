@@ -1,7 +1,7 @@
 
 import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Navbar from "./components/navbar"
+import Navbar from "./components/navbar/Navbar";
 import Inscripciones from "./pages/Inscripciones"
 import HomeAdmin from "./pages/HomeAdmin"
 import { adminMock, userMock } from './Services/mockUsers';

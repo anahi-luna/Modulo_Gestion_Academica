@@ -21,6 +21,8 @@ import ComisionCard          from "../components/ComisionCard";
 import ResultadoInscripcion  from "../components/ResultadoInscripcion";
 import EstadoBadge           from "../components/EstadoBadge";
 
+
+
 export default function Inscripciones() {
 
   // paso 1 = ingresar legajo
@@ -124,31 +126,8 @@ export default function Inscripciones() {
   // vista
   return (
     <div className="min-h-screen bg-gray-100">
-
-      {/* ── NAVBAR ── */}
-      <nav className="bg-red-700 text-white sticky top-0 z-40 shadow-md">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          {/* Logo y título */}
-          <div className="flex items-center gap-3">
-            <span className="text-2xl"></span>  {/* aca falta el logo que paso damian*/}
-            <div>
-              <p className="font-bold text-sm leading-tight">Sistema de Legajos</p>
-              <p className="text-red-200 text-xs">Bomberos Voluntarios</p>
-            </div>
-          </div>
-          {/* Indicador de módulo activo */}
-          <span className="text-xs bg-red-800 px-3 py-1 rounded-full font-medium">
-          Inscripciones
-          </span>
-
-          
-        </div>
-
         
-      </nav>
-
-
-      <main className="max-w-5xl mx-auto px-4 py-6">
+        <main className="max-w-5xl mx-auto px-4 py-6">
 
         {/* INDICADOR DE PASOS*/}
         <StepIndicator pasoActual={paso} />

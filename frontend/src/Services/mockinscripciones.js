@@ -161,6 +161,7 @@ export async function postInscripcion({ nro_legajo, id_comision }) {
         nro_legajo,
         id_comision,
         `Rango insuficiente. Requiere: ${comision.rango_minimo}`,
+        legajoData
       );
     }
   }
@@ -174,6 +175,7 @@ export async function postInscripcion({ nro_legajo, id_comision }) {
         nro_legajo,
         id_comision,
         "No cumple las correlativas requeridas",
+        legajoData,
       );
     }
   }
@@ -231,7 +233,7 @@ export async function getInscripcionesPorLegajo(nroLegajo) {
 // -------------------------------------------------------
 //respuesta de inscripción rechazada
 // -------------------------------------------------------
-function _respuestaRechazada(nro_legajo, id_comision, motivo) {
+function _respuestaRechazada(nro_legajo, id_comision, motivo, legajoData) {
   const rechazada = {
     id: INSCRIPCIONES.length + 1,
     id_legajo: nro_legajo,
