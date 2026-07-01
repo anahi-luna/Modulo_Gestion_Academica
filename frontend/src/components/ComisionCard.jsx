@@ -7,11 +7,11 @@
 
 export default function ComisionCard({ comision, onSeleccionar, seleccionada }) {
   // Calculamos el cupo restante
-  const cupoLibre = comision.cupo_maximo - comision.cupo_ocupado;
+  const cupoLibre = comision.cupo - comision.inscriptos;
   const sinCupo   = cupoLibre <= 0;
 
   // Porcentaje de ocupación para la barra de progreso
-  const porcentaje = Math.round((comision.cupo_ocupado / comision.cupo_maximo) * 100);
+  const porcentaje = Math.round((comision.inscriptos / comision.cupo) * 100);
 
   // Color de la barra según ocupación
   const colorBarra =
@@ -90,7 +90,7 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
           />
         </div>
         <p className="text-xs text-gray-400 mt-0.5">
-          {comision.cupo_ocupado}/{comision.cupo_maximo}
+          {comision.inscriptos}/{comision.cupo}
         </p>
       </div>
     </div>

@@ -11,10 +11,11 @@ from sqlalchemy.exc import IntegrityError
 
 ID_USUARIO_SIMULADO=100
 
-def existe_inscripcion(id_legajo):
-    return(
+def existe_inscripcion(id_legajo, id_comision):
+    return (
         Inscripcion.query.filter_by(
-            id_legajo = id_legajo
+            id_legajo=id_legajo,
+            id_comision=id_comision
         ).first()
         is not None
     )
@@ -91,9 +92,10 @@ def crear_inscripcion(datos):
     if not usuario:
         raise BusinessError("El usuario no existe.",404)
 
-    #Validamos si una inscripcion ya existe 
-    if existe_inscripcion(datos["id_legajo"]):
-        raise BusinessError("El alumno ya posee una inscripción.",400)
+    # Validamos si el alumno ya está inscripto en ESTA comisión
+    if existe_inscripcion(datos["id_legajo"],datos["id_comision"]):
+        raise BusinessError(
+            "El alumno ya se encuentra inscripto en esta comisión.",400)
 
     datos_inscripcion = preparar_datos_inscripcion(datos, estado.id_estado)
 

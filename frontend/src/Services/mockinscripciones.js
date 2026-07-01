@@ -26,7 +26,7 @@ const COMISIONES = [
     cupo_ocupado: 10,
     horario: "Miércoles 18:00 - 21:00",
     correlativas: [1],          // Requiere haber aprobado Matafuegos I (id=1)
-    rango_minimo: "Cabo",       
+    rango_minimo: "Cabo",
   },
   {
     id: 3,
@@ -42,7 +42,7 @@ const COMISIONES = [
 ];
 
 // Rangos disponibles en el sistema de bomberos
-const RANGOS = [
+/*const RANGOS = [
   "Aspirante",
   "Bombero",
   "Cabo",
@@ -64,13 +64,50 @@ const RANGO_POR_LEGAJO = {
   "000124": "Sargento Primero",
   "000123": "Cabo",
 };
+*/
+// ============================================================
+// Legajos disponibles (Mock del Microservicio de Legajos)
+// ============================================================
+const LEGAJOS = [
+
+  {
+    id_legajo: 1,
+    numero_legajo: "000123",
+    nombre: "Juan",
+    apellido: "Pérez",
+    activo: true,
+    rango: "Bombero",
+    materias_aprobadas: []
+  },
+
+  {
+    id_legajo: 2,
+    numero_legajo: "000124",
+    nombre: "Ana",
+    apellido: "Gómez",
+    activo: true,
+    rango: "Suboficial Mayor",
+    materias_aprobadas: [1]
+  },
+
+  {
+    id_legajo: 3,
+    numero_legajo: "000125",
+    nombre: "Carlos",
+    apellido: "López",
+    activo: false,
+    rango: "Cabo",
+    materias_aprobadas: [1, 2]
+  }
+
+];
 
 // Inscripciones ya registradas (para mostrar historial)
 let INSCRIPCIONES = [
   {
     id: 1,
     id_legajo: "000124",
-    nombre: "Juan Pablo González",   
+    nombre: "Juan Pablo González",
     id_comision: 2,
     fecha_inscripcion: "2026-15-03 10:30:00",
     estado: "Aceptada",
@@ -108,6 +145,7 @@ export async function getComisiones() {
 // -------------------------------------------------------
 // Busca un legajo por número. Si no existe devuelve error.
 // -------------------------------------------------------
+/*
 export async function getLegajo(nroLegajo) {
   await delay();
 
@@ -130,6 +168,23 @@ export async function getLegajo(nroLegajo) {
     },
     message: "Legajo obtenido correctamente",
   };
+}*/
+export async function getLegajo(nroLegajo) {
+    await delay();
+
+    const legajo = LEGAJOS.find(
+      (l) => l.numero_legajo === nroLegajo
+    );
+
+    if (!legajo) {
+      throw new Error(`No se encontró el legajo ${nroLegajo}`);
+    }
+
+    return {
+      status: "success",
+      data: legajo,
+      message: "Legajo obtenido correctamente",
+    };
 }
 
 // -------------------------------------------------------
@@ -156,7 +211,7 @@ export async function postInscripcion({ nro_legajo, id_comision }) {
   // Paso 2: ¿Cumple el rango mínimo?
   if (comision.rango_minimo) {
     const indexRangoAlumno = RANGOS.indexOf(legajoData.rango);
-    const indexRangoReq    = RANGOS.indexOf(comision.rango_minimo);
+    const indexRangoReq = RANGOS.indexOf(comision.rango_minimo);
     if (indexRangoAlumno < indexRangoReq) {
       return _respuestaRechazada(
         nro_legajo,
@@ -204,7 +259,6 @@ export async function postInscripcion({ nro_legajo, id_comision }) {
     message: "Inscripción aceptada correctamente",
   };
 }
-
 // -------------------------------------------------------
 // Devuelve el historial de inscripciones de un legajo
 // -------------------------------------------------------
@@ -246,7 +300,7 @@ function _respuestaRechazada(nro_legajo, id_comision, motivo, legajoData) {
   INSCRIPCIONES.push(rechazada);
 
   return {
-    status: "success",      
+    status: "success",
     data: {
       ...rechazada,
       comision: COMISIONES.find((c) => c.id === id_comision)?.codigo || "-",
@@ -261,10 +315,10 @@ export async function getInscripciones() {
 
   await delay();
 
-  const resultado = INSCRIPCIONES.map((i)=> {
-    const com = COMISIONES.find((c)=> c.id === i.id_comision);
+  const resultado = INSCRIPCIONES.map((i) => {
+    const com = COMISIONES.find((c) => c.id === i.id_comision);
 
-    return{
+    return {
       ...i,
       comision: com?.codigo || "-",
       comisionmateria: com?.materia || "-",

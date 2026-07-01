@@ -28,6 +28,24 @@ LEGAJOS = [
         "activo": False,
         "rango": "Cabo",
         "materias_aprobadas": [1, 2]
-    }
+    },
+    {
+    "id_legajo": 4,
+    "numero_legajo": "000126",
+    "nombre": "María",
+    "apellido": "Suárez",
+    "activo": True,
+    "rango": "Sargento",
+    "materias_aprobadas": [1]
+},
+{
+    "id_legajo": 5,
+    "numero_legajo": "000127",
+    "nombre": "Pedro",
+    "apellido": "Fernández",
+    "activo": True,
+    "rango": "Cabo",
+    "materias_aprobadas": []
+}
 
 ]

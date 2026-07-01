@@ -1,13 +1,14 @@
 // ============================================================
 // ResultadoInscripcion.jsx
-// Modal que muestra el resultado final de la inscripción:
-// si fue Aceptada o Rechazada, con el motivo si aplica.
-// Se usa después de hacer el POST al backend (o mock).
+// Modal que muestra el resultado de una inscripción y los
+// datos devueltos por el backend.
 // ============================================================
 
 export default function ResultadoInscripcion({ resultado, onCerrar, onNueva }) {
   // resultado es el objeto data que devuelve el mock/API
-  const esAceptada = resultado?.estado === "Aceptada";
+  const esAceptada =
+    resultado?.estado === "Pendiente" ||
+    resultado?.estado === "Aceptada";
 
   return (
     // Fondo oscuro semitransparente que cubre toda la pantalla
@@ -34,6 +35,7 @@ export default function ResultadoInscripcion({ resultado, onCerrar, onNueva }) {
           <Row label="Materia"  valor={resultado.materia} />
           <Row label="Legajo"   valor={resultado.id_legajo} />
           <Row label="Estado"   valor={resultado.estado} />
+          <Row label="Fecha"   valor={new Date(resultado.fecha_inscripcion).toLocaleString()} />
           {/* Motivo de rechazo, si existe */}
           {resultado.motivo && (
             <Row label="Motivo" valor={resultado.motivo} colorValor="text-red-600" />

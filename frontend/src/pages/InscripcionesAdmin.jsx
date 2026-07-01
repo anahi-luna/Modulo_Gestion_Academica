@@ -1,31 +1,90 @@
 import { useEffect, useState } from "react";
-import EstadoBadge from "../components/EstadoBadge";
-import { getInscripciones, aceptarInscripcion, rechazarInscripcion } from "../Services/mockInscripciones";
+import InscripcionCard from "../components/inscripciones/InscripcionCard";
+import ModalEliminarInscripcion from "../components/inscripciones/ModalEliminarInscripcion";
+import ModalValidarInscripcion from "../components/inscripciones/ModalValidarInscripcion";
 
+import {
+  obtenerInscripciones,
+  actualizarSolicitud,
+  eliminarSolicitud,
+  obtenerComisiones
+} from "../services/inscripcionesAdminService";
+
+/*
+ * Pantalla de administración de inscripciones.
+ * Permite visualizar las solicitudes pendientes,
+ * validarlas o eliminarlas.
+ */
 export default function InscripcionesAdmin() {
   const [inscripciones, setInscripciones] = useState([]);
-  const [ultimaAccion, setUltimaAccion] = useState(null); // { nombre, accion }
+  const [error, setError] = useState(null);
+  const [modalValidar, setModalValidar] = useState(false);
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
+  const [comisiones, setComisiones] = useState([]);
 
+  // Carga las inscripciones pendientes al iniciar la pantalla.
   useEffect(() => {
     cargarInscripciones();
   }, []);
 
+  /*
+   * Obtiene las inscripciones y las comisiones
+   * disponibles para el proceso de validación.
+   */
   async function cargarInscripciones() {
-    const res = await getInscripciones();
-    // Solo muestra las PENDIENTES
-    setInscripciones(res.data.filter(i => i.estado === "PENDIENTE"));
+    try {
+      const data = await obtenerInscripciones();
+      // Solo muestra las PENDIENTES
+      setInscripciones(data.filter(i => i.estado === "Pendiente"));
+
+      const listaComisiones = await obtenerComisiones();
+      setComisiones(listaComisiones);
+    } catch (error) {
+      setError(error.message);
+    }
   }
 
-  async function aprobar(id, nombre) {
-    await aceptarInscripcion(id);
-    setUltimaAccion({ nombre, accion: "aceptada" });
-    cargarInscripciones(); // recarga → desaparece de la lista
+  // Abre el modal de validación.
+  function abrirModalValidar(inscripcion) {
+    setInscripcionSeleccionada(inscripcion);
+    setModalValidar(true);
   }
 
-  async function rechazar(id, nombre) {
-    await rechazarInscripcion(id);
-    setUltimaAccion({ nombre, accion: "rechazada" });
-    cargarInscripciones();
+  // Abre el modal de eliminación.
+  function abrirModalEliminar(inscripcion) {
+    setInscripcionSeleccionada(inscripcion);
+    setModalEliminar(true);
+  }
+
+  // Guarda los cambios realizados sobre la inscripción.
+  async function guardarCambios(datos) {
+    try {
+      await actualizarSolicitud(inscripcionSeleccionada.id, datos);
+
+      setModalValidar(false);
+      setInscripcionSeleccionada(null);
+      cargarInscripciones();
+    }
+    catch (err) {
+      setError(err.message);
+    }
+  }
+
+  // Elimina la inscripción seleccionada.
+  async function confirmarEliminar() {
+    try {
+
+      await eliminarSolicitud(inscripcionSeleccionada.id);
+
+      setModalEliminar(false);
+      setInscripcionSeleccionada(null);
+      cargarInscripciones();
+
+    }
+    catch (err) {
+      setError(err.message);
+    }
   }
 
   return (
@@ -33,12 +92,9 @@ export default function InscripcionesAdmin() {
       <h1 className="text-xl font-bold text-gray-800 mb-4">Gestionar inscripciones</h1>
 
       {/* Mensaje de confirmación */}
-      {ultimaAccion && (
-        <div className={`mb-4 px-4 py-3 rounded-lg text-sm font-medium border
-          ${ultimaAccion.accion === "aceptada"
-            ? "bg-green-50 border-green-200 text-green-700"
-            : "bg-red-50 border-red-200 text-red-700"}`}>
-          ✓ Inscripción de <strong>{ultimaAccion.nombre}</strong> {ultimaAccion.accion} correctamente.
+      {error && (
+        <div className="mb-5 rounded-lg bg-red-100 border border-red-300 p-3 text-red-700">
+          {error}
         </div>
       )}
 
@@ -47,33 +103,36 @@ export default function InscripcionesAdmin() {
           No hay inscripciones pendientes.
         </div>
       ) : (
-        <ul className="divide-y divide-gray-100 rounded-xl bg-white shadow">
+        <div className="space-y-4">
           {inscripciones.map((ins) => (
-            <li key={ins.id} className="flex items-center justify-between px-6 py-4 gap-4">
-              <div>
-                <p className="font-semibold text-gray-800">{ins.nombre}</p>
-                <p className="text-sm text-gray-500">Legajo: {ins.id_legajo}</p>
-                <p className="text-xs text-gray-400">{ins.materia} · {ins.comision}</p>
-              </div>
-              <EstadoBadge estado={ins.estado} />
-              <div className="flex gap-2">
-                <button
-                  onClick={() => aprobar(ins.id, ins.nombre)}
-                  className="rounded-md bg-green-600 px-4 py-2 text-white text-sm hover:bg-green-700"
-                >
-                  Aceptar
-                </button>
-                <button
-                  onClick={() => rechazar(ins.id, ins.nombre)}
-                  className="rounded-md bg-red-600 px-4 py-2 text-white text-sm hover:bg-red-700"
-                >
-                  Rechazar
-                </button>
-              </div>
-            </li>
+            <InscripcionCard
+              key={ins.id}
+              inscripcion={ins}
+              onValidar={abrirModalValidar}
+              onEliminar={abrirModalEliminar}
+            />
           ))}
-        </ul>
+        </div>
       )}
+      <ModalValidarInscripcion 
+        abierto={modalValidar}
+        inscripcion={inscripcionSeleccionada}
+        onCerrar={()=>{
+          setModalValidar(false);
+          setInscripcionSeleccionada(null);
+        }}
+        onGuardar={guardarCambios}
+        comisiones={comisiones}
+      />
+      <ModalEliminarInscripcion
+          abierto={modalEliminar}
+          inscripcion={inscripcionSeleccionada}
+          onCerrar={()=>{
+            setModalEliminar(false);
+            setInscripcionSeleccionada(null);
+          }}      
+          onConfirmar={confirmarEliminar}
+      />
     </div>
   );
 }

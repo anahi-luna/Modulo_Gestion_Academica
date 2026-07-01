@@ -1,26 +1,22 @@
-//   1. El alumno ingresa su nro de legajo
-//   2. Se busca el legajo en el mock (simula GET /legajos/:id)
-//   3. Se muestran las comisiones disponibles
-//   4. El alumno elige una comisión
-//   5. Se envía la solicitud (simula POST /inscripciones)
-//   6. El mock valida: cupo → rango → correlativas
-//   7. Se muestra el resultado: Aceptada o Rechazada
+// Inscripciones.jsx
+// Vista del alumno para solicitar una inscripción.
+//
+// La vista solamente interactúa con inscripcionesService.
+// El Service decide si obtiene información desde mocks,
+// backend o futuros microservicios.
 // ============================================================
 
-import { useState, useEffect } from "react";
+import { useState} from "react";
 
 import {
-  generarNroLegajoAleatorio,
-  getLegajo,
-  getComisiones,
-  postInscripcion,
-  getInscripcionesPorLegajo,
-} from "../Services/mockInscripciones";
+  buscarLegajo,
+  obtenerComisionesDisponibles,
+  crearSolicitudInscripcion
+} from "../Services/inscripcionesService";
 
-import ComisionCard          from "../components/ComisionCard";
-import ResultadoInscripcion  from "../components/ResultadoInscripcion";
-import EstadoBadge           from "../components/EstadoBadge";
-
+import ComisionCard from "../components/ComisionCard";
+import ResultadoInscripcion from "../components/ResultadoInscripcion";
+import EstadoBadge from "../components/inscripciones/EstadoBadge";
 
 
 export default function Inscripciones() {
@@ -31,43 +27,41 @@ export default function Inscripciones() {
   const [paso, setPaso] = useState(1);
 
   // ── Estado: datos del formulario y respuestas
-  const [nroLegajo,        setNroLegajo]        = useState("");          // Lo que escribe el usuario
-  const [legajoData,       setLegajoData]        = useState(null);        // Datos del legajo validado
-  const [comisiones,       setComisiones]        = useState([]);          // Lista de comisiones del mock
-  const [comisionElegida,  setComisionElegida]   = useState(null);        // Comisión seleccionada por el alumno
-  const [resultado,        setResultado]         = useState(null);        // Respuesta del POST /inscripciones
-  const [historial,        setHistorial]         = useState([]);          // Inscripciones previas del legajo
-  const [mostrarHistorial, setMostrarHistorial]  = useState(false);       // sección historial
+  const [nroLegajo, setNroLegajo] = useState("");          // Lo que escribe el usuario
+  const [legajoData, setLegajoData] = useState(null);        // Datos del legajo validado
+  const [comisiones, setComisiones] = useState([]);          // Lista de comisiones del mock
+  const [comisionElegida, setComisionElegida] = useState(null);        // Comisión seleccionada por el alumno
+  const [resultado, setResultado] = useState(null);        // Respuesta del POST /inscripciones
+  const [historial, setHistorial] = useState([]);          // Inscripciones previas del legajo
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);       // sección historial
 
   // ── Estado: loading y errores
-  const [cargando,  setCargando]  = useState(false);
-  const [error,     setError]     = useState(null);
-  const [enviando,  setEnviando]  = useState(false);
-
-  // ── Al montar el componente, cargamos las comisiones disponibles
-  useEffect(() => {
-    getComisiones()
-      .then((res) => setComisiones(res.data))
-      .catch((err) => setError("No se pudieron cargar las comisiones: " + err.message));
-  }, []);
-
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState(null);
+  const [enviando, setEnviando] = useState(false);
 
   // PASO 1: Buscar el legajo
-
   const handleBuscarLegajo = async (e) => {
     e.preventDefault();
     setError(null);
     setCargando(true);
-    setLegajoData(null);
-    setHistorial([]);
 
     try {
       // Buscamos el legajo en el mock
-      const res = await getLegajo(nroLegajo.trim());
-      setLegajoData(res.data);
+      const legajo = await buscarLegajo(nroLegajo.trim());
 
-      const resHistorial = await getInscripcionesPorLegajo(nroLegajo.trim());
-      setHistorial(resHistorial.data);
+      setLegajoData(legajo);
+
+      // Obtener únicamente las comisiones
+      // que puede cursar este alumno
+      const listaComisiones =
+        await obtenerComisionesDisponibles(nroLegajo.trim());
+
+      setComisiones(listaComisiones);
+
+      // Por ahora el historial queda vacío.
+      // Más adelante vendrá del backend.
+      setHistorial([]);
 
       // Si todo OK, pasamos al paso 2
       setPaso(2);
@@ -78,7 +72,7 @@ export default function Inscripciones() {
     }
   };
 
-  
+
   // PASO 2: Confirmar y enviar la inscripción
 
   const handleConfirmar = async () => {
@@ -87,11 +81,12 @@ export default function Inscripciones() {
     setEnviando(true);
 
     try {
-      // Enviamos la solicitud al mock (simula POST /inscripciones)
-      const res = await postInscripcion({
-        nro_legajo:   nroLegajo.trim(),
-        id_comision:  comisionElegida.id,
-      });
+      // Enviamos la solicitud 
+      const res = await crearSolicitudInscripcion(
+        nroLegajo,
+        comisionElegida.id
+      );
+
       setResultado(res.data);
       setPaso(3); // Pasamos a mostrar el resultado
     } catch (err) {
@@ -107,18 +102,25 @@ export default function Inscripciones() {
     setPaso(1);
     setNroLegajo("");
     setLegajoData(null);
+    setComisiones([]);
     setComisionElegida(null);
     setResultado(null);
     setHistorial([]);
-    setError(null);
     setMostrarHistorial(false);
+    setError(null);
   };
 
   // Genera un número aleatorio y lo pega en el input
   const handleGenerarLegajo = () => {
     // legajos de prueba que existen en el mock
-    const legajosDePrueba = ["000125", "000124", "000123"];
-    const random = legajosDePrueba[Math.floor(Math.random() * legajosDePrueba.length)];
+    const legajos = [
+      "000123",
+      "000124",
+      "000125",
+      "000126",
+      "000127"
+    ];
+    const random = legajos[Math.floor(Math.random() * legajos.length)];
     setNroLegajo(random);
     setError(null);
   };
@@ -126,13 +128,13 @@ export default function Inscripciones() {
   // vista
   return (
     <div className="min-h-screen bg-gray-100">
-        
-        <main className="max-w-5xl mx-auto px-4 py-6">
 
-        {/* INDICADOR DE PASOS*/}
+      <main className="max-w-5xl mx-auto px-4 py-6">
+
+        
         <StepIndicator pasoActual={paso} />
 
-        {/* ── PASO 1: Ingresar legajo ── */}
+      
         {paso === 1 && (
           <div className="max-w-md mx-auto">
             <div className="bg-white rounded-2xl shadow p-6">
@@ -141,7 +143,7 @@ export default function Inscripciones() {
                 Ingresá tu número de legajo para buscar las comisiones disponibles.
               </p>
 
-              {/* Form de búsqueda de legajo */}
+             
               <form onSubmit={handleBuscarLegajo} className="space-y-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -167,7 +169,7 @@ export default function Inscripciones() {
                       className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300
                                  rounded-lg text-xs text-gray-600 transition-colors whitespace-nowrap"
                     >
-                     Aleatorio
+                      Aleatorio
                     </button>
                   </div>
                   <p className="text-xs text-gray-400 mt-1">
@@ -178,14 +180,14 @@ export default function Inscripciones() {
                 {/* Mensaje de error */}
                 {error && (
                   <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">
-                     {error}
+                    {error}
                   </div>
                 )}
 
                 {/* Botón buscar */}
                 <button
                   type="submit"
-                  disabled={!nroLegajo.trim() || cargando}
+                  disabled={!nroLegajo|| cargando}
                   className="w-full py-2.5 bg-red-700 hover:bg-red-800 disabled:opacity-50
                              disabled:cursor-not-allowed text-white font-medium rounded-lg
                              text-sm transition-colors"
@@ -197,30 +199,30 @@ export default function Inscripciones() {
           </div>
         )}
 
-        {/* ── PASO 2: Elegir comisión ── */}
+       
         {paso === 2 && legajoData && (
           <div className="space-y-6">
 
-            {/* Datos del legajo encontrado */}
+            
             <div className="bg-white rounded-2xl shadow p-4 flex flex-col sm:flex-row
                             sm:items-center justify-between gap-3">
               <div>
-                <p className="text-xs text-gray-400 font-mono">Legajo #{legajoData.nro_legajo}</p>
+                <p className="text-xs text-gray-400 font-mono">Legajo #{legajoData.numero_legajo}</p>
                 <p className="font-bold text-gray-800">
                   {legajoData.nombre} {legajoData.apellido}
                 </p>
                 <p className="text-sm text-gray-500">{legajoData.rango}</p>
               </div>
-              {/* Botón para volver al paso 1 */}
+              
               <button
                 onClick={handleNueva}
                 className="text-xs text-gray-400 hover:text-gray-600 underline"
               >
-               Cambiar legajo
+                Cambiar legajo
               </button>
             </div>
 
-            {/* Historial de inscripciones*/}
+          
             {historial.length > 0 && (
               <div className="bg-white rounded-2xl shadow overflow-hidden">
                 <button
@@ -239,7 +241,7 @@ export default function Inscripciones() {
                           <p className="text-sm font-medium text-gray-700">{ins.materia}</p>
                           <p className="text-xs text-gray-400">{ins.comision} · {ins.horario}</p>
                         </div>
-                        {/*estado */}
+                     
                         <EstadoBadge estado={ins.estado} />
                       </div>
                     ))}
@@ -248,7 +250,7 @@ export default function Inscripciones() {
               </div>
             )}
 
-            {/* parte de comisiones */}
+            
             <div>
               <h2 className="text-lg font-bold text-gray-800 mb-1">Elegir comisión</h2>
               <p className="text-sm text-gray-500 mb-4">
@@ -256,7 +258,7 @@ export default function Inscripciones() {
                 Las que aparecen opacas no tienen cupo disponible.
               </p>
 
-              {/* Grilla de tarjetas*/}
+             
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 {comisiones.map((com) => (
                   <ComisionCard
@@ -268,10 +270,10 @@ export default function Inscripciones() {
                 ))}
               </div>
 
-              {/* Error*/}
+              {/* Error estooooo*/}
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 mb-4">
-                   {error}
+                  {error}
                 </div>
               )}
 
@@ -308,12 +310,14 @@ export default function Inscripciones() {
           <ResultadoInscripcion
             resultado={resultado}
             onNueva={handleNueva}
-            onCerrar={handleNueva} 
+            onCerrar={handleNueva}
           />
         )}
 
       </main>
     </div>
+    
+    
   );
 }
 
@@ -323,28 +327,28 @@ function StepIndicator({ pasoActual }) {
   return (
     <div className="flex items-center justify-center gap-2 mb-6">
       {pasos.map((nombre, idx) => {
-        const num     = idx + 1;
-        const activo  = num === pasoActual;
-        const pasado  = num < pasoActual;
+        const num = idx + 1;
+        const activo = num === pasoActual;
+        const pasado = num < pasoActual;
 
         return (
           <div key={nombre} className="flex items-center gap-2">
             <div className={`
               w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
-              ${pasado  ? "bg-green-500 text-white" :
-                activo  ? "bg-red-700 text-white" :
-                          "bg-gray-200 text-gray-400"}
+              ${pasado ? "bg-green-500 text-white" :
+                activo ? "bg-red-700 text-white" :
+                  "bg-gray-200 text-gray-400"}
             `}>
               {pasado ? "✓" : num}
             </div>
-          
+
             <span className={`
               hidden sm:inline text-xs font-medium
               ${activo ? "text-red-700" : "text-gray-400"}
             `}>
               {nombre}
             </span>
-      
+
             {idx < pasos.length - 1 && (
               <div className={`w-8 h-0.5 ${pasado ? "bg-green-400" : "bg-gray-200"}`} />
             )}
