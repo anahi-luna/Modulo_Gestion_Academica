@@ -30,9 +30,9 @@ class Inscripcion(db.Model):
         nullable=False
     )
 
-    id_usuario_registro = db.Column(
-        db.Integer,
-        nullable=False
+    estado = db.relationship(
+        "EstadoInscripcion",
+        backref= "inscripciones"
     )
 
     ts_creacion = db.Column(
@@ -45,10 +45,16 @@ class Inscripcion(db.Model):
         nullable=True
     )
 
-    estado = db.relationship(
-        "EstadoInscripcion",
-        backref= "inscripciones"
+    id_usuario_creacion = db.Column(
+        db.Integer,
+        nullable=False
     )
+
+    id_usuario_modificacion = db.Column(
+        db.Integer,
+        nullable=True
+    )
+    
 
 def __repr__(self):
     return f"<Inscripcion {self.id_inscripcion}>"
