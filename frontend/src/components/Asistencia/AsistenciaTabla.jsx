@@ -1,57 +1,45 @@
+import { useEffect, useState } from "react";
 import IntegranteRow from "./IntegranteRow";
+import { obtenerAsistenciasPorComision, actualizarAsistencia} from "../../Services/asistenciaAdminService";
 
-export default function TablaAsistencia(){
+export default function AsistenciaTabla({idComision}) {
+  const [asistencias, setAsistencias] = useState([]);
 
-    return(
+  useEffect(() => {
+    cargarAsistencias();
+  }, [idComision]);
 
-        <div className="px-6 pb-6">
+  async function cargarAsistencias() {
+    const resultado = await obtenerAsistenciasPorComision(idComision);
+    setAsistencias(resultado);
+  }
 
-            <table className="w-full">
+  async function actualizarEstado(idAsistencia, idEstado) {
+    await actualizarAsistencia(idAsistencia, idEstado);
+    cargarAsistencias();
+  }
 
-                <thead>
+  return (
+    <div className="px-6 pb-6">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left py-3">Integrante</th>
+            <th className="text-left">DNI</th>
+            <th className="text-left">Asistencia</th>
+          </tr>
+        </thead>
 
-                    <tr className="border-b">
-
-                        <th className="text-left py-3">
-
-                            Integrante
-
-                        </th>
-
-                        <th className="text-left">
-
-                            DNI
-
-                        </th>
-
-                        <th className="text-left">
-
-                            Asistencia
-
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    <IntegranteRow
-                        nombre="Juan Pérez"
-                        dni="38124556"
-                    />
-
-                    <IntegranteRow
-                        nombre="Lucas Romero"
-                        dni="41880221"
-                    />
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    )
-
+        <tbody>
+          {asistencias.map((a) => (
+            <IntegranteRow
+              key={a.id}
+              asistencia={a}
+              onActualizarEstado={actualizarEstado}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }

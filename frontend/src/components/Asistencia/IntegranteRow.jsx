@@ -1,7 +1,9 @@
+
+
 export default function IntegranteRow({
 
-    nombre,
-    dni
+    asistencia,
+    onActualizarEstado
 
 }){
 
@@ -27,6 +29,7 @@ export default function IntegranteRow({
 
                     <button
                         className="bg-green-100 text-green-700 rounded-lg px-3 py-1"
+                        onClick={() => onActualizarEstado(asistencia.id, 1)}
                     >
 
                         Presente
@@ -35,6 +38,7 @@ export default function IntegranteRow({
 
                     <button
                         className="bg-yellow-100 text-yellow-700 rounded-lg px-3 py-1"
+                        onClick={() => onActualizarEstado(asistencia.id, 2)}
                     >
 
                         Tarde
@@ -43,6 +47,7 @@ export default function IntegranteRow({
 
                     <button
                         className="bg-red-100 text-red-700 rounded-lg px-3 py-1"
+                        onClick={() => onActualizarEstado(asistencia.id, 3)}
                     >
 
                         Ausente

@@ -2,9 +2,13 @@ import ComisionTabs from "./ComisionTabs";
 import EstadisticaCard from "./EstadisticaCard";
 import TablaAsistencia from "./AsistenciaTabla";
 import { CalendarDaysIcon, ClockIcon, MapPinIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
+
+
+
 
 export default function PanelDetalleClase(){
-
+    const [comisionSeleccionada, setComisionSeleccionada] = useState(1);
     return(
 
         <div className="col-span-9 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
@@ -54,7 +58,10 @@ export default function PanelDetalleClase(){
 
             </div>
 
-            <ComisionTabs />
+            <ComisionTabs 
+                comisionSeleccionada={comisionSeleccionada}
+                setComisionSeleccionada={setComisionSeleccionada}
+            />
 
             <div className="grid grid-cols-4 gap-5 px-8 py-6">
 
@@ -83,7 +90,7 @@ export default function PanelDetalleClase(){
 
             </div>
 
-            <TablaAsistencia/>
+            <TablaAsistencia idComision={comisionSeleccionada}/>
 
         </div>
 
