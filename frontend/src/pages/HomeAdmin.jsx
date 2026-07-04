@@ -78,6 +78,7 @@ export default function HomeAdmin() {
             descripcion="Registro y seguimiento de asistencia."
             cantidad="Hoy: 3 turnos"
             color="blue"
+            ruta="/AsistenciaAdmin"
             icono={<ClipboardDocumentListIcon className="h-6 w-6" />}
           />
           <ModuloCard

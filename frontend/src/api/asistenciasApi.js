@@ -1,0 +1,1 @@
+import API_URL from "./api"; //importamos la url de la api general

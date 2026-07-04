@@ -3,7 +3,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import user from "../../assets/user.png";
 import logo from "../../images/Logo.png";
-import { adminMock, userMock } from "../../Services/mockUsers";
+import { ADMIN_MOCK, USER_MOCK } from "../../mocks/usuariosMock";
 
 export default function Navbar({ usuario, setUsuario, modulo }) {
 
@@ -49,6 +49,7 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               <div className="flex space-x-2">
                 <NavLink to="/" className={linkClass} end>Home</NavLink>
+                <NavLink to="/AsistenciaAdmin" className={linkClass} end>Asistencia</NavLink>
                 {/* aca metemos cuando tengamos mas modulos*/}
               </div>
             </div>
@@ -92,7 +93,7 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
               >
                 <MenuItem>
                   <button
-                    onClick={() => setUsuario(adminMock)}
+                    onClick={() => setUsuario(ADMIN_MOCK)}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5"
                   >
                     Admin
@@ -100,7 +101,7 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
                 </MenuItem>
                 <MenuItem>
                   <button
-                    onClick={() => setUsuario(userMock)}
+                    onClick={() => setUsuario(USER_MOCK)}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5"
                   >
                     Usuario
