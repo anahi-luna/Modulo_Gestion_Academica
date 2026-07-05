@@ -1,17 +1,19 @@
 import './App.css'
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
-import HomeAlumno from "./pages/HomeAlumno";       // ← NUEVO
+import RutaProtegida from "./components/rutas/RutaProtegida";
+import HomeAlumno from "./pages/HomeAlumno";
+import HomeProfesor from "./pages/HomeProfesor";
 import Inscripciones from "./pages/Inscripciones";
 import HomeAdmin from "./pages/HomeAdmin";
 import InscripcionesAdmin from './pages/InscripcionesAdmin';
 import AsistenciaAdmin from './pages/AsistenciaAdmin';
-import { ADMIN_MOCK, USER_MOCK } from './mocks/usuariosMock';
+import { ROLES, ADMIN_MOCK, ALUMNO_MOCK } from './mocks/usuariosMock';
 import { useState } from "react";
 
 export default function App() {
 
-    const [usuario, setUsuario] = useState(USER_MOCK);
+    const [usuario, setUsuario] = useState(ALUMNO_MOCK);
 
     return (
         <BrowserRouter>
@@ -21,41 +23,45 @@ export default function App() {
                 <main>
                     <Routes>
 
-                        {/* Ruta principal: home según rol */}
+                        {/* Home: cambia según el rol */}
                         <Route
                             path="/"
                             element={
-                                usuario.rol === "ADMIN"
+                                usuario.rol === ROLES.ADMIN
                                     ? <HomeAdmin />
-                                    : <HomeAlumno usuario={usuario} />  // ← CAMBIADO
+                                    : usuario.rol === ROLES.PROFESOR
+                                        ? <HomeProfesor usuario={usuario} />
+                                        : <HomeAlumno usuario={usuario} />
                             }
                         />
 
-                        {/* Vista de inscripción del alumno */}
+                        {/* Pre-inscripción: sólo alumno */}
                         <Route
-                            path="/inscripciones"                        // ← NUEVO
+                            path="/inscripciones"
                             element={
-                                usuario.rol === "ADMIN"
-                                    ? <Navigate to="/" replace />
-                                    : <Inscripciones />
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
+                                    <Inscripciones />
+                                </RutaProtegida>
                             }
                         />
 
+                        {/* Gestión de inscripciones: admin y administrativo */}
                         <Route
                             path="/inscripcionesAdmin"
                             element={
-                                usuario.rol === "ADMIN"
-                                    ? <InscripcionesAdmin />
-                                    : <Navigate to="/" replace />
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.ADMINISTRATIVO]}>
+                                    <InscripcionesAdmin />
+                                </RutaProtegida>
                             }
                         />
 
+                        {/* Asistencia: admin y profesor */}
                         <Route
                             path="/AsistenciaAdmin"
                             element={
-                                usuario.rol === "ADMIN"
-                                    ? <AsistenciaAdmin />
-                                    : <Navigate to="/" replace />
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.PROFESOR]}>
+                                    <AsistenciaAdmin />
+                                </RutaProtegida>
                             }
                         />
 

@@ -3,7 +3,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import user from "../../assets/user.png";
 import logo from "../../images/Logo.png";
-import { ADMIN_MOCK, USER_MOCK } from "../../mocks/usuariosMock";
+import { ROLES, ADMIN_MOCK, ALUMNO_MOCK, PROFESOR_MOCK, ADMINISTRATIVO_MOCK } from "../../mocks/usuariosMock";
 
 export default function Navbar({ usuario, setUsuario, modulo }) {
 
@@ -49,8 +49,18 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               <div className="flex space-x-2">
                 <NavLink to="/" className={linkClass} end>Home</NavLink>
-                <NavLink to="/inscripcionesAdmin" className={linkClass} end>Inscripciones</NavLink>
-                <NavLink to="/AsistenciaAdmin" className={linkClass} end>Asistencia</NavLink>
+
+                {(usuario.rol === ROLES.ALUMNO) && (
+                    <NavLink to="/inscripciones" className={linkClass} end>Inscribirme</NavLink>
+                )}
+
+                {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.ADMINISTRATIVO) && (
+                    <NavLink to="/inscripcionesAdmin" className={linkClass} end>Inscripciones</NavLink>
+                )}
+
+                {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.PROFESOR) && (
+                    <NavLink to="/AsistenciaAdmin" className={linkClass} end>Asistencia</NavLink>
+                )}
                 {/* aca metemos cuando tengamos mas modulos*/}
               </div>
             </div>
@@ -102,10 +112,26 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
                 </MenuItem>
                 <MenuItem>
                   <button
-                    onClick={() => setUsuario(USER_MOCK)}
+                    onClick={() => setUsuario(ALUMNO_MOCK)}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5"
                   >
-                    Usuario
+                    Alumno
+                  </button>
+                </MenuItem>
+                <MenuItem>
+                  <button
+                    onClick={() => setUsuario(PROFESOR_MOCK)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5"
+                  >
+                    Profesor
+                  </button>
+                </MenuItem>
+                <MenuItem>
+                  <button
+                    onClick={() => setUsuario(ADMINISTRATIVO_MOCK)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5"
+                  >
+                    Administrativo
                   </button>
                 </MenuItem>
               </MenuItems>
