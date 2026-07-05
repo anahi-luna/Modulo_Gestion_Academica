@@ -1,70 +1,73 @@
-
 import './App.css'
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
-import Inscripciones from "./pages/Inscripciones"
-import HomeAdmin from "./pages/HomeAdmin"
-import { ADMIN_MOCK, USER_MOCK } from './mocks/usuariosMock';
-import { useState } from "react";
+import RutaProtegida from "./components/rutas/RutaProtegida";
+import HomeAlumno from "./pages/HomeAlumno";
+import HomeProfesor from "./pages/HomeProfesor";
+import Inscripciones from "./pages/Inscripciones";
+import HomeAdmin from "./pages/HomeAdmin";
 import InscripcionesAdmin from './pages/InscripcionesAdmin';
 import AsistenciaAdmin from './pages/AsistenciaAdmin';
-
-
+import { ROLES, ADMIN_MOCK, ALUMNO_MOCK } from './mocks/usuariosMock';
+import { useState } from "react";
 
 export default function App() {
 
-  const [usuario, setUsuario] = useState(USER_MOCK)
-    
-  return (
-    //Rutas segun el rol
-    <BrowserRouter>
+    const [usuario, setUsuario] = useState(ALUMNO_MOCK);
 
-      <>
-        <Navbar
-          usuario = {usuario}
-          setUsuario = {setUsuario}
-        />
-        
-        
-        <main>
+    return (
+        <BrowserRouter>
+            <>
+                <Navbar usuario={usuario} setUsuario={setUsuario} />
 
-          <Routes>
-              <Route
-                path="/"
-                element={
-                  usuario.rol === "ADMIN"
-                  ? <HomeAdmin />
-                  : <Inscripciones />
-                }
-              />
+                <main>
+                    <Routes>
 
-              <Route
-                path="/inscripcionesAdmin"
-                element={
-                  usuario.rol ==="ADMIN"
+                        {/* Home: cambia según el rol */}
+                        <Route
+                            path="/"
+                            element={
+                                usuario.rol === ROLES.ADMIN
+                                    ? <HomeAdmin />
+                                    : usuario.rol === ROLES.PROFESOR
+                                        ? <HomeProfesor usuario={usuario} />
+                                        : <HomeAlumno usuario={usuario} />
+                            }
+                        />
 
-                    ? <InscripcionesAdmin/>
-                    : <Navigate to="/" replace />
-                }
-              />
+                        {/* Pre-inscripción: sólo alumno */}
+                        <Route
+                            path="/inscripciones"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
+                                    <Inscripciones />
+                                </RutaProtegida>
+                            }
+                        />
 
-              <Route
-                path="/AsistenciaAdmin"
-                element={
-                  usuario.rol ==="ADMIN"
+                        {/* Gestión de inscripciones: admin y administrativo */}
+                        <Route
+                            path="/inscripcionesAdmin"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.ADMINISTRATIVO]}>
+                                    <InscripcionesAdmin />
+                                </RutaProtegida>
+                            }
+                        />
 
-                    ? <AsistenciaAdmin/>
-                    : <Navigate to="/" replace />
-                }
-              />
-          </Routes>
-        </main>
-      </>
-        
+                        {/* Asistencia: admin y profesor */}
+                        <Route
+                            path="/AsistenciaAdmin"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.PROFESOR]}>
+                                    <AsistenciaAdmin />
+                                </RutaProtegida>
+                            }
+                        />
 
-    </BrowserRouter>  
-    
-
-  )
+                    </Routes>
+                </main>
+            </>
+        </BrowserRouter>
+    );
 }
-
