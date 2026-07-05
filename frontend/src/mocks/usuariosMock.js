@@ -10,4 +10,6 @@ export const USER_MOCK = {
   id: 2,
   nombre: "Juan Pablo Gonzalez",
   rol: "USER",
+  id_legajo: 1,           
+  numero_legajo: "000123"
 };

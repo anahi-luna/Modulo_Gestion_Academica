@@ -49,6 +49,7 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               <div className="flex space-x-2">
                 <NavLink to="/" className={linkClass} end>Home</NavLink>
+                <NavLink to="/inscripcionesAdmin" className={linkClass} end>Inscripciones</NavLink>
                 <NavLink to="/AsistenciaAdmin" className={linkClass} end>Asistencia</NavLink>
                 {/* aca metemos cuando tengamos mas modulos*/}
               </div>

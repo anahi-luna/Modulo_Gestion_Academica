@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ModuloCard from "../components/ModuloCard";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
-import {obtenerInscripciones} from "../services/inscripcionesAdminService";
+import {obtenerInscripciones} from "../Services/inscripcionesAdminService";
 
 /*
  * Pantalla principal del administrador.
