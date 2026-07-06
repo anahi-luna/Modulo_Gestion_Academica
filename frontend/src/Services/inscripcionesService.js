@@ -4,6 +4,7 @@
 import { getLegajo } from "../mocks/legajosMock";
 import { getComisiones } from "../mocks/comisionesMock";
 import { crearInscripcion } from "../api/inscripcionesApi";
+import { getListaDeInscripciones } from "../api/inscripcionesApi";
 
 // Orden jerárquico de rangos
 
@@ -151,4 +152,28 @@ export async function crearSolicitudInscripcion(
 
     };
 
+}
+
+// Obtiene las inscripciones del legajo del alumno logueado.
+// Filtra del listado completo ya que todavía no existe un endpoint por legajo.
+export async function obtenerMisInscripciones(idLegajo) {
+
+    const response = await getListaDeInscripciones();
+    const comisiones = await obtenerComisiones();
+
+    const mias = response.data.filter(
+        ins => ins.id_legajo === idLegajo
+    );
+
+    return mias.map(ins => {
+        const com = comisiones.find(c => c.id === ins.id_comision);
+        return {
+            id: ins.id_inscripcion,
+            materia: com?.materia ?? "-",
+            comision: com?.codigo ?? "-",
+            horario: com?.horario ?? "-",
+            estado: ins.estado.nombre,
+            fecha_inscripcion: ins.fecha_inscripcion
+        };
+    });
 }

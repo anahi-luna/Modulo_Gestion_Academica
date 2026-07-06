@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ModuloCard from "../components/ModuloCard";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
-import {obtenerInscripciones} from "../services/inscripcionesAdminService";
+import {obtenerInscripciones} from "../Services/inscripcionesAdminService";
 
 /*
  * Pantalla principal del administrador.
@@ -78,6 +78,7 @@ export default function HomeAdmin() {
             descripcion="Registro y seguimiento de asistencia."
             cantidad="Hoy: 3 turnos"
             color="blue"
+            ruta="/AsistenciaAdmin"
             icono={<ClipboardDocumentListIcon className="h-6 w-6" />}
           />
           <ModuloCard
