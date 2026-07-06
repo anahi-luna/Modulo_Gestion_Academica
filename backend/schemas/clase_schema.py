@@ -3,13 +3,17 @@ from marshmallow import fields
 
 from models.modelo_clase import Clase
 
+# Convierte los objetos del modelo en formato JSON y viceversa.
 class ClaseSchema(ma.SQLAlchemyAutoSchema):
 
     class Meta:
-        model = Clase
-        load_instance = False
-        include_fk = True
+        model = Clase # Modelo asociado al schema.
+        load_instance = False # Indica que no se crearán automáticamente instancias del modelo.
+        include_fk = True # Incluye las claves foráneas al serializar.
 
+
+# Este schema valida todos los datos para la creacióm de una clase
+# Todos los campos son obligatorios.
 class ClaseRequestSchema(ma.Schema):
     id_comision = fields.Integer(
         required=True
@@ -50,10 +54,13 @@ class ClaseRequestSchema(ma.Schema):
         }
     )
 
-
+#Valida los datos enviados para modificar una clase existente
+# Solo el id_comision es obligatorio; el resto de los campos
+# pueden enviarse de forma opcional.
 class ModificarClaseSchema(ma.Schema):
+    # Comisión a la que pertenece la clase.
     id_comision = fields.Integer(required=True)
-
+    #Después se valida todos los datos nuevos de la clase
     numero_clase = fields.Integer(required=False)
 
     fecha = fields.Date(required=False)
@@ -66,8 +73,14 @@ class ModificarClaseSchema(ma.Schema):
 
     estado = fields.String(required=False)
 
-clase_schema = ClaseSchema()
-clases_schema = ClaseSchema(many=True)
+# ============================================================
+# Instancias de los schemas utilizadas por los controladores.
+# ============================================================
 
+clase_schema = ClaseSchema() # Schema para una única clase.
+clases_schema = ClaseSchema(many=True) # Schema para una lista de clases.
+
+# Schema utilizado al crear una clase.
 clase_request_schema = ClaseRequestSchema()
+ # Schema utilizado al modificar una clase.
 modificar_clase_schema = ModificarClaseSchema()

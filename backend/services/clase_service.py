@@ -9,21 +9,27 @@ from sqlalchemy.exc import IntegrityError
 ID_USUARIO_SIMULADO = 100
 
 def obtener_lista_de_clases(id_comision=None,estado=None):
+    # Inicia la consulta sobre la tabla Clase.
     query = Clase.query
 
+     # Si se recibe una comisión, filtra únicamente sus clases.
     if id_comision is not None:
         query = query.filter_by(
             id_comision=id_comision
         )
+
+    # Si se recibe un estado, filtra únicamente las clases con ese estado.
     if estado is not None:
         query = query.filter_by(
             estado=estado
         )
 
+    # Ejecuta la consulta y devuelve todos los registros encontrados.
     return query.all()
 
 
 def obtener_clase_por_id(id_clase):
+    # Busca la clase utilizando su clave primaria.
     return db.session.get(Clase, id_clase)
 
 
@@ -52,15 +58,19 @@ def crear_clase(datos):
     if not usuario:
         raise BusinessError("El usuario no existe", 404)
     
+    # Completa automáticamente los datos de auditoría.
     datos_clase= preparar_datos_clase(datos)
 
+    # Crea la nueva instancia del modelo.
     nueva_clase = Clase(**datos_clase)
-
+    # Agrega el objeto a la sesión de la base de datos.
     db.session.add(nueva_clase)
 
     try:
+        # Guarda definitivamente la información.
         db.session.commit()
     except IntegrityError:
+        # Revierte la transacción en caso de error.
         db.session.rollback()
         raise BusinessError(
             "Ocurrió un error al guardar la clase",
@@ -68,6 +78,9 @@ def crear_clase(datos):
         )
     return nueva_clase
 
+
+# Modifica una clase existente.
+# Solo actualiza los campos enviados.
 def modificar_clase(id_clase,datos):
     clase = obtener_clase_por_id(id_clase)
 
@@ -88,9 +101,12 @@ def modificar_clase(id_clase,datos):
     if "tema" in datos:
         clase.tema = datos["tema"]
 
+    # O si actualizo el estado de la clase.
     if "estado" in datos:
         clase.estado = EstadoClase[datos["estado"]]
     
+    # Si cambia el número de clase,
+    # verifica que no exista otro igual.
     if "numero_clase" in datos:
         
         if (datos["numero_clase"] != clase.numero_clase
@@ -101,9 +117,11 @@ def modificar_clase(id_clase,datos):
             )
         clase.numero_clase = datos["numero_clase"]
    
+   # Actualiza los datos de auditoría.
     clase.id_usuario_modificacion = ID_USUARIO_SIMULADO
     clase.ts_modificacion = datetime.now()
 
+    # Verifica nuevamente el horario.
     if clase.hora_fin <= clase.hora_inicio:
         raise BusinessError(
             "La hora de fin debe ser mayor que la hora de inicio.",
@@ -111,8 +129,10 @@ def modificar_clase(id_clase,datos):
         )
 
     try:
+        # Guarda los cambios.
         db.session.commit()
     except IntegrityError:
+        # Revierte la transacción.
         db.session.rollback()
         raise BusinessError(
             "No fue posible actualizar la clase.",
@@ -138,6 +158,9 @@ def eliminar_clase(id_clase):
         )
     return True
 
+
+# Verifica si ya existe un número de clase
+# dentro de una determinada comisión.
 def existe_numero_clase(id_comision,numero_clase):
     return (
         Clase.query.filter_by(
@@ -148,9 +171,13 @@ def existe_numero_clase(id_comision,numero_clase):
     )
 
 
+# Completa automáticamente los datos necesarios
+# para crear una nueva clase.
 def preparar_datos_clase(datos):
-    ahora = datetime.now()
+    ahora = datetime.now() # Obtiene la fecha y hora actual.
 
+    # Devuelve un diccionario con toda la información
+    # necesaria para crear el registro.
     return{
         "id_comision": datos["id_comision"],
         "numero_clase": datos["numero_clase"],
@@ -158,7 +185,8 @@ def preparar_datos_clase(datos):
         "hora_inicio": datos["hora_inicio"],
         "hora_fin": datos["hora_fin"],
         "tema": datos["tema"],
-        "estado":EstadoClase.PROGRAMADA ,
+        "estado":EstadoClase.PROGRAMADA , # Toda clase nueva comienza con estado PROGRAMADA.
+        # Datos de auditoría.
         "id_usuario_creacion": ID_USUARIO_SIMULADO,
         "id_usuario_modificacion": None,
         "ts_creacion": ahora,
