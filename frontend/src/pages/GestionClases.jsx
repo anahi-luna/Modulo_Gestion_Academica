@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ClasesTable from "../components/Clases/ClaseTable";
 import ModalClase from "../components/clases/ClaseModal";
+import EliminarClaseModal from "../components/clases/EliminarClaseModal";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getComisiones } from "../mocks/comisionesMock";
 
@@ -61,6 +62,16 @@ export default function GestionClases() {
         setClaseSeleccionada(null);
 
         setMostrarModal(true);
+
+    }
+
+    async function confirmarEliminar(clase){
+
+        console.log("Eliminar", clase);
+
+        setMostrarEliminar(false);
+
+        setClaseSeleccionada(null);
 
     }
 
@@ -145,12 +156,12 @@ export default function GestionClases() {
                 onGuardar={guardarClase}
             />
 
-            {/*<ModalEliminarClase
+            <EliminarClaseModal
                 abierto={mostrarEliminar}
                 clase={claseSeleccionada}
                 onCerrar={() => setMostrarEliminar(false)}
                 onConfirmar={confirmarEliminar}
-            />*/}
+            />
         </div>
     );
 }
