@@ -1,0 +1,109 @@
+users:
+
+  admin:
+
+    id_usuario: 1
+
+    username: admin
+
+    nombre: Administrador del Sistema
+
+    roles:
+
+      - ADMINISTRADOR_DEL_SISTEMA
+
+  director:
+
+    id_usuario: 2
+
+    username: director
+
+    nombre: Director
+
+    roles:
+
+      - DIRECTOR
+
+  director_adjunto:
+
+    id_usuario: 3
+
+    username: director_adjunto
+
+    nombre: Director Adjunto
+
+    roles:
+
+      - DIRECTOR_ADJUNTO
+
+  jefe_academico:
+
+    id_usuario: 4
+
+    username: jefe_academico
+
+    nombre: Jefe Departamento Académico
+
+    roles:
+
+      - JEFE_DEPARTAMENTO_ACADEMICO
+
+  direccion_carrera:
+
+    id_usuario: 5
+
+    username: direccion_carrera
+
+    nombre: Dirección de Carrera
+
+    roles:
+
+      - DIRECCION_CARRERA
+
+  direccion_eventos:
+
+    id_usuario: 6
+
+    username: direccion_eventos
+
+    nombre: Dirección de Eventos Académicos
+
+    roles:
+
+      - DIRECCION_EVENTOS_ACADEMICOS
+
+  administrativo:
+
+    id_usuario: 7
+
+    username: administrativo
+
+    nombre: Administrativo Académico
+
+    roles:
+
+      - ADMINISTRATIVO_ACADEMICO
+
+  docente:
+
+    id_usuario: 8
+
+    username: docente
+
+    nombre: Docente
+
+    roles:
+
+      - DOCENTE
+
+  alumno:
+
+    id_usuario: 9
+
+    username: alumno
+
+    nombre: Alumno
+
+    roles:
+
+      - ALUMNO_BOMBERO

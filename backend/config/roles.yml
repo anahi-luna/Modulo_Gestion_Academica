@@ -1,0 +1,313 @@
+roles:
+
+  ADMINISTRADOR_DEL_SISTEMA:
+
+    description: Administrador del Sistema
+
+    actions:
+
+      - "*"
+
+  DIRECTOR:
+
+    description: Director
+
+    actions:
+
+      - inscripcion.inscripciones.leer
+      - inscripcion.clases.leer
+      - inscripcion.asistencias.leer
+      - inscripcion.evaluaciones.leer
+      - inscripcion.calificaciones.leer
+      - inscripcion.resultado_academico.leer
+      - inscripcion.resultado_plan.leer
+      - inscripcion.certificados.leer
+
+  DIRECTOR_ADJUNTO:
+
+    description: Director Adjunto
+
+    actions:
+
+      - inscripcion.inscripciones.leer
+      - inscripcion.clases.leer
+      - inscripcion.asistencias.leer
+      - inscripcion.evaluaciones.leer
+      - inscripcion.calificaciones.leer
+      - inscripcion.resultado_academico.leer
+      - inscripcion.resultado_plan.leer
+      - inscripcion.certificados.leer
+
+  JEFE_DEPARTAMENTO_ACADEMICO:
+
+    description: Jefe Departamento Académico
+
+    actions:
+
+      # Inscripciones (RU)
+
+      - inscripcion.inscripciones.leer
+      - inscripcion.inscripciones.actualizar
+
+      # Clases (CRUD)
+
+      - inscripcion.clases.crear
+      - inscripcion.clases.leer
+      - inscripcion.clases.actualizar
+      - inscripcion.clases.eliminar
+
+      # Asistencias (CRUD)
+
+      - inscripcion.asistencias.crear
+      - inscripcion.asistencias.leer
+      - inscripcion.asistencias.actualizar
+      - inscripcion.asistencias.eliminar
+
+      # Evaluaciones (CRUD)
+
+      - inscripcion.evaluaciones.crear
+      - inscripcion.evaluaciones.leer
+      - inscripcion.evaluaciones.actualizar
+      - inscripcion.evaluaciones.eliminar
+
+      # Calificaciones (CRUD)
+
+      - inscripcion.calificaciones.crear
+      - inscripcion.calificaciones.leer
+      - inscripcion.calificaciones.actualizar
+      - inscripcion.calificaciones.eliminar
+
+      # Resultado Académico (RU)
+
+      - inscripcion.resultado_academico.leer
+      - inscripcion.resultado_academico.actualizar
+
+      # Resultado Plan (RU)
+
+      - inscripcion.resultado_plan.leer
+      - inscripcion.resultado_plan.actualizar
+
+      # Certificados (CRUD)
+
+      - inscripcion.certificados.crear
+      - inscripcion.certificados.leer
+      - inscripcion.certificados.actualizar
+      - inscripcion.certificados.eliminar
+
+  DIRECCION_CARRERA:
+
+    description: Dirección de Carrera
+
+    actions:
+
+      # Inscripciones (RU)
+
+      - inscripcion.inscripciones.leer
+      - inscripcion.inscripciones.actualizar
+
+      # Clases (CRUD)
+
+      - inscripcion.clases.crear
+      - inscripcion.clases.leer
+      - inscripcion.clases.actualizar
+      - inscripcion.clases.eliminar
+
+      # Asistencias (R)
+
+      - inscripcion.asistencias.leer
+
+      # Evaluaciones (CRUD)
+
+      - inscripcion.evaluaciones.crear
+      - inscripcion.evaluaciones.leer
+      - inscripcion.evaluaciones.actualizar
+      - inscripcion.evaluaciones.eliminar
+
+      # Calificaciones (R)
+
+      - inscripcion.calificaciones.leer
+
+      # Resultado Académico (R)
+
+      - inscripcion.resultado_academico.leer
+
+      # Resultado Plan (R)
+
+      - inscripcion.resultado_plan.leer
+
+      # Certificados (R)
+
+      - inscripcion.certificados.leer
+
+  DIRECCION_EVENTOS_ACADEMICOS:
+
+    description: Dirección de Eventos Académicos
+
+    actions:
+
+      # Inscripciones (R)
+
+      - inscripcion.inscripciones.leer
+
+      # Clases (CRUD)
+
+      - inscripcion.clases.crear
+      - inscripcion.clases.leer
+      - inscripcion.clases.actualizar
+      - inscripcion.clases.eliminar
+
+      # Asistencias (R)
+
+      - inscripcion.asistencias.leer
+
+      # Evaluaciones (R)
+
+      - inscripcion.evaluaciones.leer
+
+      # Calificaciones (R)
+
+      - inscripcion.calificaciones.leer
+
+      # Resultado Académico (R)
+
+      - inscripcion.resultado_academico.leer
+
+      # Resultado Plan (R)
+
+      - inscripcion.resultado_plan.leer
+
+      # Certificados (CR)
+
+      - inscripcion.certificados.crear
+      - inscripcion.certificados.leer
+
+  ADMINISTRATIVO_ACADEMICO:
+
+    description: Administrativo Académico
+
+    actions:
+
+      # Inscripciones (RUD)
+
+      - inscripcion.inscripciones.leer
+      - inscripcion.inscripciones.actualizar
+      - inscripcion.inscripciones.eliminar
+
+      # Clases (CRUD)
+
+      - inscripcion.clases.crear
+      - inscripcion.clases.leer
+      - inscripcion.clases.actualizar
+      - inscripcion.clases.eliminar
+
+      # Asistencias (R)
+
+      - inscripcion.asistencias.leer
+
+      # Evaluaciones (R)
+
+      - inscripcion.evaluaciones.leer
+
+      # Calificaciones (R)
+
+      - inscripcion.calificaciones.leer
+
+      # Resultado Académico (R)
+
+      - inscripcion.resultado_academico.leer
+
+      # Resultado Plan (R)
+
+      - inscripcion.resultado_plan.leer
+
+      # Certificados (CR)
+
+      - inscripcion.certificados.crear
+      - inscripcion.certificados.leer
+
+  DOCENTE:
+
+    description: Docente / Instructor
+
+    actions:
+
+      # Inscripciones (R)
+
+      - inscripcion.inscripciones.leer
+
+      # Clases (RU)
+
+      - inscripcion.clases.leer
+      - inscripcion.clases.actualizar
+
+      # Asistencias (CRUD)
+
+      - inscripcion.asistencias.crear
+      - inscripcion.asistencias.leer
+      - inscripcion.asistencias.actualizar
+      - inscripcion.asistencias.eliminar
+
+      # Evaluaciones (CRUD)
+
+      - inscripcion.evaluaciones.crear
+      - inscripcion.evaluaciones.leer
+      - inscripcion.evaluaciones.actualizar
+      - inscripcion.evaluaciones.eliminar
+
+      # Calificaciones (CRUD)
+
+      - inscripcion.calificaciones.crear
+      - inscripcion.calificaciones.leer
+      - inscripcion.calificaciones.actualizar
+      - inscripcion.calificaciones.eliminar
+
+      # Resultado Académico (R)
+
+      - inscripcion.resultado_academico.leer
+
+      # Resultado Plan (R)
+
+      - inscripcion.resultado_plan.leer
+
+      # Certificados (R)
+
+      - inscripcion.certificados.leer
+
+  ALUMNO_BOMBERO:
+
+    description: Alumno / Bombero
+
+    actions:
+
+      # Inscripciones (CR)
+
+      - inscripcion.inscripciones.crear
+      - inscripcion.inscripciones.leer
+
+      # Clases (R)
+
+      - inscripcion.clases.leer
+
+      # Asistencias (R)
+
+      - inscripcion.asistencias.leer
+
+      # Evaluaciones (R)
+
+      - inscripcion.evaluaciones.leer
+
+      # Calificaciones (R)
+
+      - inscripcion.calificaciones.leer
+
+      # Resultado Académico (R)
+
+      - inscripcion.resultado_academico.leer
+
+      # Resultado Plan (R)
+
+      - inscripcion.resultado_plan.leer
+
+      # Certificados (R)
+
+      - inscripcion.certificados.leer

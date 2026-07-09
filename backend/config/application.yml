@@ -1,0 +1,29 @@
+application:
+
+  name: gestion-academica
+
+  version: 1.0.0
+
+server:
+
+  host: localhost
+
+  port: 5002 #a nosotros usamos el puerto 5000 para levantar flask nose si varia
+
+security:
+
+  mock_enabled: true
+
+  auth_enabled: false
+
+  jwt_enabled: false
+
+auth:
+
+  url: http://localhost:5003
+
+redis:
+
+  host: localhost
+
+  port: 6379

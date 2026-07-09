@@ -1,0 +1,79 @@
+microservice:
+
+  name: gestion-academica
+
+actions:
+
+  # -------------------------
+  # INSCRIPCIONES
+  # -------------------------
+
+  - inscripcion.inscripciones.crear
+  - inscripcion.inscripciones.leer
+  - inscripcion.inscripciones.actualizar
+  - inscripcion.inscripciones.eliminar
+
+  # -------------------------
+  # CLASES
+  # -------------------------
+
+  - inscripcion.clases.crear
+  - inscripcion.clases.leer
+  - inscripcion.clases.actualizar
+  - inscripcion.clases.eliminar
+
+  # -------------------------
+  # ASISTENCIAS
+  # -------------------------
+
+  - inscripcion.asistencias.crear
+  - inscripcion.asistencias.leer
+  - inscripcion.asistencias.actualizar
+  - inscripcion.asistencias.eliminar
+
+  # -------------------------
+  # EVALUACIONES
+  # -------------------------
+
+  - inscripcion.evaluaciones.crear
+  - inscripcion.evaluaciones.leer
+  - inscripcion.evaluaciones.actualizar
+  - inscripcion.evaluaciones.eliminar
+
+  # -------------------------
+  # CALIFICACIONES
+  # -------------------------
+
+  - inscripcion.calificaciones.crear
+  - inscripcion.calificaciones.leer
+  - inscripcion.calificaciones.actualizar
+  - inscripcion.calificaciones.eliminar
+
+  # -------------------------
+  # RESULTADO ACADÉMICO
+  # -------------------------
+
+  - inscripcion.resultado_academico.leer
+  - inscripcion.resultado_academico.actualizar
+
+  # -------------------------
+  # RESULTADO PLAN
+  # -------------------------
+
+  - inscripcion.resultado_plan.leer
+  - inscripcion.resultado_plan.actualizar
+
+  # -------------------------
+  # CERTIFICADOS
+  # -------------------------
+
+  - inscripcion.certificados.crear
+  - inscripcion.certificados.leer
+  - inscripcion.certificados.actualizar
+  - inscripcion.certificados.eliminar
+
+  # -------------------------
+  # REPORTES
+  # -------------------------
+
+  - inscripcion.reportes.leer
