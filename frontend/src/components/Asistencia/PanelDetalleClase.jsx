@@ -1,6 +1,7 @@
 import ComisionTabs from "./ComisionTabs";
 import EstadisticaCard from "./EstadisticaCard";
 import TablaAsistencia from "./AsistenciaTabla";
+import { useNavigate } from "react-router-dom";
 import { CalendarDaysIcon, ClockIcon, MapPinIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
@@ -9,6 +10,8 @@ import { useState } from "react";
 
 export default function PanelDetalleClase(){
     const [comisionSeleccionada, setComisionSeleccionada] = useState(1);
+
+    const navigate = useNavigate();
     return(
 
         <div className="col-span-9 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
@@ -47,10 +50,11 @@ export default function PanelDetalleClase(){
                     </div>
 
                     <button
+                        onClick={() => navigate("/GestionClases")}
                         className="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-100 transition"
                     >
                         <PencilSquareIcon className="h-5 w-5" />
-                        Editar clase
+                        Gestionar Clases
 
                     </button>
 

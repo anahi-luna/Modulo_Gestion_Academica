@@ -152,16 +152,35 @@ export default function ClasesTable({
 
                 <tbody>
 
-                    {clases.map(clase => (
+                    {clases.length === 0 ? (
 
-                        <ClaseRow
-                            key={clase.id}
-                            clase={clase}
-                            onEditar={onEditar}
-                            onEliminar={onEliminar}
-                        />
+                        <tr>
 
-                    ))}
+                            <td
+                                colSpan={6}
+                                className="py-8 text-center text-gray-400"
+                            >
+
+                                No se encontraron clases.
+
+                            </td>
+
+                        </tr>
+
+                    ) : (
+
+                        clases.map((clase) => (
+
+                            <ClaseRow
+                                key={clase.id}
+                                clase={clase}
+                                onEditar={onEditar}
+                                onEliminar={onEliminar}
+                            />
+
+                        ))
+
+                    )}
 
                 </tbody>
 

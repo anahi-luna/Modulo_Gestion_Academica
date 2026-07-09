@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import TablaClases from "../components/Clases/TablaClases";
+import ClasesTable from "../components/Clases/ClaseTable";
+import ModalClase from "../components/clases/ClaseModal";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getComisiones } from "../mocks/comisionesMock";
 
@@ -8,6 +9,10 @@ export default function GestionClases() {
     const [clases, setClases] = useState([]);
 
     const [mostrarModal, setMostrarModal] = useState(false);
+
+    const [claseSeleccionada, setClaseSeleccionada] = useState(null);
+
+    const [mostrarEliminar, setMostrarEliminar] = useState(false);
 
     const [filtroMateria, setFiltroMateria] = useState("");
     const [filtroComision, setFiltroComision] = useState("");
@@ -51,7 +56,29 @@ export default function GestionClases() {
         setClaseSeleccionada(clase);
         setMostrarEliminar(true);
     }
-    
+    function nuevaClase() {
+
+        setClaseSeleccionada(null);
+
+        setMostrarModal(true);
+
+    }
+
+    async function guardarClase(datos){
+
+        if(claseSeleccionada){
+
+            console.log("Editar", datos);
+
+        }else{
+
+            console.log("Crear", datos);
+
+        }
+
+        setMostrarModal(false);
+
+    }
     return (
         <div className="max-w-7xl mx-auto px-6 py-8">
 
@@ -77,7 +104,7 @@ export default function GestionClases() {
                     </button>
 
                     <button
-                        onClick={() => setMostrarModal(true)}
+                        onClick={nuevaClase}
                         className="flex items-center gap-2 rounded-lg bg-red-700 px-4 py-3 text-white hover:bg-red-800 transition"
                     >
                         <PlusIcon className="h-5 w-5" />
@@ -88,7 +115,7 @@ export default function GestionClases() {
 
             </div>
 
-            <TablaClases
+            <ClasesTable
                 clases={clasesFiltradas}
 
                 filtroMateria={filtroMateria}
@@ -105,8 +132,25 @@ export default function GestionClases() {
 
                 filtroLugar={filtroLugar}
                 setFiltroLugar={setFiltroLugar}
+
+                onEditar={editarClase}
+                onEliminar={eliminarClase}
             />
 
+            <ModalClase
+                abierto={mostrarModal}
+                clase={claseSeleccionada}
+                comisiones={clases}
+                onCerrar={() => setMostrarModal(false)}
+                onGuardar={guardarClase}
+            />
+
+            {/*<ModalEliminarClase
+                abierto={mostrarEliminar}
+                clase={claseSeleccionada}
+                onCerrar={() => setMostrarEliminar(false)}
+                onConfirmar={confirmarEliminar}
+            />*/}
         </div>
     );
 }
