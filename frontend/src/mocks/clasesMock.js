@@ -27,6 +27,22 @@ const CLASES = [
     hora_fin: "21:00",
     lugar: "Anexo Norte",
   },
+   {
+    id_clase: 4,
+    id_comision: 1,
+    fecha: "2026-07-16",
+    hora_inicio: "09:00",
+    hora_fin: "12:00",
+    lugar: "Sede Central",
+  },
+  {
+    id_clase: 5,
+    id_comision: 1,
+    fecha: "2026-07-23",
+    hora_inicio: "09:00",
+    hora_fin: "12:00",
+    lugar: "Sede Central",
+  },
 ];
 
 export async function getClases() {

@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, BellIcon, XMarkIcon, ClipboardDocumentCheckIcon, CalendarDaysIcon, AcademicCapIcon, DocumentCheckIcon } from '@heroicons/react/24/outline'
 import user from "../../assets/user.png";
-import logo from "../../images/Logo.png";
+import logo from "../../images/Logo.jpeg";
 import { ROLES, ADMIN_MOCK, ALUMNO_MOCK, PROFESOR_MOCK, ADMINISTRATIVO_MOCK } from "../../mocks/usuariosMock";
+import NavDropdown from "./NavDropdown";
 
 export default function Navbar({ usuario, setUsuario, modulo }) {
 
@@ -14,8 +15,38 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
        : "text-red-100 hover:bg-red-700"
      }`;
 
+  // Items del dropdown "Gestión académica", armados según el rol.
+  // Cada uno junta: a dónde va, ícono, título y descripción chica
+  // (mismo patrón visual que usan los otros módulos del sistema).
+  const itemsGestionAcademica = [
+    ...(usuario.rol === ROLES.ALUMNO
+      ? [{ to: "/inscripciones", icono: ClipboardDocumentCheckIcon, titulo: "Inscribirme", descripcion: "Inscribirte a comisiones disponibles" }]
+      : []),
+    ...(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.ADMINISTRATIVO
+      ? [{ to: "/inscripcionesAdmin", icono: ClipboardDocumentCheckIcon, titulo: "Inscripciones", descripcion: "Alta, baja y validación de inscripciones" }]
+      : []),
+    ...(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.PROFESOR
+      ? [{ to: "/AsistenciaAdmin", icono: CalendarDaysIcon, titulo: "Asistencia", descripcion: "Registrar asistencia por clase" }]
+      : []),
+    ...(usuario.rol === ROLES.ALUMNO
+      ? [{ to: "/miAsistencia", icono: CalendarDaysIcon, titulo: "Asistencia", descripcion: "Ver tu asistencia por día" }]
+      : []),
+    ...(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.PROFESOR
+      ? [{ to: "/calificacionesAdmin", icono: AcademicCapIcon, titulo: "Calificaciones", descripcion: "Cargar y editar notas" }]
+      : []),
+    ...(usuario.rol === ROLES.ALUMNO
+      ? [{ to: "/calificaciones", icono: AcademicCapIcon, titulo: "Mis calificaciones", descripcion: "Consultar tus notas" }]
+      : []),
+    ...(usuario.rol === ROLES.ADMIN
+      ? [{ to: "/certificadosAdmin", icono: DocumentCheckIcon, titulo: "Certificados", descripcion: "Emitir, firmar y revocar certificados" }]
+      : []),
+    ...(usuario.rol === ROLES.ALUMNO
+      ? [{ to: "/certificados", icono: DocumentCheckIcon, titulo: "Mis certificados", descripcion: "Consultar y descargar certificados" }]
+      : []),
+  ];
+
   return (
-    <Disclosure as="nav" className="bg-red-800 shadow-md sticky top-0 z-40">
+    <Disclosure as="nav" className="bg-red-700 shadow-md sticky top-0 z-40">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
 
@@ -48,18 +79,10 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
             {/* Links de navegación */}
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               <div className="flex space-x-2">
-                <NavLink to="/" className={linkClass} end>Home</NavLink>
+                <NavLink to="/" className={linkClass} end>Inicio</NavLink>
 
-                {(usuario.rol === ROLES.ALUMNO) && (
-                    <NavLink to="/inscripciones" className={linkClass} end>Inscribirme</NavLink>
-                )}
-
-                {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.ADMINISTRATIVO) && (
-                    <NavLink to="/inscripcionesAdmin" className={linkClass} end>Inscripciones</NavLink>
-                )}
-
-                {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.PROFESOR) && (
-                    <NavLink to="/AsistenciaAdmin" className={linkClass} end>Asistencia</NavLink>
+                {itemsGestionAcademica.length > 0 && (
+                  <NavDropdown label="Gestión académica" items={itemsGestionAcademica} />
                 )}
                 {/* aca metemos cuando tengamos mas modulos*/}
               </div>
@@ -144,7 +167,12 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
       {/* Menú mobile desplegable */}
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
-          <NavLink to="/" className={linkClass} end>Home</NavLink>
+          <NavLink to="/" className={linkClass} end>Inicio</NavLink>
+          {itemsGestionAcademica.map((item) => (
+            <NavLink key={item.to} to={item.to} className={linkClass} end>
+              {item.titulo}
+            </NavLink>
+          ))}
         </div>
       </DisclosurePanel>
     </Disclosure>

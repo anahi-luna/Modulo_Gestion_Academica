@@ -9,6 +9,11 @@ import HomeAdmin from "./pages/HomeAdmin";
 import InscripcionesAdmin from './pages/InscripcionesAdmin';
 import AsistenciaAdmin from './pages/AsistenciaAdmin';
 import GestionClases from "./pages/GestionClases";
+import MisCalificaciones from "./pages/MisCalificaciones";
+import GestionCalificaciones from "./pages/GestionCalificaciones";
+import MisCertificados from "./pages/MisCertificados";
+import GestionCertificados from "./pages/GestionCertificados";
+import MiAsistencia from "./pages/MiAsistencia";
 import { ROLES, ADMIN_MOCK, ALUMNO_MOCK } from './mocks/usuariosMock';
 import { useState } from "react";
 
@@ -67,6 +72,16 @@ export default function App() {
                             }
                         />
 
+                        {/* Mi asistencia: sólo alumno, solo lectura */}
+                        <Route
+                            path="/miAsistencia"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
+                                    <MiAsistencia usuario={usuario} />
+                                </RutaProtegida>
+                            }
+                        />
+
 
                         {/* Gestion de clases: admin */}
                         <Route
@@ -74,6 +89,46 @@ export default function App() {
                             element={
                                 <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
                                     <GestionClases />
+                                </RutaProtegida>
+                            }
+                        />
+
+                        {/* Mis calificaciones: sólo alumno */}
+                        <Route
+                            path="/calificaciones"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
+                                    <MisCalificaciones usuario={usuario} />
+                                </RutaProtegida>
+                            }
+                        />
+
+                        {/* Gestión de calificaciones: docente y admin */}
+                        <Route
+                            path="/calificacionesAdmin"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.PROFESOR]}>
+                                    <GestionCalificaciones usuario={usuario} />
+                                </RutaProtegida>
+                            }
+                        />
+
+                        {/* Mis certificados: sólo alumno */}
+                        <Route
+                            path="/certificados"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
+                                    <MisCertificados usuario={usuario} />
+                                </RutaProtegida>
+                            }
+                        />
+
+                        {/* Gestión de certificados: sólo admin (autoridad habilitada) */}
+                        <Route
+                            path="/certificadosAdmin"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
+                                    <GestionCertificados usuario={usuario} />
                                 </RutaProtegida>
                             }
                         />
