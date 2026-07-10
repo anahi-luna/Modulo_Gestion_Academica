@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 export default function ModalClase({
     abierto,
     clase,
@@ -10,10 +9,11 @@ export default function ModalClase({
 
     const [formulario, setFormulario] = useState({
         id_comision: "",
+        numero_clase: "",
         fecha: "",
         hora_inicio: "",
         hora_fin: "",
-        lugar: "",
+        tema: "",
     });
 
     useEffect(() => {
@@ -22,20 +22,22 @@ export default function ModalClase({
 
             setFormulario({
                 id_comision: clase.id_comision,
+                numero_clase: clase.numero_clase,
                 fecha: clase.fecha,
                 hora_inicio: clase.hora_inicio,
                 hora_fin: clase.hora_fin,
-                lugar: clase.lugar,
+                tema: clase.tema,
             });
 
         } else {
 
             setFormulario({
                 id_comision: "",
+                numero_clase: "",
                 fecha: "",
                 hora_inicio: "",
                 hora_fin: "",
-                lugar: "",
+                tema: "",
             });
 
         }
@@ -128,6 +130,30 @@ export default function ModalClase({
                         </div>
 
                     )}
+                    {/* Numero de clase */}
+
+                    <div>
+
+                        <label className="block font-medium mb-2">
+
+                            Número de clase
+
+                        </label>
+
+                        <input
+                            type="number"
+                            min="1"
+                            value={formulario.numero_clase}
+                            onChange={(e) =>
+                                setFormulario({
+                                    ...formulario,
+                                    numero_clase: Number(e.target.value),
+                                })
+                            }
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+
+                    </div>
 
                     {/* Fecha */}
 
@@ -203,24 +229,24 @@ export default function ModalClase({
 
                     </div>
 
-                    {/* Lugar */}
+                    {/* Tema */}
 
                     <div>
 
                         <label className="block font-medium mb-2">
 
-                            Lugar
+                            Tema
 
                         </label>
 
                         <input
                             type="text"
-                            value={formulario.lugar}
-                            placeholder="Ej: Sede Central"
+                            value={formulario.tema}
+                            placeholder="Inserte tema de la clase"
                             onChange={(e) =>
                                 setFormulario({
                                     ...formulario,
-                                    lugar: e.target.value,
+                                    tema: e.target.value,
                                 })
                             }
                             className="w-full rounded-lg border border-gray-300 px-3 py-2"

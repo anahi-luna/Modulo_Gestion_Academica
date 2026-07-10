@@ -55,6 +55,5 @@ class Inscripcion(db.Model):
         nullable=True
     )
     
-
-def __repr__(self):
-    return f"<Inscripcion {self.id_inscripcion}>"
+    def __repr__(self):
+        return f"<Inscripcion {self.id_inscripcion}>"
