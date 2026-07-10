@@ -1,5 +1,6 @@
 from seed.seed_estado_inscripcion import cargar_estados_inscripcion
 from seed.seed_estado_asistencia import cargar_estados_asistencia
+from seed.seed_tipo_evaluacion import cargar_tipos_de_evaluacion
 
 # ============================================================
 # Carga los datos iniciales del sistema.
@@ -14,6 +15,9 @@ def cargar_datos_iniciales():
 
     # Carga los estados posibles de una asistencia.
     cargar_estados_asistencia()
+
+    # Carga los tipos posibles de evaluación.
+    cargar_tipos_de_evaluacion()
 
 
 
