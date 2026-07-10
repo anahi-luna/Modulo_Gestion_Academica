@@ -4,14 +4,14 @@ from controllers.asistencia_controller import *
 
 asistencia_bp = Blueprint("asistencia_bp",__name__)
 
-# Crear clase
+# Crear asistencia
 asistencia_bp.route("/",methods=["POST"])(agregar_asistencias)
 
-# Obtener todas las clases
+# Obtener todas las asistencias
 asistencia_bp.route("/",methods=["GET"])(get_lista_de_asistencias)
 
-# Obtener una clase
+# Obtener una asistencia
 asistencia_bp.route( "/<int:id_asistencia>",methods=["GET"])(get_asistencia)
 
-# Modificar una clase
+# Modificar una asistencia
 asistencia_bp.route( "/<int:id_asistencia>",methods=["PUT"])(actualizar_asistencia)

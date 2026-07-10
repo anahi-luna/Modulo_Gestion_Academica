@@ -26,6 +26,7 @@ def create_app():
     app.register_blueprint(clase_bp, url_prefix="/api/clases")
     app.register_blueprint(asistencia_bp, url_prefix ="/api/asistencias")
     app.register_blueprint(evaluacion_bp,url_prefix ="/api/evaluaciones")
+    app.register_blueprint(calificacion_bp,url_prefix ="/api/calificaciones")
 
     # Ruta de prueba
     @app.route("/")
