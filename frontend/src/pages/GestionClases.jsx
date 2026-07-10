@@ -160,7 +160,8 @@ export default function GestionClases() {
                         Crear, editar y eliminar clases.
                     </p>
                 </div>
-
+                
+                {/* Botones limpiar filtro y nueva clase */}
                 <div className="flex gap-3">
 
                     <button
@@ -182,6 +183,7 @@ export default function GestionClases() {
 
             </div>
 
+            {/* Tabla Clases */}
             <ClasesTable
                 clases={clasesFiltradas}
 
@@ -204,6 +206,7 @@ export default function GestionClases() {
                 onEliminar={abrirModalEliminar}
             />
 
+            {/* Modal para crear o editar */}
             <ModalClase
                 abierto={mostrarModal}
                 clase={claseSeleccionada}
@@ -212,6 +215,7 @@ export default function GestionClases() {
                 onGuardar={guardarClase}
             />
 
+            {/* Modal eliminar */}
             <EliminarClaseModal
                 abierto={mostrarEliminar}
                 clase={claseSeleccionada}
