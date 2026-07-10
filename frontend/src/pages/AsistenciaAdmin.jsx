@@ -20,11 +20,6 @@ export default function AsistenciaAdmin() {
 
         </div>
 
-        <button
-          className="bg-red-700 hover:bg-red-800 text-white px-5 py-3 rounded-lg font-medium"
-        >
-          + Nueva clase
-        </button>
 
       </div>
 

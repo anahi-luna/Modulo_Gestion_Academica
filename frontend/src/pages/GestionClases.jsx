@@ -3,6 +3,7 @@ import ClasesTable from "../components/Clases/ClaseTable";
 import ModalClase from "../components/clases/ClaseModal";
 import EliminarClaseModal from "../components/clases/EliminarClaseModal";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { getClases, registrarClase, modificarClase, borrarClase } from "../Services/clasesAdminService";
 import { getComisiones } from "../mocks/comisionesMock";
 
 export default function GestionClases() {
@@ -15,6 +16,8 @@ export default function GestionClases() {
 
     const [mostrarEliminar, setMostrarEliminar] = useState(false);
 
+    const [comisiones, setComisiones] = useState([]);
+
     const [filtroMateria, setFiltroMateria] = useState("");
     const [filtroComision, setFiltroComision] = useState("");
     const [filtroDocente, setFiltroDocente] = useState("");
@@ -23,11 +26,30 @@ export default function GestionClases() {
 
     useEffect(() => {
         cargarClases();
+
+        cargarComisiones();
     }, []);
 
     async function cargarClases() {
-        const res = await getComisiones();
-        setClases(res.data);
+
+        try {
+            const resultado = await getClases();
+
+            setClases(resultado);
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
+
+    async function cargarComisiones(){
+
+        const resultado = await getComisiones();
+
+        setComisiones(resultado.data);
+
     }
 
     const clasesFiltradas = clases.filter((clase) => {
@@ -48,12 +70,24 @@ export default function GestionClases() {
         setFiltroFecha("");
         setFiltroLugar("");
     }
-    function editarClase(clase){
-        setClaseSeleccionada(clase);
-        setMostrarModal(true);
+
+    async function abrirModalEditar(clase){
+
+        try{
+
+            setClaseSeleccionada(clase);
+
+            setMostrarModal(true);
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
     }
 
-    function eliminarClase(clase){
+    function abrirModalEliminar(clase){
         setClaseSeleccionada(clase);
         setMostrarEliminar(true);
     }
@@ -66,28 +100,50 @@ export default function GestionClases() {
     }
 
     async function confirmarEliminar(clase){
+        try{
 
-        console.log("Eliminar", clase);
+            await borrarClase(clase.id);
 
-        setMostrarEliminar(false);
+            setMostrarEliminar(false);
 
-        setClaseSeleccionada(null);
+            setClaseSeleccionada(null);
+
+            await cargarClases();
+
+        }catch(error){
+            console.error(error);
+        }
 
     }
 
-    async function guardarClase(datos){
+   async function guardarClase(datos) {
 
-        if(claseSeleccionada){
+        try {
 
-            console.log("Editar", datos);
+            if (claseSeleccionada) {
 
-        }else{
+                await modificarClase(
+                    claseSeleccionada.id,
+                    datos
+                );
 
-            console.log("Crear", datos);
+            } else {
+
+                await registrarClase(datos);
+
+            }
+
+            setMostrarModal(false);
+
+            setClaseSeleccionada(null);
+
+            await cargarClases();
+
+        } catch (error) {
+
+            console.error(error);
 
         }
-
-        setMostrarModal(false);
 
     }
     return (
@@ -144,14 +200,14 @@ export default function GestionClases() {
                 filtroLugar={filtroLugar}
                 setFiltroLugar={setFiltroLugar}
 
-                onEditar={editarClase}
-                onEliminar={eliminarClase}
+                onEditar={abrirModalEditar}
+                onEliminar={abrirModalEliminar}
             />
 
             <ModalClase
                 abierto={mostrarModal}
                 clase={claseSeleccionada}
-                comisiones={clases}
+                comisiones={comisiones}
                 onCerrar={() => setMostrarModal(false)}
                 onGuardar={guardarClase}
             />

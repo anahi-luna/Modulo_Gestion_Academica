@@ -75,9 +75,9 @@ export default function EliminarClaseModal({
 
                     <p>
 
-                        <strong>Lugar:</strong>{" "}
+                        <strong>tema:</strong>{" "}
 
-                        {clase.lugar}
+                        {clase.tema}
 
                     </p>
 
