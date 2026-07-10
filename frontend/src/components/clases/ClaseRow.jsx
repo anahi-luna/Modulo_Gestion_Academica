@@ -44,10 +44,10 @@ export default function ClaseRow({
 
             </td>
 
-            {/* Lugar */}
+            {/* Tema */}
             <td className="text-gray-700">
 
-                {clase.lugar}
+                {clase.tema}
 
             </td>
 

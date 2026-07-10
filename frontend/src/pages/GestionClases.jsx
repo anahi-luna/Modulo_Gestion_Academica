@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import TablaClases from "../components/Clases/TablaClases";
+import ClasesTable from "../components/Clases/ClaseTable";
+import ModalClase from "../components/clases/ClaseModal";
+import EliminarClaseModal from "../components/clases/EliminarClaseModal";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { getClases, registrarClase, modificarClase, borrarClase } from "../Services/clasesAdminService";
 import { getComisiones } from "../mocks/comisionesMock";
 
 export default function GestionClases() {
@@ -8,6 +11,12 @@ export default function GestionClases() {
     const [clases, setClases] = useState([]);
 
     const [mostrarModal, setMostrarModal] = useState(false);
+
+    const [claseSeleccionada, setClaseSeleccionada] = useState(null);
+
+    const [mostrarEliminar, setMostrarEliminar] = useState(false);
+
+    const [comisiones, setComisiones] = useState([]);
 
     const [filtroMateria, setFiltroMateria] = useState("");
     const [filtroComision, setFiltroComision] = useState("");
@@ -17,11 +26,30 @@ export default function GestionClases() {
 
     useEffect(() => {
         cargarClases();
+
+        cargarComisiones();
     }, []);
 
     async function cargarClases() {
-        const res = await getComisiones();
-        setClases(res.data);
+
+        try {
+            const resultado = await getClases();
+
+            setClases(resultado);
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
+
+    async function cargarComisiones(){
+
+        const resultado = await getComisiones();
+
+        setComisiones(resultado.data);
+
     }
 
     const clasesFiltradas = clases.filter((clase) => {
@@ -42,16 +70,82 @@ export default function GestionClases() {
         setFiltroFecha("");
         setFiltroLugar("");
     }
-    function editarClase(clase){
-        setClaseSeleccionada(clase);
-        setMostrarModal(true);
+
+    async function abrirModalEditar(clase){
+
+        try{
+
+            setClaseSeleccionada(clase);
+
+            setMostrarModal(true);
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
     }
 
-    function eliminarClase(clase){
+    function abrirModalEliminar(clase){
         setClaseSeleccionada(clase);
         setMostrarEliminar(true);
     }
-    
+    function nuevaClase() {
+
+        setClaseSeleccionada(null);
+
+        setMostrarModal(true);
+
+    }
+
+    async function confirmarEliminar(clase){
+        try{
+
+            await borrarClase(clase.id);
+
+            setMostrarEliminar(false);
+
+            setClaseSeleccionada(null);
+
+            await cargarClases();
+
+        }catch(error){
+            console.error(error);
+        }
+
+    }
+
+   async function guardarClase(datos) {
+
+        try {
+
+            if (claseSeleccionada) {
+
+                await modificarClase(
+                    claseSeleccionada.id,
+                    datos
+                );
+
+            } else {
+
+                await registrarClase(datos);
+
+            }
+
+            setMostrarModal(false);
+
+            setClaseSeleccionada(null);
+
+            await cargarClases();
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
     return (
         <div className="max-w-7xl mx-auto px-6 py-8">
 
@@ -66,7 +160,8 @@ export default function GestionClases() {
                         Crear, editar y eliminar clases.
                     </p>
                 </div>
-
+                
+                {/* Botones limpiar filtro y nueva clase */}
                 <div className="flex gap-3">
 
                     <button
@@ -77,7 +172,7 @@ export default function GestionClases() {
                     </button>
 
                     <button
-                        onClick={() => setMostrarModal(true)}
+                        onClick={nuevaClase}
                         className="flex items-center gap-2 rounded-lg bg-red-700 px-4 py-3 text-white hover:bg-red-800 transition"
                     >
                         <PlusIcon className="h-5 w-5" />
@@ -88,7 +183,8 @@ export default function GestionClases() {
 
             </div>
 
-            <TablaClases
+            {/* Tabla Clases */}
+            <ClasesTable
                 clases={clasesFiltradas}
 
                 filtroMateria={filtroMateria}
@@ -105,8 +201,27 @@ export default function GestionClases() {
 
                 filtroLugar={filtroLugar}
                 setFiltroLugar={setFiltroLugar}
+
+                onEditar={abrirModalEditar}
+                onEliminar={abrirModalEliminar}
             />
 
+            {/* Modal para crear o editar */}
+            <ModalClase
+                abierto={mostrarModal}
+                clase={claseSeleccionada}
+                comisiones={comisiones}
+                onCerrar={() => setMostrarModal(false)}
+                onGuardar={guardarClase}
+            />
+
+            {/* Modal eliminar */}
+            <EliminarClaseModal
+                abierto={mostrarEliminar}
+                clase={claseSeleccionada}
+                onCerrar={() => setMostrarEliminar(false)}
+                onConfirmar={confirmarEliminar}
+            />
         </div>
     );
 }

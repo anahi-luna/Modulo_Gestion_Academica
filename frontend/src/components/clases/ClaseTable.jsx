@@ -15,8 +15,8 @@ export default function ClasesTable({
     filtroFecha,
     setFiltroFecha,
 
-    filtroLugar,
-    setFiltroLugar,
+    filtroTema,
+    setFiltroTema,
 
     onEditar,
     onEliminar,
@@ -26,7 +26,7 @@ export default function ClasesTable({
     const comisiones = [...new Set(clases.map(c => c.codigo))];
     const docentes = [...new Set(clases.map(c => c.docente))];
     const fechas = [...new Set(clases.map(c => c.fecha))];
-    const lugares = [...new Set(clases.map(c => c.lugar))];
+    const temas = [...new Set(clases.map(c => c.tema))];
 
     return (
 
@@ -42,7 +42,7 @@ export default function ClasesTable({
                         <th className="text-left py-4">Comisión</th>
                         <th className="text-left py-4">Docente</th>
                         <th className="text-left py-4">Fecha</th>
-                        <th className="text-left py-4">Lugar</th>
+                        <th className="text-left py-4">Tema</th>
                         <th className="text-center py-4">Acciones</th>
 
                     </tr>
@@ -128,15 +128,15 @@ export default function ClasesTable({
                         <th className="py-2">
 
                             <select
-                                value={filtroLugar}
-                                onChange={(e) => setFiltroLugar(e.target.value)}
+                                value={filtroTema}
+                                onChange={(e) => setFiltroTema(e.target.value)}
                                 className="w-full rounded border px-2 py-1"
                             >
                                 <option value="">Todos</option>
 
-                                {lugares.map(lugar => (
-                                    <option key={lugar} value={lugar}>
-                                        {lugar}
+                                {temas.map(tema => (
+                                    <option key={tema} value={tema}>
+                                        {tema}
                                     </option>
                                 ))}
 
@@ -152,16 +152,35 @@ export default function ClasesTable({
 
                 <tbody>
 
-                    {clases.map(clase => (
+                    {clases.length === 0 ? (
 
-                        <ClaseRow
-                            key={clase.id}
-                            clase={clase}
-                            onEditar={onEditar}
-                            onEliminar={onEliminar}
-                        />
+                        <tr>
 
-                    ))}
+                            <td
+                                colSpan={6}
+                                className="py-8 text-center text-gray-400"
+                            >
+
+                                No se encontraron clases.
+
+                            </td>
+
+                        </tr>
+
+                    ) : (
+
+                        clases.map((clase) => (
+
+                            <ClaseRow
+                                key={clase.id}
+                                clase={clase}
+                                onEditar={onEditar}
+                                onEliminar={onEliminar}
+                            />
+
+                        ))
+
+                    )}
 
                 </tbody>
 

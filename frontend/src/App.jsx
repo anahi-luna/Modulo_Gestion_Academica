@@ -8,8 +8,10 @@ import Inscripciones from "./pages/Inscripciones";
 import HomeAdmin from "./pages/HomeAdmin";
 import InscripcionesAdmin from './pages/InscripcionesAdmin';
 import AsistenciaAdmin from './pages/AsistenciaAdmin';
+import GestionClases from "./pages/GestionClases";
 import { ROLES, ADMIN_MOCK, ALUMNO_MOCK } from './mocks/usuariosMock';
 import { useState } from "react";
+
 
 export default function App() {
 
@@ -61,6 +63,17 @@ export default function App() {
                             element={
                                 <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.PROFESOR]}>
                                     <AsistenciaAdmin />
+                                </RutaProtegida>
+                            }
+                        />
+
+
+                        {/* Gestion de clases: admin */}
+                        <Route
+                            path="/GestionClases"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
+                                    <GestionClases />
                                 </RutaProtegida>
                             }
                         />
