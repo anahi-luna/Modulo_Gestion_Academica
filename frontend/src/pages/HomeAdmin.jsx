@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ModuloCard from "../components/ModuloCard";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
-import {obtenerInscripciones} from "../services/inscripcionesAdminService";
+import {obtenerInscripciones} from "../Services/inscripcionesAdminService";
 
 /*
  * Pantalla principal del administrador.
@@ -78,6 +78,7 @@ export default function HomeAdmin() {
             descripcion="Registro y seguimiento de asistencia."
             cantidad="Hoy: 3 turnos"
             color="blue"
+            ruta="/AsistenciaAdmin"
             icono={<ClipboardDocumentListIcon className="h-6 w-6" />}
           />
           <ModuloCard
@@ -85,6 +86,7 @@ export default function HomeAdmin() {
             descripcion="Carga y edicion de notas, evaluaciones y resultados de desempeño"
             cantidad="12 Pendientes"
             color="green"
+            ruta="/calificacionesAdmin"
             icono={<ClipboardDocumentListIcon className="h-6 w-6" />}
           />
           <ModuloCard
@@ -92,6 +94,7 @@ export default function HomeAdmin() {
             descripcion="Generacion, emision y seguimiento de certificados"
             cantidad="123 emitidos"
             color="yellow"
+            ruta="/certificadosAdmin"
             icono={<ClipboardDocumentListIcon className="h-6 w-6" />}
           />
         </div>

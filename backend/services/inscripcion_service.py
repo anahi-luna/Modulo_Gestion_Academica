@@ -28,7 +28,8 @@ def preparar_datos_inscripcion(inscripcion_data,id_estado):
         "id_comision": inscripcion_data["id_comision"],
         "id_estado": id_estado,
         "fecha_inscripcion": ahora,
-        "id_usuario_registro": ID_USUARIO_SIMULADO,
+        "id_usuario_creacion": ID_USUARIO_SIMULADO,
+        "id_usuario_modificacion": None,
         "ts_creacion": ahora,
         "ts_modificacion": None
     }
@@ -148,7 +149,8 @@ def modificar_inscripcion(id_inscripcion, datos):
         
         inscripcion.id_comision = datos["id_comision"]
         # Pendiente:Actualizar cupos cuando el microservicio de comisiones exponga su API.
-
+    
+    inscripcion.id_usuario_modificacion = ID_USUARIO_SIMULADO
     inscripcion.ts_modificacion = datetime.now()
     
     try:

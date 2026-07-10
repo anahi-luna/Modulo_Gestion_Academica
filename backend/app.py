@@ -2,8 +2,8 @@ from flask import Flask
 from flask_cors import CORS
 from config.config import Config
 from extensions import db, ma
-from routes.inscripcion_routes import inscripcion_bp
-from seed_data import cargar_datos_iniciales
+from routes import *
+from seed.seed_data import cargar_datos_iniciales
 from models import *
 
 #Crea y configura la aplicación Flask.
@@ -23,7 +23,9 @@ def create_app():
 
 
     app.register_blueprint(inscripcion_bp, url_prefix="/api/inscripciones")
-
+    app.register_blueprint(clase_bp, url_prefix="/api/clases")
+    app.register_blueprint(asistencia_bp, url_prefix ="/api/asistencias")
+    
     # Ruta de prueba
     @app.route("/")
     def home():
