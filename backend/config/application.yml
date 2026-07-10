@@ -8,7 +8,7 @@ server:
 
   host: localhost
 
-  port: 5002 #a nosotros usamos el puerto 5000 para levantar flask nose si varia
+  port: 5002 
 
 security:
 

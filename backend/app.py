@@ -5,7 +5,9 @@ from extensions import db, ma
 from routes import *
 from seed.seed_data import cargar_datos_iniciales
 from models import *
-
+from security.before_request import cargar_contexto_usuario
+from security.decorators import requires_permission
+from flask import g
 #Crea y configura la aplicación Flask.
 def create_app():
 
@@ -24,15 +26,19 @@ def create_app():
 
     app.register_blueprint(inscripcion_bp, url_prefix="/api/inscripciones")
     app.register_blueprint(clase_bp, url_prefix="/api/clases")
-
+    app.before_request(cargar_contexto_usuario)
     
     # Ruta de prueba
     @app.route("/")
+    @requires_permission(  #decorador
+        "inscripcion.clases.leer"
+    )
     def home():
         return {
             "status":"success",
-            "message":"Microservicio de Gestion Academica funcionando"
+            "usuario":g.usuario,
         }
+
     
     return app
 
