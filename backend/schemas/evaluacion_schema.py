@@ -18,6 +18,19 @@ class EvaluacionSchema(ma.SQLAlchemyAutoSchema):
         dump_only=True
     )
 
+# Schema resumido de una evaluación.
+# Se utiliza como objeto anidado en Calificación.
+class EvaluacionResumenSchema(ma.Schema):
+
+    id_evaluacion = fields.Integer()
+
+    titulo = fields.String()
+
+    fecha_evaluacion = fields.Date()
+
+    puntaje_maximo = fields.Float()
+
+    id_tipo_evaluacion = fields.Integer()
 
 # Valida los datos enviados para crear una evaluación.
 class EvaluacionRequestSchema(ma.Schema):

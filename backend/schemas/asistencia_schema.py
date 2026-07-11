@@ -4,7 +4,7 @@ from marshmallow import fields
 from models.modelo_asistencia import Asistencia
 
 from schemas.estado_asistencia_schema import EstadoAsistenciaSchema
-from schemas.clase_schema import ClaseSchema
+from schemas.clase_schema import ClaseResumenSchema
 
 
 # Convierte los objetos del modelo Asistencia en formato JSON.
@@ -24,7 +24,7 @@ class AsistenciaSchema(ma.SQLAlchemyAutoSchema):
 
     # Devuelve la información de la clase.
     clase = fields.Nested(
-        ClaseSchema,
+        ClaseResumenSchema,
         dump_only=True
     )
 

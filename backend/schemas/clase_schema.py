@@ -11,6 +11,22 @@ class ClaseSchema(ma.SQLAlchemyAutoSchema):
         load_instance = False # Indica que no se crearán automáticamente instancias del modelo.
         include_fk = True # Incluye las claves foráneas al serializar.
 
+# Schema resumido de una clase.
+# Se utiliza cuando otra entidad necesita mostrar
+# únicamente la información principal de la clase.
+class ClaseResumenSchema(ma.Schema):
+
+    id_clase = fields.Integer()
+
+    numero_clase = fields.Integer()
+
+    tema = fields.String()
+
+    fecha = fields.Date()
+
+    estado = fields.Function(
+        lambda obj: obj.estado.name
+    )
 
 # Este schema valida todos los datos para la creacióm de una clase
 # Todos los campos son obligatorios.

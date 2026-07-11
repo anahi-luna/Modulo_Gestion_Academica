@@ -3,7 +3,7 @@ from marshmallow import fields
 
 from models.modelo_calificacion import Calificacion
 
-from schemas.evaluacion_schema import EvaluacionSchema
+from schemas.evaluacion_schema import EvaluacionResumenSchema
 
 
 # Convierte los objetos del modelo Calificacion a JSON.
@@ -17,7 +17,7 @@ class CalificacionSchema(ma.SQLAlchemyAutoSchema):
 
     # Información de la evaluación.
     evaluacion = fields.Nested(
-        EvaluacionSchema,
+        EvaluacionResumenSchema,
         dump_only=True
     )
 

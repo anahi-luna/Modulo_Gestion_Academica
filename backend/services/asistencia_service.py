@@ -4,18 +4,19 @@ from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
 
-from models.modelo_asistencia import (Asistencia,TipoRegistro)
+from models.modelo_asistencia import Asistencia, TipoRegistro
 from models.modelo_clase import EstadoClase
 from services.clase_service import obtener_clase_por_id
-from services.estado_asistencia_services import (obtener_estado_asistencia_por_id)
+from services.estado_asistencia_services import obtener_estado_asistencia_por_id
 from services.usuario_cliente import obtener_usuario
 from services.inscripcion_service import obtener_inscripcion_por_id
 
 ID_USUARIO_SIMULADO = 100
 
+
 # Obtiene el listado de asistencias.
 # Permite filtrar por clase o inscripción.
-def obtener_lista_de_asistencias(id_clase=None,id_inscripcion=None):
+def obtener_lista_de_asistencias(id_clase=None, id_inscripcion=None):
     logger.info("Consultando listado de asistencias.")
 
     query = Asistencia.query
@@ -24,27 +25,27 @@ def obtener_lista_de_asistencias(id_clase=None,id_inscripcion=None):
         query = query.filter_by(id_clase=id_clase)
 
     if id_inscripcion is not None:
-        query = query.filter_by(id_inscripcion=id_inscripcion )
+        query = query.filter_by(id_inscripcion=id_inscripcion)
 
     return query.all()
 
+
 # Obtiene una asistencia mediante su identificador.
 def obtener_asistencia_por_id(id_asistencia):
-    logger.info(
-        f"Consultando asistencia {id_asistencia}."
-    )
-    return db.session.get( Asistencia,id_asistencia )
+    logger.info(f"Consultando asistencia {id_asistencia}.")
+    return db.session.get(Asistencia, id_asistencia)
+
 
 # Verifica si una inscripción ya posee asistencia
 # registrada para una determinada clase.
-def existe_asistencia(id_inscripcion,id_clase):
+def existe_asistencia(id_inscripcion, id_clase):
     return (
         Asistencia.query.filter_by(
-            id_inscripcion=id_inscripcion,
-            id_clase=id_clase
+            id_inscripcion=id_inscripcion, id_clase=id_clase
         ).first()
         is not None
     )
+
 
 # Valida que una asistencia pueda registrarse.
 def validar_item_asistencia(item, clase, id_clase):
@@ -52,15 +53,10 @@ def validar_item_asistencia(item, clase, id_clase):
     inscripcion = obtener_inscripcion_por_id(item["id_inscripcion"])
 
     if not inscripcion:
-        logger.warning(
-            f"La inscripción "
-            f"{item['id_inscripcion']} no existe."
-        )
+        logger.warning(f"La inscripción " f"{item['id_inscripcion']} no existe.")
 
         raise BusinessError(
-            f"La inscripción "
-            f"{item['id_inscripcion']} no existe.",
-            404
+            f"La inscripción " f"{item['id_inscripcion']} no existe.", 404
         )
 
     # Verifica que la inscripción pertenezca
@@ -74,33 +70,31 @@ def validar_item_asistencia(item, clase, id_clase):
         )
 
         raise BusinessError(
-            "La inscripción no pertenece a la comisión de la clase.", 400)
+            "La inscripción no pertenece a la comisión de la clase.", 400
+        )
 
     # Verifica que exista el estado.
     estado = obtener_estado_asistencia_por_id(item["id_estado"])
 
     if not estado:
-        logger.warning(
-            f"Estado de asistencia "
-            f"{item['id_estado']} inexistente."
-        )
+        logger.warning(f"Estado de asistencia " f"{item['id_estado']} inexistente.")
 
-        raise BusinessError( "Estado de asistencia inválido.",400)
+        raise BusinessError("Estado de asistencia inválido.", 400)
 
     # Verifica que la asistencia no exista.
-    if existe_asistencia(item["id_inscripcion"],id_clase):
+    if existe_asistencia(item["id_inscripcion"], id_clase):
         logger.warning(
             f"La inscripción "
             f"{item['id_inscripcion']} "
             f"ya posee asistencia registrada."
         )
 
-        raise BusinessError("La asistencia ya fue registrada.",400)
-            
+        raise BusinessError("La asistencia ya fue registrada.", 400)
+
 
 # Prepara los datos necesarios para crear una asistencia.
-def preparar_datos_asistencia(item, id_clase,fecha):
-    
+def preparar_datos_asistencia(item, id_clase, fecha):
+
     return {
         "id_inscripcion": item["id_inscripcion"],
         "id_clase": id_clase,
@@ -110,8 +104,9 @@ def preparar_datos_asistencia(item, id_clase,fecha):
         "id_usuario_creacion": ID_USUARIO_SIMULADO,
         "id_usuario_modificacion": None,
         "ts_creacion": fecha,
-        "ts_modificacion": None
+        "ts_modificacion": None,
     }
+
 
 # Registra las asistencias de una clase.
 def crear_asistencias(datos):
@@ -131,7 +126,7 @@ def crear_asistencias(datos):
 
         if not clase:
             logger.warning(f"La clase {datos['id_clase']} no existe.")
-            raise BusinessError("La clase no existe.",404)
+            raise BusinessError("La clase no existe.", 404)
 
         # Solo se puede registrar asistencia cuando
         # la clase fue dictada.
@@ -140,25 +135,27 @@ def crear_asistencias(datos):
                 f"Intento de registrar asistencia para "
                 f"una clase con estado {clase.estado.name}."
             )
-            raise BusinessError("Solo es posible registrar asistencia en clases dictadas.",400)
+            raise BusinessError(
+                "Solo es posible registrar asistencia en clases dictadas.", 400
+            )
 
         # Verifica que exista el usuario.
         usuario = obtener_usuario(ID_USUARIO_SIMULADO)
 
         if not usuario:
             logger.warning("El usuario no existe.")
-            raise BusinessError("El usuario no existe.",404)
-        
+            raise BusinessError("El usuario no existe.", 404)
+
         ahora = datetime.now()
 
         # Recorre todas las asistencias enviadas.
         for item in datos["asistencias"]:
             # Valida la asistencia.
-            validar_item_asistencia(item, clase,datos["id_clase"])
+            validar_item_asistencia(item, clase, datos["id_clase"])
 
             # Prepara los datos de la asistencia.
-            nueva_asistencia = preparar_datos_asistencia(item, datos["id_clase"],ahora)
-            
+            nueva_asistencia = preparar_datos_asistencia(item, datos["id_clase"], ahora)
+
             # Agrega la asistencia a la lista.
             lista_asistencias.append(Asistencia(**nueva_asistencia))
 
@@ -180,7 +177,7 @@ def crear_asistencias(datos):
     except IntegrityError:
         db.session.rollback()
 
-        logger.exception( "Error de integridad al registrar las asistencias.")
+        logger.exception("Error de integridad al registrar las asistencias.")
         raise BusinessError("No fue posible registrar las asistencias.", 500)
 
     # Error de negocio.
@@ -194,20 +191,18 @@ def crear_asistencias(datos):
         db.session.rollback()
 
         logger.exception("Ocurrió un error inesperado al registrar las asistencias.")
-        raise BusinessError("Ocurrió un error interno del servidor.",500)
+        raise BusinessError("Ocurrió un error interno del servidor.", 500)
 
 
-            
 # Modifica una asistencia existente.
 def modificar_asistencia(id_asistencia, datos):
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} "
-        f"modificando la asistencia {id_asistencia}."
+        f"Usuario {ID_USUARIO_SIMULADO} " f"modificando la asistencia {id_asistencia}."
     )
 
     # Busca la asistencia.
-    asistencia = obtener_asistencia_por_id( id_asistencia )
+    asistencia = obtener_asistencia_por_id(id_asistencia)
 
     if not asistencia:
         logger.warning(f"La asistencia {id_asistencia} no existe.")
@@ -216,14 +211,14 @@ def modificar_asistencia(id_asistencia, datos):
     # Verifica que exista el usuario.
     if not obtener_usuario(ID_USUARIO_SIMULADO):
         logger.warning("El usuario no existe.")
-        raise BusinessError("El usuario no existe.",404)
+        raise BusinessError("El usuario no existe.", 404)
 
     # Verifica que exista la clase.
     clase = obtener_clase_por_id(asistencia.id_clase)
 
     if not clase:
         logger.warning(f"La clase {asistencia.id_clase} no existe.")
-        raise BusinessError("La clase no existe.",404)
+        raise BusinessError("La clase no existe.", 404)
 
     # Solo pueden modificarse asistencias
     # de clases dictadas.
@@ -233,7 +228,9 @@ def modificar_asistencia(id_asistencia, datos):
             f"de una clase con estado {clase.estado.name}."
         )
 
-        raise BusinessError("Solo es posible modificar asistencias de clases dictadas.",400)
+        raise BusinessError(
+            "Solo es posible modificar asistencias de clases dictadas.", 400
+        )
 
     # Indica si realmente hubo modificaciones.
     hubo_cambios = False
@@ -244,11 +241,10 @@ def modificar_asistencia(id_asistencia, datos):
         if not obtener_estado_asistencia_por_id(datos["id_estado"]):
 
             logger.warning(
-                f"Estado de asistencia "
-                f"{datos['id_estado']} inexistente."
+                f"Estado de asistencia " f"{datos['id_estado']} inexistente."
             )
 
-            raise BusinessError("Estado de asistencia inválido.",400)
+            raise BusinessError("Estado de asistencia inválido.", 400)
 
         # Solo actualiza si cambió.
         if asistencia.id_estado != datos["id_estado"]:
@@ -265,10 +261,7 @@ def modificar_asistencia(id_asistencia, datos):
     # Si no hubo cambios, no realiza UPDATE.
     if not hubo_cambios:
 
-        logger.info(
-            f"La asistencia {id_asistencia} "
-            f"no presentó modificaciones."
-        )
+        logger.info(f"La asistencia {id_asistencia} " f"no presentó modificaciones.")
 
         return asistencia
 
@@ -279,20 +272,67 @@ def modificar_asistencia(id_asistencia, datos):
     try:
 
         db.session.commit()
-        logger.info(
-            f"Asistencia {id_asistencia} "
-            f"actualizada correctamente."
-        )
+        logger.info(f"Asistencia {id_asistencia} " f"actualizada correctamente.")
         return asistencia
 
     except IntegrityError:
         db.session.rollback()
 
         logger.exception("Error de integridad al actualizar la asistencia.")
-        raise BusinessError("No fue posible actualizar la asistencia.",500) 
+        raise BusinessError("No fue posible actualizar la asistencia.", 500)
 
     except Exception:
         db.session.rollback()
 
         logger.exception("Ocurrió un error inesperado al actualizar la asistencia.")
-        raise BusinessError("Ocurrió un error interno del servidor.",500)
+        raise BusinessError("Ocurrió un error interno del servidor.", 500)
+
+
+# Elimina una asistencia.
+# SOLO PARA DESARROLLO.
+def eliminar_asistencia(id_asistencia):
+
+    try:
+
+        logger.info(
+            f"Usuario {ID_USUARIO_SIMULADO} "
+            f"eliminando la asistencia {id_asistencia}."
+        )
+
+        asistencia = obtener_asistencia_por_id(id_asistencia)
+
+        if not asistencia:
+
+            logger.warning(f"La asistencia {id_asistencia} no existe.")
+
+            return False
+
+        db.session.delete(asistencia)
+
+        db.session.commit()
+
+        logger.info(f"Asistencia {id_asistencia} eliminada correctamente.")
+
+        return True
+
+    except IntegrityError:
+
+        db.session.rollback()
+
+        logger.exception("Error de integridad al eliminar la asistencia.")
+
+        raise BusinessError("No fue posible eliminar la asistencia.", 500)
+
+    except BusinessError:
+
+        db.session.rollback()
+
+        raise
+
+    except Exception:
+
+        db.session.rollback()
+
+        logger.exception("Ocurrió un error inesperado al eliminar la asistencia.")
+
+        raise BusinessError("Ocurrió un error interno del servidor.", 500)

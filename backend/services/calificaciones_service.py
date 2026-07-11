@@ -6,94 +6,61 @@ from exceptions import BusinessError
 from utils.logger import logger
 
 from models.modelo_calificacion import Calificacion
-
-from services.evaluacion_service import (
-    obtener_evaluacion_por_id
-)
-
-from services.inscripcion_service import (
-    obtener_inscripcion_por_id
-)
-
-from services.usuario_cliente import (
-    obtener_usuario
-)
+from services.evaluacion_service import obtener_evaluacion_por_id
+from services.inscripcion_service import obtener_inscripcion_por_id
+from services.usuario_cliente import obtener_usuario
 
 ID_USUARIO_SIMULADO = 100
 
+
 # Obtiene el listado de calificaciones.
 # Permite filtrar por evaluación o inscripción.
-def obtener_lista_de_calificaciones(
-    id_evaluacion=None,
-    id_inscripcion=None
-):
+def obtener_lista_de_calificaciones(id_evaluacion=None, id_inscripcion=None):
 
-    logger.info(
-        "Consultando listado de calificaciones."
-    )
+    logger.info("Consultando listado de calificaciones.")
 
     query = Calificacion.query
 
     if id_evaluacion is not None:
-        query = query.filter_by(
-            id_evaluacion=id_evaluacion
-        )
+        query = query.filter_by(id_evaluacion=id_evaluacion)
 
     if id_inscripcion is not None:
-        query = query.filter_by(
-            id_inscripcion=id_inscripcion
-        )
+        query = query.filter_by(id_inscripcion=id_inscripcion)
 
     return query.all()
+
 
 # Obtiene una calificación por su identificador.
 def obtener_calificacion_por_id(id_calificacion):
 
-    logger.info(
-        f"Consultando calificación {id_calificacion}."
-    )
+    logger.info(f"Consultando calificación {id_calificacion}.")
 
-    return db.session.get(
-        Calificacion,
-        id_calificacion
-    )
+    return db.session.get(Calificacion, id_calificacion)
+
 
 # Verifica si una inscripción ya posee una
 # calificación para una determinada evaluación.
-def existe_calificacion(
-    id_evaluacion,
-    id_inscripcion
-):
+def existe_calificacion(id_evaluacion, id_inscripcion):
 
     return (
         Calificacion.query.filter_by(
-            id_evaluacion=id_evaluacion,
-            id_inscripcion=id_inscripcion
+            id_evaluacion=id_evaluacion, id_inscripcion=id_inscripcion
         ).first()
         is not None
     )
 
-# ==========================================================
+
 # Valida que una calificación pueda registrarse.
-# ==========================================================
 def validar_item_calificacion(item, evaluacion):
 
     # Verifica que exista la inscripción.
-    inscripcion = obtener_inscripcion_por_id(
-        item["id_inscripcion"]
-    )
+    inscripcion = obtener_inscripcion_por_id(item["id_inscripcion"])
 
     if not inscripcion:
 
-        logger.warning(
-            f"La inscripción "
-            f"{item['id_inscripcion']} no existe."
-        )
+        logger.warning(f"La inscripción " f"{item['id_inscripcion']} no existe.")
 
-        raise BusinessError(
-            f"La inscripción {item['id_inscripcion']} no existe.",
-            404
-        )
+        raise BusinessError(f"La inscripción {item['id_inscripcion']} no existe.", 404)
 
     # Verifica que la inscripción pertenezca
     # a la comisión de la evaluación.
@@ -107,15 +74,11 @@ def validar_item_calificacion(item, evaluacion):
         )
 
         raise BusinessError(
-            "La inscripción no pertenece a la comisión de la evaluación.",
-            400
+            "La inscripción no pertenece a la comisión de la evaluación.", 400
         )
 
     # Verifica que no exista una calificación previa.
-    if existe_calificacion(
-        evaluacion.id_evaluacion,
-        item["id_inscripcion"]
-    ):
+    if existe_calificacion(evaluacion.id_evaluacion, item["id_inscripcion"]):
 
         logger.warning(
             f"La inscripción "
@@ -123,41 +86,27 @@ def validar_item_calificacion(item, evaluacion):
             "ya posee una calificación registrada."
         )
 
-        raise BusinessError(
-            "La calificación ya fue registrada.",
-            400
-        )
+        raise BusinessError("La calificación ya fue registrada.", 400)
 
     # El puntaje no puede ser negativo.
     if item["puntaje"] < 0:
 
-        logger.warning(
-            "El puntaje no puede ser negativo."
-        )
+        logger.warning("El puntaje no puede ser negativo.")
 
-        raise BusinessError(
-            "El puntaje no puede ser negativo.",
-            400
-        )
+        raise BusinessError("El puntaje no puede ser negativo.", 400)
 
     # El puntaje no puede superar
     # el máximo de la evaluación.
     if item["puntaje"] > evaluacion.puntaje_maximo:
 
-        logger.warning(
-            "El puntaje supera el máximo permitido."
-        )
+        logger.warning("El puntaje supera el máximo permitido.")
 
-        raise BusinessError(
-            "El puntaje supera el máximo permitido.",
-            400
-        )
+        raise BusinessError("El puntaje supera el máximo permitido.", 400)
 
-# ==========================================================
+
 # Prepara los datos necesarios para crear
 # una calificación.
-# ==========================================================
-def preparar_datos_calificacion(item,id_evaluacion,fecha):
+def preparar_datos_calificacion(item, id_evaluacion, fecha):
 
     return {
         "id_evaluacion": id_evaluacion,
@@ -167,17 +116,15 @@ def preparar_datos_calificacion(item,id_evaluacion,fecha):
         "id_usuario_creacion": ID_USUARIO_SIMULADO,
         "id_usuario_modificacion": None,
         "ts_creacion": fecha,
-        "ts_modificacion": None
+        "ts_modificacion": None,
     }
 
-# ==========================================================
+
 # Registra las calificaciones de una evaluación.
-# ==========================================================
 def crear_calificaciones(datos):
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} "
-        "inició el registro de calificaciones."
+        f"Usuario {ID_USUARIO_SIMULADO} " "inició el registro de calificaciones."
     )
 
     lista_calificaciones = []
@@ -185,59 +132,33 @@ def crear_calificaciones(datos):
     try:
 
         # Verifica que exista la evaluación.
-        evaluacion = obtener_evaluacion_por_id(
-            datos["id_evaluacion"]
-        )
+        evaluacion = obtener_evaluacion_por_id(datos["id_evaluacion"])
 
         if not evaluacion:
 
-            logger.warning(
-                f"La evaluación "
-                f"{datos['id_evaluacion']} no existe."
-            )
+            logger.warning(f"La evaluación " f"{datos['id_evaluacion']} no existe.")
 
-            raise BusinessError(
-                "La evaluación no existe.",
-                404
-            )
+            raise BusinessError("La evaluación no existe.", 404)
 
         # Verifica que exista el usuario.
-        if not obtener_usuario(
-            ID_USUARIO_SIMULADO
-        ):
+        if not obtener_usuario(ID_USUARIO_SIMULADO):
 
-            logger.warning(
-                "El usuario no existe."
-            )
+            logger.warning("El usuario no existe.")
 
-            raise BusinessError(
-                "El usuario no existe.",
-                404
-            )
+            raise BusinessError("El usuario no existe.", 404)
 
         ahora = datetime.now()
 
         # Recorre todas las calificaciones.
         for item in datos["calificaciones"]:
 
-            validar_item_calificacion(
-                item,
-                evaluacion
-            )
+            validar_item_calificacion(item, evaluacion)
 
-            nueva = preparar_datos_calificacion(
-                item,
-                datos["id_evaluacion"],
-                ahora
-            )
+            nueva = preparar_datos_calificacion(item, datos["id_evaluacion"], ahora)
 
-            lista_calificaciones.append(
-                Calificacion(**nueva)
-            )
+            lista_calificaciones.append(Calificacion(**nueva))
 
-        db.session.add_all(
-            lista_calificaciones
-        )
+        db.session.add_all(lista_calificaciones)
 
         db.session.commit()
 
@@ -253,14 +174,9 @@ def crear_calificaciones(datos):
 
         db.session.rollback()
 
-        logger.exception(
-            "Error de integridad al registrar las calificaciones."
-        )
+        logger.exception("Error de integridad al registrar las calificaciones.")
 
-        raise BusinessError(
-            "No fue posible registrar las calificaciones.",
-            500
-        )
+        raise BusinessError("No fue posible registrar las calificaciones.", 500)
 
     except BusinessError:
 
@@ -271,18 +187,12 @@ def crear_calificaciones(datos):
 
         db.session.rollback()
 
-        logger.exception(
-            "Ocurrió un error inesperado al registrar las calificaciones."
-        )
+        logger.exception("Ocurrió un error inesperado al registrar las calificaciones.")
 
-        raise BusinessError(
-            "Ocurrió un error interno del servidor.",
-            500
-        )
-    
-# ==========================================================
+        raise BusinessError("Ocurrió un error interno del servidor.", 500)
+
+
 # Modifica una calificación existente.
-# ==========================================================
 def modificar_calificacion(id_calificacion, datos):
 
     logger.info(
@@ -291,45 +201,29 @@ def modificar_calificacion(id_calificacion, datos):
     )
 
     # Busca la calificación.
-    calificacion = obtener_calificacion_por_id(
-        id_calificacion
-    )
+    calificacion = obtener_calificacion_por_id(id_calificacion)
 
     if not calificacion:
 
-        logger.warning(
-            f"La calificación {id_calificacion} no existe."
-        )
+        logger.warning(f"La calificación {id_calificacion} no existe.")
 
         return None
 
     # Verifica que exista el usuario.
     if not obtener_usuario(ID_USUARIO_SIMULADO):
 
-        logger.warning(
-            "El usuario no existe."
-        )
+        logger.warning("El usuario no existe.")
 
-        raise BusinessError(
-            "El usuario no existe.",
-            404
-        )
+        raise BusinessError("El usuario no existe.", 404)
 
     # Obtiene la evaluación asociada.
-    evaluacion = obtener_evaluacion_por_id(
-        calificacion.id_evaluacion
-    )
+    evaluacion = obtener_evaluacion_por_id(calificacion.id_evaluacion)
 
     if not evaluacion:
 
-        logger.warning(
-            f"La evaluación {calificacion.id_evaluacion} no existe."
-        )
+        logger.warning(f"La evaluación {calificacion.id_evaluacion} no existe.")
 
-        raise BusinessError(
-            "La evaluación no existe.",
-            404
-        )
+        raise BusinessError("La evaluación no existe.", 404)
 
     # Indica si realmente hubo cambios.
     hubo_cambios = False
@@ -341,17 +235,11 @@ def modificar_calificacion(id_calificacion, datos):
 
         if datos["puntaje"] < 0:
 
-            raise BusinessError(
-                "El puntaje no puede ser negativo.",
-                400
-            )
+            raise BusinessError("El puntaje no puede ser negativo.", 400)
 
         if datos["puntaje"] > evaluacion.puntaje_maximo:
 
-            raise BusinessError(
-                "El puntaje supera el máximo permitido.",
-                400
-            )
+            raise BusinessError("El puntaje supera el máximo permitido.", 400)
 
         if calificacion.puntaje != datos["puntaje"]:
 
@@ -371,10 +259,7 @@ def modificar_calificacion(id_calificacion, datos):
     # Si no hubo modificaciones, evita hacer UPDATE.
     if not hubo_cambios:
 
-        logger.info(
-            f"La calificación {id_calificacion} "
-            "no presentó modificaciones."
-        )
+        logger.info(f"La calificación {id_calificacion} " "no presentó modificaciones.")
 
         return calificacion
 
@@ -386,10 +271,7 @@ def modificar_calificacion(id_calificacion, datos):
 
         db.session.commit()
 
-        logger.info(
-            f"Calificación {id_calificacion} "
-            "actualizada correctamente."
-        )
+        logger.info(f"Calificación {id_calificacion} " "actualizada correctamente.")
 
         return calificacion
 
@@ -397,28 +279,19 @@ def modificar_calificacion(id_calificacion, datos):
 
         db.session.rollback()
 
-        logger.exception(
-            "Error de integridad al actualizar la calificación."
-        )
+        logger.exception("Error de integridad al actualizar la calificación.")
 
-        raise BusinessError(
-            "No fue posible actualizar la calificación.",
-            500
-        )
+        raise BusinessError("No fue posible actualizar la calificación.", 500)
 
     except Exception:
 
         db.session.rollback()
 
-        logger.exception(
-            "Ocurrió un error inesperado al actualizar la calificación."
-        )
+        logger.exception("Ocurrió un error inesperado al actualizar la calificación.")
 
-        raise BusinessError(
-            "Ocurrió un error interno del servidor.",
-            500
-        )
-    
+        raise BusinessError("Ocurrió un error interno del servidor.", 500)
+
+
 # ==========================================================
 # Elimina una calificación.
 # ==========================================================
@@ -429,29 +302,21 @@ def eliminar_calificacion(id_calificacion):
         f"eliminando la calificación {id_calificacion}."
     )
 
-    calificacion = obtener_calificacion_por_id(
-        id_calificacion
-    )
+    calificacion = obtener_calificacion_por_id(id_calificacion)
 
     if not calificacion:
 
-        logger.warning(
-            f"La calificación {id_calificacion} no existe."
-        )
+        logger.warning(f"La calificación {id_calificacion} no existe.")
 
         return False
 
     try:
 
-        db.session.delete(
-            calificacion
-        )
+        db.session.delete(calificacion)
 
         db.session.commit()
 
-        logger.info(
-            f"Calificación {id_calificacion} eliminada correctamente."
-        )
+        logger.info(f"Calificación {id_calificacion} eliminada correctamente.")
 
         return True
 
@@ -459,24 +324,14 @@ def eliminar_calificacion(id_calificacion):
 
         db.session.rollback()
 
-        logger.exception(
-            "Error de integridad al eliminar la calificación."
-        )
+        logger.exception("Error de integridad al eliminar la calificación.")
 
-        raise BusinessError(
-            "No fue posible eliminar la calificación.",
-            500
-        )
+        raise BusinessError("No fue posible eliminar la calificación.", 500)
 
     except Exception:
 
         db.session.rollback()
 
-        logger.exception(
-            "Ocurrió un error inesperado al eliminar la calificación."
-        )
+        logger.exception("Ocurrió un error inesperado al eliminar la calificación.")
 
-        raise BusinessError(
-            "Ocurrió un error interno del servidor.",
-            500
-        )
+        raise BusinessError("Ocurrió un error interno del servidor.", 500)
