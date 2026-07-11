@@ -1,14 +1,15 @@
-import * as asistenciasMock from "../mocks/asistenciasMock";
 import * as legajosMock from "../mocks/legajosMock";
 import * as comisionesMock from "../mocks/comisionesMock";
+import { getAsistenciaPorClase, getAsistenciaPorId, actualizarAsistencia, registrarAsistencia} from "../api/asistenciasApi";
+import { getInscripcionPorId } from "../api/inscripcionesApi";
 
 
 //Obtiene todas las asistencias dependiendo de la comision
 
-export async function obtenerAsistenciasPorComision(idComision) {
+export async function obtenerAsistenciasPorClase(idClase) {
 
     const response =
-        await asistenciasMock.getAsistenciasPorComision(idComision);
+        await getAsistenciaPorClase(idClase);
 
     const comisiones =
         (await comisionesMock.getComisiones()).data;
@@ -16,6 +17,8 @@ export async function obtenerAsistenciasPorComision(idComision) {
     const resultado = await Promise.all(
 
         response.data.map(async (asistencia) => {
+
+            const inscripcion = await getListaDeInscripciones(asistencia.id_inscripcion);
 
             const legajo = (
                 await legajosMock.getLegajoPorId(asistencia.id_legajo)
@@ -31,13 +34,15 @@ export async function obtenerAsistenciasPorComision(idComision) {
 
                 id_legajo: legajo.numero_legajo,
 
-                nombre: `${legajo.nombre} ${legajo.apellido}`,
+                alumno: `${legajo.nombre} ${legajo.apellido}`,
 
                 dni: legajo.dni,
 
                 rango: legajo.rango,
 
-                id_comision: asistencia.id_comision,
+                id_inscripcion: inscripcion.id_inscripcion,
+
+                id_comision: inscripcion.id_comision,
 
                 codigo_comision: comision?.codigo ?? "-",
 
@@ -47,7 +52,9 @@ export async function obtenerAsistenciasPorComision(idComision) {
 
                 horario: comision?.horario ?? "-",
 
-                estado: asistencia.estado,
+                estado: asistencia.estado.nombre,
+
+                observacion: asistencia.observacion,
 
             };
 
@@ -61,5 +68,9 @@ export async function obtenerAsistenciasPorComision(idComision) {
 
 //Actualiza la asistencia
 
-export const actualizarAsistencia =
-    asistenciasMock.actualizarAsistencia;
+export async function modificarAsistencia(idAsistencia, idEstado){
+    return await actualizarAsistencia(idAsistencia, idEstado);
+
+}
+
+    

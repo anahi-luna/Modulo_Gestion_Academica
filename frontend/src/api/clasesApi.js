@@ -1,12 +1,22 @@
 import API_URL from "./api";
 
-export async function getListaClases() {
+export async function getListaClases(idComision) {
     try{   
-        const response = await fetch(`${API_URL}/clases/`); //Guarda la lista en la variable response
+
+        const url = idComision //Cambia entre obtener las clases por comision o todas segun lo que se ejecute
+            ? `${API_URL}/clases?id_comision=${idComision}`
+            :`${API_URL}/clases/`
+        
+
+        const response = await fetch(url); //Guarda la lista en la variable response
+
         const data = await response.json();
+
+
         if(!response.ok){
             throw new Error(data.message)
         }
+
         return data; 
     }catch(error){
         console.error("Error al obtener las clases", error)

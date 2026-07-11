@@ -3,9 +3,9 @@ import { getListaClases, getClasePorId, crearClase, editarClase, eliminarClase }
 import { getComisiones } from "../mocks/comisionesMock";
 
 
-export async function getClases() {
+export async function getClases(idComision) {
 
-    const response = await getListaClases();
+    const response = await getListaClases(idComision);
 
     const comisiones = (await getComisiones()).data;
 
@@ -88,6 +88,7 @@ export async function getClase(id) {
     };
 
 }
+
 
 export async function registrarClase(datos) {
 

@@ -1,8 +1,39 @@
-import ClaseCard from "./ClaseCard";
+import { useEffect, useState } from "react";
+import ClaseCard from "./ComisionCard";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { getComisiones } from "../../mocks/comisionesMock";
+import ComisionCard from "./ComisionCard";
 
-export default function PanelesClase() {
 
+
+export default function PanelesClase({
+    comisionSeleccionada,
+    setComisionSeleccionada
+}) {
+    const [comisiones, setComisiones] = useState([]);
+    
+
+    useEffect(() =>{
+    
+            async function cargarComisiones() {
+                try{
+                    console.log("Cargando comisiones...");
+                    const resultado = await getComisiones();
+                    setComisiones(resultado.data);
+    
+                    if(resultado.data.length > 0) {
+                        setComisionSeleccionada(resultado.data[0]);
+    
+                    }
+    
+    
+                }catch(error){
+                    console.error(error);
+                }
+            }
+            
+            cargarComisiones();
+        }, []);
     return (
 
         <div className="col-span-3 bg-white rounded-xl shadow border p-5">
@@ -32,24 +63,16 @@ export default function PanelesClase() {
 
             <div className="space-y-3 overflow-y-auto max-h-[600px] pr-1">
 
-                <ClaseCard
-                    nombre="Primeros Auxilios"
-                    fecha="02 Jul"
-                    cantidad={3}
-                    seleccionada
-                />
+                {comisiones.map((comision)=>(
+                    <ComisionCard
+                        key={comision.id}
+                        comision={comision}
+                        seleccionada={comision.id === comisionSeleccionada?.id}
+                        onClick={() => setComisionSeleccionada(comision)}
+                    />
+                ))}
 
-                <ClaseCard
-                    nombre="Gestión Operativa"
-                    fecha="05 Jul"
-                    cantidad={2}
-                />
-
-                <ClaseCard
-                    nombre="Defensa Civil"
-                    fecha="12 Jul"
-                    cantidad={1}
-                />
+               
 
             </div>
 

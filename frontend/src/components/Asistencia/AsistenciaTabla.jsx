@@ -1,22 +1,46 @@
 import { useEffect, useState } from "react";
 import IntegranteRow from "./IntegranteRow";
-import { obtenerAsistenciasPorComision, actualizarAsistencia} from "../../Services/asistenciaAdminService";
+import {modificarAsistencia, obtenerAsistenciasPorClase} from "../../Services/asistenciaAdminService";
 
-export default function AsistenciaTabla({idComision}) {
+export default function AsistenciaTabla({idClase}) {
   const [asistencias, setAsistencias] = useState([]);
 
   useEffect(() => {
-    cargarAsistencias();
-  }, [idComision]);
+
+    if(idClase){
+      cargarAsistencias();
+    } else{
+      setAsistencias([]);
+    }
+    
+  }, [idClase]);
 
   async function cargarAsistencias() {
-    const resultado = await obtenerAsistenciasPorComision(idComision);
-    setAsistencias(resultado);
-  }
+    try{
 
+      const resultado = await obtenerAsistenciasPorClase(idClase);
+      setAsistencias(resultado);
+
+    }catch(error){
+
+      console.error(error);
+
+    }
+    
+  }
+  
   async function actualizarEstado(idAsistencia, idEstado) {
-    await actualizarAsistencia(idAsistencia, idEstado);
-    cargarAsistencias();
+    try{
+
+      await modificarAsistencia(idAsistencia, idEstado);
+      cargarAsistencias();
+
+    }catch(error){
+
+      console.error(error);
+
+    }
+    
   }
 
   return (

@@ -1,8 +1,10 @@
 import PanelClases from "../components/Asistencia/PanelesClase";
 import PanelDetalleClase from "../components/Asistencia/PanelDetalleClase";
 import PanelesClase from "../components/Asistencia/PanelesClase";
+import { useState } from "react";
 
 export default function AsistenciaAdmin() {
+  const [comisionSeleccionada, setComisionSeleccionada] = useState(null);
   return (
     <div className="min-h-screen bg-gray-100 p-6">
 
@@ -15,7 +17,7 @@ export default function AsistenciaAdmin() {
           </h1>
 
           <p className="text-gray-500">
-            Seleccioná una clase y registrá la asistencia.
+            Seleccioná una comision y registrá la asistencia.
           </p>
 
         </div>
@@ -25,9 +27,14 @@ export default function AsistenciaAdmin() {
 
       <div className="grid grid-cols-12 gap-6">
 
-        <PanelesClase />
+        <PanelesClase
+          comisionSeleccionada={comisionSeleccionada}
+          setComisionSeleccionada={setComisionSeleccionada}
+        />
 
-        <PanelDetalleClase />
+        <PanelDetalleClase 
+          idComision = {comisionSeleccionada?.id}
+        />
 
       </div>
 

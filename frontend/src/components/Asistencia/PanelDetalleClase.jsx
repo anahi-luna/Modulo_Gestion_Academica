@@ -1,17 +1,46 @@
-import ComisionTabs from "./ComisionTabs";
+import ClaseSelect from "./ClaseSelect";
 import EstadisticaCard from "./EstadisticaCard";
 import TablaAsistencia from "./AsistenciaTabla";
 import { useNavigate } from "react-router-dom";
 import { CalendarDaysIcon, ClockIcon, MapPinIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getClase, getClases } from "../../Services/clasesAdminService";
 
 
 
 
-export default function PanelDetalleClase(){
-    const [comisionSeleccionada, setComisionSeleccionada] = useState(1);
+export default function PanelDetalleClase({idComision}){
+    const [claseSeleccionada, setClaseSeleccionada] = useState(null);
+    const [clases, setClases] = useState([])
 
     const navigate = useNavigate();
+
+    console.log("idComision:", idComision);
+
+    useEffect(() =>{
+
+        async function cargarClases() {
+            try{
+                console.log("Cargando clases...");
+                const resultado = await getClases(idComision);
+                setClases(resultado);
+
+                if(resultado.length > 0) {
+                    setClaseSeleccionada(resultado[0]);
+
+                }
+
+
+            }catch(error){
+                console.error(error);
+            }
+        }
+
+        if(idComision) {
+            cargarClases(); 
+        }
+    },[idComision]);
+
     return(
 
         <div className="col-span-9 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
@@ -23,8 +52,8 @@ export default function PanelDetalleClase(){
                     <div>
 
                         <h2 className="text-4xl font-bold text-gray-800">
-
-                            Primeros Auxilios
+                            {claseSeleccionada?.tema}
+                            
 
                         </h2>
 
@@ -32,17 +61,17 @@ export default function PanelDetalleClase(){
 
                             <div className="flex items-center gap-2">
                                 <CalendarDaysIcon className="h-5 w-5 text-red-600" />
-                                <span>02 Jul</span>
+                                <span>{claseSeleccionada?.fecha}</span>
                             </div>
 
                             <div className="flex items-center gap-2">
                                 <ClockIcon className="h-5 w-5 text-red-600" />
-                                <span>09:00</span>
+                                <span>{claseSeleccionada?.hora_inicio}</span>
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <MapPinIcon className="h-5 w-5 text-red-600" />
-                                <span>Sede Central</span>
+                                <ClockIcon className="h-5 w-5 text-red-600" />
+                                <span>{claseSeleccionada?.hora_fin}</span>
                             </div>
 
                         </div>
@@ -62,9 +91,10 @@ export default function PanelDetalleClase(){
 
             </div>
 
-            <ComisionTabs 
-                comisionSeleccionada={comisionSeleccionada}
-                setComisionSeleccionada={setComisionSeleccionada}
+            <ClaseSelect
+                clases={clases}
+                claseSeleccionada={claseSeleccionada}
+                setClaseSeleccionada={setClaseSeleccionada}
             />
 
             <div className="grid grid-cols-4 gap-5 px-8 py-6">
@@ -94,7 +124,7 @@ export default function PanelDetalleClase(){
 
             </div>
 
-            <TablaAsistencia idComision={comisionSeleccionada}/>
+            <TablaAsistencia idClase={claseSeleccionada?.id}/>
 
         </div>
 
