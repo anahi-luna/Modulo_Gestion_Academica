@@ -128,8 +128,12 @@ export default function GestionClases() {
                 );
 
             } else {
-
-                await registrarClase(datos);
+                const {
+                    estado,
+                    ...datosCrear
+                    
+                }=datos;
+                await registrarClase(datosCrear);
 
             }
 

@@ -2,6 +2,7 @@ import * as legajosMock from "../mocks/legajosMock";
 import * as comisionesMock from "../mocks/comisionesMock";
 import { getAsistenciaPorClase, getAsistenciaPorId, actualizarAsistencia, registrarAsistencia} from "../api/asistenciasApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
+import { modificarClase } from "./clasesAdminService";
 
 
 //Obtiene todas las asistencias dependiendo de la comision
@@ -18,14 +19,14 @@ export async function obtenerAsistenciasPorClase(idClase) {
 
         response.data.map(async (asistencia) => {
 
-            const inscripcion = await getListaDeInscripciones(asistencia.id_inscripcion);
+            const inscripcion = (await getInscripcionPorId(asistencia.id_inscripcion)).data;
 
             const legajo = (
-                await legajosMock.getLegajoPorId(asistencia.id_legajo)
+                await (legajosMock.getLegajoPorId(inscripcion.id_legajo))
             ).data;
 
             const comision = comisiones.find(
-                c => c.id === asistencia.id_comision
+                c => c.id === inscripcion.id_comision
             );
 
             return {
@@ -35,8 +36,6 @@ export async function obtenerAsistenciasPorClase(idClase) {
                 id_legajo: legajo.numero_legajo,
 
                 alumno: `${legajo.nombre} ${legajo.apellido}`,
-
-                dni: legajo.dni,
 
                 rango: legajo.rango,
 
@@ -52,7 +51,7 @@ export async function obtenerAsistenciasPorClase(idClase) {
 
                 horario: comision?.horario ?? "-",
 
-                estado: asistencia.estado.nombre,
+                id_estado: asistencia.id_estado,
 
                 observacion: asistencia.observacion,
 
@@ -65,6 +64,13 @@ export async function obtenerAsistenciasPorClase(idClase) {
     return resultado;
 }
 
+export async function registrarAsistenciaService(datos) {
+
+    const response = await registrarAsistencia(datos);
+
+    return response.data;
+
+}
 
 //Actualiza la asistencia
 
@@ -73,4 +79,24 @@ export async function modificarAsistencia(idAsistencia, idEstado){
 
 }
 
-    
+export async function actualizarEstadoAutomaticamente(clase) {
+    const ahora = new Date();
+    const inicio = new Date(`${clase.fecha}T${clase.hora_inicio}`);
+
+    if (
+        clase.estado === "PROGRAMADA" &&
+        inicio <= ahora
+    ) {
+        await modificarClase(clase.id, {
+            id_comision: clase.id_comision,
+            estado: "DICTADA"
+        });
+
+        return {
+            ...clase,
+            estado: "DICTADA"
+        };
+    }
+
+    return clase;
+}

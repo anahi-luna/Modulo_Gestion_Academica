@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { CalendarDaysIcon, ClockIcon, MapPinIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { getClase, getClases } from "../../Services/clasesAdminService";
+import { obtenerAsistenciasPorClase, modificarAsistencia, registrarAsistenciaService, actualizarEstadoAutomaticamente } from "../../Services/asistenciaAdminService";
+import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
+import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
 
 
 
@@ -12,34 +15,127 @@ import { getClase, getClases } from "../../Services/clasesAdminService";
 export default function PanelDetalleClase({idComision}){
     const [claseSeleccionada, setClaseSeleccionada] = useState(null);
     const [clases, setClases] = useState([])
+    const [asistencias, setAsistencias] = useState([]);
 
     const navigate = useNavigate();
 
     console.log("idComision:", idComision);
 
-    useEffect(() =>{
+    useEffect(() => {
 
         async function cargarClases() {
-            try{
-                console.log("Cargando clases...");
+            try {
+
                 const resultado = await getClases(idComision);
-                setClases(resultado);
+                const clasesActualizadas = await Promise.all(
+                    resultado.map(actualizarEstadoAutomaticamente)
+                );
 
-                if(resultado.length > 0) {
+                setClases(clasesActualizadas);
+
+                if (resultado.length > 0) {
                     setClaseSeleccionada(resultado[0]);
-
                 }
 
-
-            }catch(error){
+            } catch (error) {
                 console.error(error);
             }
         }
 
-        if(idComision) {
-            cargarClases(); 
+        if (idComision) {
+            cargarClases();
         }
-    },[idComision]);
+
+    }, [idComision]);
+
+    useEffect(() => {
+
+        if(claseSeleccionada?.id){
+        cargarAsistencias();
+        } else{
+        setAsistencias([]);
+        }
+    
+    }, [claseSeleccionada?.id]);
+
+    async function cargarAsistencias() {
+        try{
+            
+            const asistencias = await obtenerAsistenciasPorClase(claseSeleccionada.id);
+            if(asistencias.length > 0){
+                setAsistencias(asistencias);
+            }else{
+                const inscriptos = await obtenerInscripcionesPorComision(idComision);
+
+                setAsistencias(inscriptos);
+            }
+            
+            
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+    
+    }
+
+    function cambiarEstado(idInscripcion, idEstado){
+
+        setAsistencias(prev =>
+            prev.map(a =>
+                a.id_inscripcion === idInscripcion
+                    ? {
+                        ...a,
+                        id_estado: idEstado
+                    }
+                    : a
+            )
+        );
+
+    }
+  
+    async function guardarAsistencias(){
+
+        const datos = {
+
+            id_clase: claseSeleccionada.id,
+
+            asistencias: asistencias.map(a => ({
+
+                id_inscripcion: a.id_inscripcion,
+
+                id_estado: a.id_estado,
+
+                observacion: a.observacion
+
+            }))
+
+        };
+        console.log(datos);
+        await registrarAsistenciaService(datos);
+
+    }
+    console.log(asistencias);
+    const inscriptos = asistencias.length;
+
+    const presentes = asistencias.filter(
+        a => a.id_estado === 1
+    ).length;
+
+    const ausentes = asistencias.filter(
+        a => a.id_estado === 2
+    ).length;
+
+
+    const justificado = asistencias.filter(
+        a => a.id_estado === 3
+
+    ).length;
+
+    const tarde = asistencias.filter(
+        a => a.id_estado === 4
+    ).length;
 
     return(
 
@@ -101,30 +197,47 @@ export default function PanelDetalleClase({idComision}){
 
                 <EstadisticaCard
                     titulo="Inscriptos"
-                    cantidad={18}
+                    cantidad={inscriptos}
                 />
 
                 <EstadisticaCard
                     titulo="Presentes"
-                    cantidad={14}
+                    cantidad={presentes}
                     color="green"
                 />
 
                 <EstadisticaCard
-                    titulo="Tarde"
-                    cantidad={2}
+                    titulo="Ausentes"
+                    cantidad={ausentes}
                     color="yellow"
                 />
 
                 <EstadisticaCard
-                    titulo="Ausentes"
-                    cantidad={2}
+                    titulo="Tarde"
+                    cantidad={tarde}
                     color="red"
+                />
+                
+                <EstadisticaCard
+                    titulo="Justificados"
+                    cantidad={justificado}
+                    
                 />
 
             </div>
 
-            <TablaAsistencia idClase={claseSeleccionada?.id}/>
+            <TablaAsistencia 
+                asistencias={asistencias}
+                onCambiarEstado={cambiarEstado}
+            />
+
+            <button
+                onClick={guardarAsistencias}
+            >
+
+                Guardar asistencias
+
+            </button>
 
         </div>
 

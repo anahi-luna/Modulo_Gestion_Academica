@@ -12,6 +12,25 @@ export async function getInscripcionPorId(id) {
     return await responde.json();
 }
 
+export async function getInscripcionesPorComision(idComision) {
+    try{
+        const response = await fetch(
+            `${API_URL}/inscripciones?id_comision=${idComision}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    }catch(error){
+        console.error(error)
+    }
+    
+}
+
 //Se crea una inscripcion por el metodo POST
 export async function crearInscripcion(datos) {
     const responde = await fetch(

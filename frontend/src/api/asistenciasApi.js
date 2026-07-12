@@ -80,7 +80,7 @@ export async function registrarAsistencia(datos) {
         );
 
         const data = await response.json();
-
+        console.log("Respuesta backend:", data);
         if(!response.ok){
             throw new Error(data.message)
         }
