@@ -2,7 +2,7 @@ from extensions import db
 from models.modelo_estado_academico import EstadoAcademico
 
 # ============================================================
-# Inserta los estados de asistencia en la base de datos.
+# Inserta los estados academicos en la base de datos.
 # La carga se realiza únicamente si la tabla está vacía,
 # evitando duplicar registros.
 # ============================================================
