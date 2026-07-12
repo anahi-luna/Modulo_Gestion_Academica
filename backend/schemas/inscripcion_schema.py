@@ -17,6 +17,16 @@ class InscripcionSchema(ma.SQLAlchemyAutoSchema):
         load_instance = False
         include_fk = True
 
+class InscripcionResumenSchema(ma.Schema):
+
+    id_inscripcion = fields.Integer()
+
+    id_legajo = fields.Integer()
+
+    id_comision = fields.Integer()
+
+    id_estado = fields.Integer()
+
 #Valida una inscripcion del POST "osea el request"
 class InscripcionRequestSchema(ma.Schema):
     id_legajo = fields.Integer(
