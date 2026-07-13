@@ -27,6 +27,7 @@ export default function EvaluacionesTable({
     return (
 
         <div className="rounded-xl bg-white shadow border overflow-hidden">
+            <div className="overflow-x-auto">
 
             <table className="w-full">
 
@@ -132,7 +133,7 @@ export default function EvaluacionesTable({
             </table>
 
         </div>
-
+        </div>
     );
 
 }

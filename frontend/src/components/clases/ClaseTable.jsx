@@ -31,7 +31,7 @@ export default function ClasesTable({
     return (
 
         <div className="rounded-xl bg-white shadow border overflow-hidden">
-
+            <div className="overflow-x-auto">
             <table className="w-full">
 
                 <thead className="bg-gray-100">
@@ -186,6 +186,7 @@ export default function ClasesTable({
 
             </table>
 
+        </div>
         </div>
 
     );

@@ -13,6 +13,8 @@ import CalificacionesAdmin from "./pages/CalificacionesAdmin";
 import GestionEvaluaciones from "./pages/GestionEvaluaciones";
 import MisCalificaciones from "./pages/MisCalificaciones";
 import { ROLES, ADMIN_MOCK, ALUMNO_MOCK } from './mocks/usuariosMock';
+import MisCertificados from "./pages/MisCertificados";
+import GestionCertificados from "./pages/GestionCertificados";
 import { useState } from "react";
 
 
@@ -54,7 +56,7 @@ export default function App() {
                         <Route
                             path="/inscripcionesAdmin"
                             element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.ADMINISTRATIVO]}>
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
                                     <InscripcionesAdmin />
                                 </RutaProtegida>
                             }
@@ -109,7 +111,37 @@ export default function App() {
                                     <MisCalificaciones usuario={usuario} />
                                 </RutaProtegida>
                             }
+                            
                         />
+
+                        {/* Mis certificados: sólo alumno, solo lectura */}
+                        <Route
+                            path="/certificados"
+                            element={
+                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
+                                    <MisCertificados usuario={usuario} />
+                                </RutaProtegida>
+                            }
+                        />
+                        {/* Mis certificados: sólo alumno */}
+<Route
+    path="/certificados"
+    element={
+        <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
+            <MisCertificados usuario={usuario} />
+        </RutaProtegida>
+    }
+/>
+
+{/* Gestión de certificados: sólo admin (autoridad habilitada para emitir/firmar) */}
+<Route
+    path="/certificadosAdmin"
+    element={
+        <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
+            <GestionCertificados usuario={usuario} />
+        </RutaProtegida>
+    }
+/>
 
                     </Routes>
                 </main>

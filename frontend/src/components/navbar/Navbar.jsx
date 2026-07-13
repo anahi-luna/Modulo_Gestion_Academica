@@ -3,7 +3,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import user from "../../assets/user.png";
 import logo from "../../images/Logo.png";
-import { ROLES, ADMIN_MOCK, ALUMNO_MOCK, PROFESOR_MOCK, ADMINISTRATIVO_MOCK } from "../../mocks/usuariosMock";
+import { ROLES, ADMIN_MOCK, ALUMNO_MOCK, PROFESOR_MOCK } from "../../mocks/usuariosMock";
 
 export default function Navbar({ usuario, setUsuario, modulo }) {
 
@@ -14,13 +14,22 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
        : "text-red-100 hover:bg-red-700"
      }`;
 
+  // Mismo link de mobile, usado tanto en el menú desplegable como en el
+  // desktop, para no repetir la lista de condiciones por rol dos veces.
+  const linkClassMobile = ({ isActive }) =>
+    `block px-3 py-2 rounded-md text-base font-medium
+     ${isActive
+       ? "bg-red-600 text-white"
+       : "text-red-100 hover:bg-red-700"
+     }`;
+
   return (
     <Disclosure as="nav" className="bg-red-800 shadow-md sticky top-0 z-40">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
 
-          {/* Botón menú mobile */}
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+          {/* Botón menú mobile: ahora se ve hasta pantallas lg (antes sm) */}
+          <div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-red-200 hover:bg-red-700 hover:text-white">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Abrir menú</span>
@@ -30,31 +39,31 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
           </div>
 
           {/* Logo + título + links */}
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+          <div className="flex flex-1 items-center justify-center lg:items-stretch lg:justify-start">
 
             {/* Logo e identidad */}
             <div className="flex shrink-0 items-center gap-3">
               <img
                 src={logo}
                 alt="Logo Bomberos"
-                className="h-12 w-12 object-contain"   
+                className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
               />
-              <div className="hidden sm:block">
+              <div className="hidden md:block">
                 <p className="font-bold text-white text-sm leading-tight">Sistema de Legajos</p>
                 <p className="text-red-200 text-xs">Bomberos Voluntarios</p>
               </div>
             </div>
 
-            {/* Links de navegación */}
-            <div className="hidden sm:ml-6 sm:flex sm:items-center">
-              <div className="flex space-x-2">
+            {/* Links de navegación (desktop, >= lg) */}
+            <div className="hidden lg:ml-6 lg:flex lg:items-center">
+              <div className="flex space-x-1 xl:space-x-2">
                 <NavLink to="/" className={linkClass} end>Home</NavLink>
 
                 {(usuario.rol === ROLES.ALUMNO) && (
                     <NavLink to="/inscripciones" className={linkClass} end>Inscribirme</NavLink>
                 )}
 
-                {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.ADMINISTRATIVO) && (
+                {(usuario.rol === ROLES.ADMIN) && (
                     <NavLink to="/inscripcionesAdmin" className={linkClass} end>Inscripciones</NavLink>
                 )}
 
@@ -69,17 +78,25 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
                 {(usuario.rol === ROLES.ALUMNO) && (
                     <NavLink to="/calificaciones" className={linkClass} end>Mis calificaciones</NavLink>
                 )}
+
+                {(usuario.rol === ROLES.ADMIN) && (
+                    <NavLink to="/certificadosAdmin" className={linkClass} end>Certificados</NavLink>
+                )}
+
+                {(usuario.rol === ROLES.ALUMNO) && (
+                    <NavLink to="/certificados" className={linkClass} end>Mis certificados</NavLink>
+                )}
                 {/* aca metemos cuando tengamos mas modulos*/}
               </div>
             </div>
           </div>
 
           {/* Derecha: módulo activo + campana + perfil */}
-          <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          <div className="absolute inset-y-0 right-0 flex items-center gap-1 sm:gap-2 pr-2 lg:static lg:inset-auto lg:ml-6 lg:pr-0">
 
-            {/* Badge módulo activo — viene como prop desde la vista */}
+            {/* Badge módulo activo — se oculta hasta md para no apretar en tablet chica */}
             {modulo && (
-              <span className="hidden sm:inline text-xs bg-red-900 text-red-100 px-3 py-1 rounded-full font-medium">
+              <span className="hidden md:inline text-xs bg-red-900 text-red-100 px-3 py-1 rounded-full font-medium">
                 {modulo}
               </span>
             )}
@@ -95,7 +112,7 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
             </button>
 
             {/* Dropdown perfil */}
-            <Menu as="div" className="relative ml-2">
+            <Menu as="div" className="relative ml-1 sm:ml-2">
               <MenuButton className="relative flex rounded-full">
                 <span className="absolute -inset-1.5" />
                 <span className="sr-only">Menú usuario</span>
@@ -134,14 +151,6 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
                     Profesor
                   </button>
                 </MenuItem>
-                <MenuItem>
-                  <button
-                    onClick={() => setUsuario(ADMINISTRATIVO_MOCK)}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5"
-                  >
-                    Administrativo
-                  </button>
-                </MenuItem>
               </MenuItems>
             </Menu>
           </div>
@@ -149,10 +158,38 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
         </div>
       </div>
 
-      {/* Menú mobile desplegable */}
-      <DisclosurePanel className="sm:hidden">
+      {/* Menú mobile desplegable (visible hasta lg) */}
+      <DisclosurePanel className="lg:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
-          <NavLink to="/" className={linkClass} end>Home</NavLink>
+          <NavLink to="/" className={linkClassMobile} end>Home</NavLink>
+
+          {(usuario.rol === ROLES.ALUMNO) && (
+              <NavLink to="/inscripciones" className={linkClassMobile} end>Inscribirme</NavLink>
+          )}
+
+          {(usuario.rol === ROLES.ADMIN) && (
+              <NavLink to="/inscripcionesAdmin" className={linkClassMobile} end>Inscripciones</NavLink>
+          )}
+
+          {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.PROFESOR) && (
+              <NavLink to="/AsistenciaAdmin" className={linkClassMobile} end>Asistencia</NavLink>
+          )}
+
+          {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.PROFESOR) && (
+              <NavLink to="/CalificacionesAdmin" className={linkClassMobile} end>Calificaciones</NavLink>
+          )}
+
+          {(usuario.rol === ROLES.ALUMNO) && (
+              <NavLink to="/calificaciones" className={linkClassMobile} end>Mis calificaciones</NavLink>
+          )}
+
+          {(usuario.rol === ROLES.ADMIN) && (
+              <NavLink to="/certificadosAdmin" className={linkClassMobile} end>Certificados</NavLink>
+          )}
+
+          {(usuario.rol === ROLES.ALUMNO) && (
+              <NavLink to="/certificados" className={linkClassMobile} end>Mis certificados</NavLink>
+          )}
         </div>
       </DisclosurePanel>
     </Disclosure>
