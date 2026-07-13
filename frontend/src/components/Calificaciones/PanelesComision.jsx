@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
+import ComisionCard from "../Asistencia/ComisionCard";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getComisiones } from "../../mocks/comisionesMock";
-import ComisionCard from "./ComisionCard";
 
-export default function PanelesClase({
+export default function PanelesComision({
     comisionSeleccionada,
     setComisionSeleccionada
 }) {
     const [comisiones, setComisiones] = useState([]);
+    const [busqueda, setBusqueda] = useState("");
 
-    // Carga las comisiones al montar el componente
     useEffect(() => {
         async function cargarComisiones() {
             try {
                 const resultado = await getComisiones();
                 setComisiones(resultado.data);
-
                 if (resultado.data.length > 0) {
                     setComisionSeleccionada(resultado.data[0]);
                 }
@@ -26,33 +25,32 @@ export default function PanelesClase({
         cargarComisiones();
     }, []);
 
+    const comisionesFiltradas = comisiones.filter((c) =>
+        `${c.materia} ${c.codigo} ${c.docente}`
+            .toLowerCase()
+            .includes(busqueda.toLowerCase())
+    );
+
     return (
-        // Antes: "col-span-3" fijo (rompía en mobile porque el grid
-        // padre tiene 12 columnas incluso en pantallas chicas).
-        // Ahora: en mobile ocupa el ancho completo, y recién en lg
-        // vuelve a ocupar 3 de las 12 columnas.
+        // lg:col-span-3 en vez de col-span-3 fijo (mismo criterio que PanelesClase)
         <div className="lg:col-span-3 bg-white rounded-xl shadow border p-4 sm:p-5">
 
             <div className="flex justify-between items-center mb-4 sm:mb-5">
-                <h2 className="text-lg sm:text-xl font-semibold">
-                    Clases
-                </h2>
+                <h2 className="text-lg sm:text-xl font-semibold">Comisiones</h2>
             </div>
 
             <div className="relative mb-4 sm:mb-5">
-                <MagnifyingGlassIcon
-                    className="absolute left-3 top-3 h-5 w-5 text-gray-400"
-                />
+                <MagnifyingGlassIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                 <input
-                    placeholder="Buscar clase..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    placeholder="Buscar comisión..."
                     className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-3 focus:border-red-600 focus:ring-2 focus:ring-red-200 outline-none"
                 />
             </div>
 
-            {/* max-h más chico en mobile (max-h-72) para no ocupar media pantalla;
-                en desktop (lg) vuelve a los 600px originales. */}
             <div className="space-y-3 overflow-y-auto max-h-72 lg:max-h-[600px] pr-1">
-                {comisiones.map((comision) => (
+                {comisionesFiltradas.map((comision) => (
                     <ComisionCard
                         key={comision.id}
                         comision={comision}
@@ -63,5 +61,5 @@ export default function PanelesClase({
             </div>
 
         </div>
-    )
+    );
 }

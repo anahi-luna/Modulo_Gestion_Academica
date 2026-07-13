@@ -1,48 +1,49 @@
 import API_URL from "./api";
 
-export async function getListaClases(idComision) {
-    try{   
+// Lista de evaluaciones. Si se pasa idComision, filtra por esa comisión
+// (igual que getListaClases). Sin parámetro, trae todas (usado en
+// Gestionar Evaluaciones).
+export async function getListaEvaluaciones(idComision) {
+    try{
 
-        const url = idComision //Cambia entre obtener las clases por comision o todas segun lo que se ejecute
-            ? `${API_URL}/clases?id_comision=${idComision}`
-            :`${API_URL}/clases/`
-        
+        const url = idComision
+            ? `${API_URL}/evaluaciones?id_comision=${idComision}`
+            : `${API_URL}/evaluaciones/`
 
-        const response = await fetch(url); //Guarda la lista en la variable response
+        const response = await fetch(url);
 
         const data = await response.json();
-
 
         if(!response.ok){
             throw new Error(data.message)
         }
 
-        return data; 
+        return data;
     }catch(error){
-        console.error("Error al obtener las clases", error)
+        console.error("Error al obtener las evaluaciones", error)
         throw error
     }
 }
 
-export async function getClasePorId(id) {
+export async function getEvaluacionPorId(id) {
     try{
-        const response = await fetch(`${API_URL}/clases/${id}`);
+        const response = await fetch(`${API_URL}/evaluaciones/${id}`);
         const data = await response.json();
         if(!response.ok){
             throw new Error(data.message)
         }
         return data;
     }catch(error){
-        console.error("Error al obtener la clase", error)
+        console.error("Error al obtener la evaluación", error)
         throw error
     }
 }
 
-export async function crearClase(datos) {
+export async function crearEvaluacion(datos) {
 
     try{
         const response = await fetch(
-            `${API_URL}/clases/`, 
+            `${API_URL}/evaluaciones/`,
             {
                 method: "POST",
                 headers:{
@@ -59,23 +60,23 @@ export async function crearClase(datos) {
         }
         return data;
     }catch(error){
-        console.error("Error al crear la clase", error);
+        console.error("Error al crear la evaluación", error);
         throw error
     }
-    
-} 
 
-export async function editarClase(id,datos) {
+}
+
+export async function editarEvaluacion(id, datos) {
 
     try{
         const response = await fetch(
-            `${API_URL}/clases/${id}`,
+            `${API_URL}/evaluaciones/${id}`,
             {
                 method:"PUT",
                 headers:{
                     "Content-Type":"application/json"
                 },
-                body: JSON.stringify(datos) 
+                body: JSON.stringify(datos)
             }
         )
 
@@ -87,16 +88,16 @@ export async function editarClase(id,datos) {
         return data;
 
     }catch(error){
-        console.error("Error al editar la clase", error)
+        console.error("Error al editar la evaluación", error)
         throw error
     }
 }
 
-export async function eliminarClase(id) {
+export async function eliminarEvaluacion(id) {
 
     try{
         const response = await fetch(
-            `${API_URL}/clases/${id}`,
+            `${API_URL}/evaluaciones/${id}`,
             {
                 method:"DELETE"
             }
@@ -109,7 +110,7 @@ export async function eliminarClase(id) {
         }
         return data;
     }catch(error){
-        console.error("Error al eliminar la clase", error)
+        console.error("Error al eliminar la evaluación", error)
         throw error
     }
 }

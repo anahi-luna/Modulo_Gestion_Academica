@@ -14,6 +14,7 @@ export default function ModalClase({
         hora_inicio: "",
         hora_fin: "",
         tema: "",
+        estado: "PROGRAMADA",
     });
 
     useEffect(() => {
@@ -27,6 +28,7 @@ export default function ModalClase({
                 hora_inicio: clase.hora_inicio,
                 hora_fin: clase.hora_fin,
                 tema: clase.tema,
+                estado: clase.estado,
             });
 
         } else {
@@ -38,6 +40,7 @@ export default function ModalClase({
                 hora_inicio: "",
                 hora_fin: "",
                 tema: "",
+                estado: "PROGRAMADA",
             });
 
         }
@@ -253,6 +256,40 @@ export default function ModalClase({
                         />
 
                     </div>
+
+                    {clase && (
+                        <div>
+
+                            <label className="block font-medium mb-2">
+
+                                Estado de la clase
+
+                            </label>
+
+                            <select
+                                type="text"
+                                value={formulario.estado}
+                                onChange={(e) =>
+                                    setFormulario({
+                                        ...formulario,
+                                        estado: e.target.value,
+                                    })
+                                }
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                            >
+
+                                <option value="PROGRAMADA">Programada</option>
+                                <option value="DICTADA">Dictada</option>
+                                <option value="CANCELADA">Cancelada</option>
+
+                            </select>
+
+                        </div>
+                    )}
+
+                    
+
+                
 
                 </div>
 

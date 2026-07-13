@@ -6,7 +6,8 @@ import {
     getListaDeInscripciones,
     getInscripcionPorId,
     actualizarInscripcion,
-    eliminarInscripcion
+    eliminarInscripcion,
+    getInscripcionesPorComision
 } from "../api/inscripcionesApi";
 
 import { getLegajoPorId } from "../mocks/legajosMock";
@@ -63,6 +64,51 @@ export async function obtenerInscripcion(id) {
     const response = await getInscripcionPorId(id);
     return response.data;
 
+}
+
+export async function obtenerInscripcionesPorComision(idComision) {
+
+    const response = await getInscripcionesPorComision(idComision);
+
+    const comisiones = (await getComisiones()).data;
+
+    const resultado = await Promise.all(
+
+        response.data.map(async (inscripcion) => {
+
+            const legajo = (
+                await getLegajoPorId(inscripcion.id_legajo)
+            ).data;
+
+            const comision = comisiones.find(
+                c => c.id === inscripcion.id_comision
+            );
+
+            return {
+
+                id_inscripcion: inscripcion.id_inscripcion,
+
+                id_legajo: legajo.numero_legajo,
+
+                alumno: `${legajo.nombre} ${legajo.apellido}`,
+
+                dni: legajo.dni,
+
+                rango: legajo.rango,
+
+                id_comision: inscripcion.id_comision,
+
+                materia: comision?.materia ?? "-",
+
+                estado: inscripcion.estado.nombre,
+
+            };
+
+        })
+
+    );
+
+    return resultado;
 }
 
 // Actualizar inscripción

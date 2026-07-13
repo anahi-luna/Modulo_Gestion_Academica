@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import ClasesTable from "../components/Clases/ClaseTable";
-import ModalClase from "../components/clases/ClaseModal";
-import EliminarClaseModal from "../components/clases/EliminarClaseModal";
+import EvaluacionesTable from "../components/evaluaciones/EvaluacionTable";
+import EvaluacionModal from "../components/evaluaciones/EvaluacionModal";
+import EliminarEvaluacionModal from "../components/evaluaciones/EliminarEvaluacionModal";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { getClases, registrarClase, modificarClase, borrarClase } from "../Services/clasesAdminService";
+import { getEvaluaciones, registrarEvaluacion, modificarEvaluacion, borrarEvaluacion } from "../Services/evaluacionesAdminService";
 import { getComisiones } from "../mocks/comisionesMock";
 
-export default function GestionClases() {
+export default function GestionEvaluaciones() {
 
-    const [clases, setClases] = useState([]);
+    const [evaluaciones, setEvaluaciones] = useState([]);
 
     const [mostrarModal, setMostrarModal] = useState(false);
 
-    const [claseSeleccionada, setClaseSeleccionada] = useState(null);
+    const [evaluacionSeleccionada, setEvaluacionSeleccionada] = useState(null);
 
     const [mostrarEliminar, setMostrarEliminar] = useState(false);
 
@@ -21,44 +21,37 @@ export default function GestionClases() {
     const [filtroMateria, setFiltroMateria] = useState("");
     const [filtroComision, setFiltroComision] = useState("");
     const [filtroDocente, setFiltroDocente] = useState("");
-    const [filtroFecha, setFiltroFecha] = useState("");
-    const [filtroLugar, setFiltroLugar] = useState("");
+    const [filtroTipo, setFiltroTipo] = useState("");
 
     useEffect(() => {
-        cargarClases();
-
+        cargarEvaluaciones();
         cargarComisiones();
     }, []);
 
-    async function cargarClases() {
+    async function cargarEvaluaciones() {
 
         try {
-            const resultado = await getClases();
-
-            setClases(resultado);
+            const resultado = await getEvaluaciones();
+            setEvaluaciones(resultado);
         } catch (error) {
-
             console.error(error);
-
         }
 
     }
 
-    async function cargarComisiones(){
+    async function cargarComisiones() {
 
         const resultado = await getComisiones();
-
         setComisiones(resultado.data);
 
     }
 
-    const clasesFiltradas = clases.filter((clase) => {
+    const evaluacionesFiltradas = evaluaciones.filter((evaluacion) => {
 
-        if (filtroMateria && clase.materia !== filtroMateria) return false;
-        if (filtroComision && clase.codigo !== filtroComision) return false;
-        if (filtroDocente && clase.docente !== filtroDocente) return false;
-        if (filtroFecha && clase.fecha !== filtroFecha) return false;
-        if (filtroLugar && clase.lugar !== filtroLugar) return false;
+        if (filtroMateria && evaluacion.materia !== filtroMateria) return false;
+        if (filtroComision && evaluacion.codigo !== filtroComision) return false;
+        if (filtroDocente && evaluacion.docente !== filtroDocente) return false;
+        if (filtroTipo && evaluacion.tipo !== filtroTipo) return false;
 
         return true;
     });
@@ -67,89 +60,74 @@ export default function GestionClases() {
         setFiltroMateria("");
         setFiltroComision("");
         setFiltroDocente("");
-        setFiltroFecha("");
-        setFiltroLugar("");
+        setFiltroTipo("");
     }
 
-    async function abrirModalEditar(clase){
+    async function abrirModalEditar(evaluacion) {
 
-        try{
-
-            setClaseSeleccionada(clase);
-
+        try {
+            setEvaluacionSeleccionada(evaluacion);
             setMostrarModal(true);
-
-        }catch(error){
-
+        } catch (error) {
             console.error(error);
-
         }
 
     }
 
-    function abrirModalEliminar(clase){
-        setClaseSeleccionada(clase);
+    function abrirModalEliminar(evaluacion) {
+        setEvaluacionSeleccionada(evaluacion);
         setMostrarEliminar(true);
     }
-    function nuevaClase() {
 
-        setClaseSeleccionada(null);
-
+    function nuevaEvaluacion() {
+        setEvaluacionSeleccionada(null);
         setMostrarModal(true);
-
     }
 
-    async function confirmarEliminar(clase){
-        try{
+    async function confirmarEliminar(evaluacion) {
+        try {
 
-            await borrarClase(clase.id);
+            await borrarEvaluacion(evaluacion.id);
 
             setMostrarEliminar(false);
+            setEvaluacionSeleccionada(null);
 
-            setClaseSeleccionada(null);
+            await cargarEvaluaciones();
 
-            await cargarClases();
-
-        }catch(error){
+        } catch (error) {
             console.error(error);
         }
 
     }
 
-   async function guardarClase(datos) {
+    async function guardarEvaluacion(datos) {
 
         try {
 
-            if (claseSeleccionada) {
+            if (evaluacionSeleccionada) {
 
-                await modificarClase(
-                    claseSeleccionada.id,
+                await modificarEvaluacion(
+                    evaluacionSeleccionada.id,
                     datos
                 );
 
             } else {
-                const {
-                    estado,
-                    ...datosCrear
-                    
-                }=datos;
-                await registrarClase(datosCrear);
+
+                await registrarEvaluacion(datos);
 
             }
 
             setMostrarModal(false);
+            setEvaluacionSeleccionada(null);
 
-            setClaseSeleccionada(null);
-
-            await cargarClases();
+            await cargarEvaluaciones();
 
         } catch (error) {
-
             console.error(error);
-
         }
 
     }
+
     return (
         <div className="max-w-7xl mx-auto px-6 py-8">
 
@@ -157,15 +135,14 @@ export default function GestionClases() {
 
                 <div>
                     <h1 className="text-3xl font-bold text-gray-800">
-                        Gestión de Clases
+                        Gestión de Evaluaciones
                     </h1>
 
                     <p className="text-gray-500 mt-1">
-                        Crear, editar y eliminar clases.
+                        Crear, editar y eliminar evaluaciones (parciales, TPs y finales).
                     </p>
                 </div>
-                
-                {/* Botones limpiar filtro y nueva clase */}
+
                 <div className="flex gap-3">
 
                     <button
@@ -176,20 +153,19 @@ export default function GestionClases() {
                     </button>
 
                     <button
-                        onClick={nuevaClase}
+                        onClick={nuevaEvaluacion}
                         className="flex items-center gap-2 rounded-lg bg-red-700 px-4 py-3 text-white hover:bg-red-800 transition"
                     >
                         <PlusIcon className="h-5 w-5" />
-                        Nueva Clase
+                        Nueva Evaluación
                     </button>
 
                 </div>
 
             </div>
 
-            {/* Tabla Clases */}
-            <ClasesTable
-                clases={clasesFiltradas}
+            <EvaluacionesTable
+                evaluaciones={evaluacionesFiltradas}
 
                 filtroMateria={filtroMateria}
                 setFiltroMateria={setFiltroMateria}
@@ -200,32 +176,28 @@ export default function GestionClases() {
                 filtroDocente={filtroDocente}
                 setFiltroDocente={setFiltroDocente}
 
-                filtroFecha={filtroFecha}
-                setFiltroFecha={setFiltroFecha}
-
-                filtroLugar={filtroLugar}
-                setFiltroLugar={setFiltroLugar}
+                filtroTipo={filtroTipo}
+                setFiltroTipo={setFiltroTipo}
 
                 onEditar={abrirModalEditar}
                 onEliminar={abrirModalEliminar}
             />
 
-            {/* Modal para crear o editar */}
-            <ModalClase
+            <EvaluacionModal
                 abierto={mostrarModal}
-                clase={claseSeleccionada}
+                evaluacion={evaluacionSeleccionada}
                 comisiones={comisiones}
                 onCerrar={() => setMostrarModal(false)}
-                onGuardar={guardarClase}
+                onGuardar={guardarEvaluacion}
             />
 
-            {/* Modal eliminar */}
-            <EliminarClaseModal
+            <EliminarEvaluacionModal
                 abierto={mostrarEliminar}
-                clase={claseSeleccionada}
+                evaluacion={evaluacionSeleccionada}
                 onCerrar={() => setMostrarEliminar(false)}
                 onConfirmar={confirmarEliminar}
             />
+
         </div>
     );
 }

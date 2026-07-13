@@ -1,14 +1,16 @@
-import * as asistenciasMock from "../mocks/asistenciasMock";
 import * as legajosMock from "../mocks/legajosMock";
 import * as comisionesMock from "../mocks/comisionesMock";
+import { getAsistenciaPorClase, getAsistenciaPorId, actualizarAsistencia, registrarAsistencia} from "../api/asistenciasApi";
+import { getInscripcionPorId } from "../api/inscripcionesApi";
+import { modificarClase } from "./clasesAdminService";
 
 
 //Obtiene todas las asistencias dependiendo de la comision
 
-export async function obtenerAsistenciasPorComision(idComision) {
+export async function obtenerAsistenciasPorClase(idClase) {
 
     const response =
-        await asistenciasMock.getAsistenciasPorComision(idComision);
+        await getAsistenciaPorClase(idClase);
 
     const comisiones =
         (await comisionesMock.getComisiones()).data;
@@ -17,12 +19,14 @@ export async function obtenerAsistenciasPorComision(idComision) {
 
         response.data.map(async (asistencia) => {
 
+            const inscripcion = (await getInscripcionPorId(asistencia.id_inscripcion)).data;
+
             const legajo = (
-                await legajosMock.getLegajoPorId(asistencia.id_legajo)
+                await (legajosMock.getLegajoPorId(inscripcion.id_legajo))
             ).data;
 
             const comision = comisiones.find(
-                c => c.id === asistencia.id_comision
+                c => c.id === inscripcion.id_comision
             );
 
             return {
@@ -31,13 +35,13 @@ export async function obtenerAsistenciasPorComision(idComision) {
 
                 id_legajo: legajo.numero_legajo,
 
-                nombre: `${legajo.nombre} ${legajo.apellido}`,
-
-                dni: legajo.dni,
+                alumno: `${legajo.nombre} ${legajo.apellido}`,
 
                 rango: legajo.rango,
 
-                id_comision: asistencia.id_comision,
+                id_inscripcion: inscripcion.id_inscripcion,
+
+                id_comision: inscripcion.id_comision,
 
                 codigo_comision: comision?.codigo ?? "-",
 
@@ -47,7 +51,9 @@ export async function obtenerAsistenciasPorComision(idComision) {
 
                 horario: comision?.horario ?? "-",
 
-                estado: asistencia.estado,
+                id_estado: asistencia.id_estado,
+
+                observacion: asistencia.observacion,
 
             };
 
@@ -58,8 +64,39 @@ export async function obtenerAsistenciasPorComision(idComision) {
     return resultado;
 }
 
+export async function registrarAsistenciaService(datos) {
+
+    const response = await registrarAsistencia(datos);
+
+    return response.data;
+
+}
 
 //Actualiza la asistencia
 
-export const actualizarAsistencia =
-    asistenciasMock.actualizarAsistencia;
+export async function modificarAsistencia(idAsistencia, idEstado){
+    return await actualizarAsistencia(idAsistencia, idEstado);
+
+}
+
+export async function actualizarEstadoAutomaticamente(clase) {
+    const ahora = new Date();
+    const inicio = new Date(`${clase.fecha}T${clase.hora_inicio}`);
+
+    if (
+        clase.estado === "PROGRAMADA" &&
+        inicio <= ahora
+    ) {
+        await modificarClase(clase.id, {
+            id_comision: clase.id_comision,
+            estado: "DICTADA"
+        });
+
+        return {
+            ...clase,
+            estado: "DICTADA"
+        };
+    }
+
+    return clase;
+}
