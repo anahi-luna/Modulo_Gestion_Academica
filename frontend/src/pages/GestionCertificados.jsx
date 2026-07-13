@@ -51,7 +51,7 @@ export default function GestionCertificados({ usuario }) {
       await revocar(cert.idCertificado);
       cargarDatos();
     } catch (err) {
-      setError(err.message);
+      setError(err.message); 
     }
   }
 
