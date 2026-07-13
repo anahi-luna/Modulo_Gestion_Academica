@@ -31,36 +31,14 @@ class ResultadoAcademicoSchema(ma.SQLAlchemyAutoSchema):
 # Valida la creación de un resultado académico.
 class ResultadoAcademicoRequestSchema(ma.Schema):
 
-    id_inscripcion = fields.Integer(
-        required=True,
-        error_messages={
-            "required": "La inscripción es obligatoria."
-        }
+    id_comision = fields.Integer(
+        required=True
     )
 
-    observacion = fields.String(
-        required=False
-    )
-
-
-# Valida la modificación.
-# Solamente permite modificar observaciones.
-# El resto de los datos se recalculan automáticamente.
-class ModificarResultadoAcademicoSchema(ma.Schema):
-
-    observacion = fields.String(
-        required=False
-    )
-    
-    id_estado_academico = fields.Integer(
-        required=False
-    )
 
 
 # Instancias de los schemas.
-
 resultado_academico_schema = ResultadoAcademicoSchema()
 resultados_academicos_schema = ResultadoAcademicoSchema(many=True)
 
 resultado_academico_request_schema = ResultadoAcademicoRequestSchema()
-modificar_resultado_academico_schema = ModificarResultadoAcademicoSchema()

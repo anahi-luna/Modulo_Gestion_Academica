@@ -15,12 +15,10 @@ def cargar_estados_academicos():
     
     # Crea la lista de estados academicos predeterminados.
     estados = [
-        EstadoAcademico(id_estado_academico = 1, nombre="En curso"),
-        EstadoAcademico(id_estado_academico = 2, nombre="Regular"),
-        EstadoAcademico(id_estado_academico = 3, nombre="Aprobado"),
-        EstadoAcademico(id_estado_academico = 4, nombre="Desaprobado"),
-        EstadoAcademico(id_estado_academico = 5, nombre="Libre"),
-        EstadoAcademico(id_estado_academico = 6, nombre="Abandonó")
+        EstadoAcademico(id_estado_academico = 1, nombre="Regular"),
+        EstadoAcademico(id_estado_academico = 2, nombre="Aprobado"),
+        EstadoAcademico(id_estado_academico = 3, nombre="Desaprobado"),
+        EstadoAcademico(id_estado_academico = 4, nombre="Libre")
     ]
 
      # Agrega todos los estados a la sesión de la base de datos.

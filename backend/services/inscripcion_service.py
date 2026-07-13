@@ -1,16 +1,20 @@
 from datetime import datetime
+from extensions import db
+from exceptions import BusinessError
+from sqlalchemy.exc import IntegrityError
+from utils.logger import logger
+
 from services.legajo_cliente import obtener_legajo
 from services.comision_cliente import obtener_comision
 from services.usuario_cliente import obtener_usuario
 from services.estado_inscripcion_service import obtener_estado_por_nombre
-from exceptions import BusinessError
-from extensions import db
+from services.resultado_plan_service import actualizar_resultado_plan
+from services.plan_asignatura_cliente import obtener_plan_asignatura
+
 from models.modelo_inscripcion import Inscripcion
 from models.modelo_estado_inscripcion import EstadoInscripcion
 from models.modelo_asistencia import Asistencia
 from models.modelo_calificacion import Calificacion
-from sqlalchemy.exc import IntegrityError
-from utils.logger import logger
 
 ID_USUARIO_SIMULADO = 100
 
@@ -39,17 +43,13 @@ def preparar_datos_inscripcion(inscripcion_data, id_estado):
     }
 
 
-# ==========================================================
 # Verifica si una inscripción posee asistencias registradas.
-# ==========================================================
 def existe_asistencia_inscripcion(id_inscripcion):
 
     return Asistencia.query.filter_by(id_inscripcion=id_inscripcion).first() is not None
 
 
-# ==========================================================
 # Verifica si una inscripción posee calificaciones registradas.
-# ==========================================================
 def existe_calificacion_inscripcion(id_inscripcion):
 
     return (
@@ -177,15 +177,37 @@ def modificar_inscripcion(id_inscripcion, datos):
             logger.warning(f"La inscripción {id_inscripcion} no existe.")
             return None
 
-        # cambiar estado
+        # Cambiar estado.
         if "id_estado" in datos:
+
             nuevo_estado = db.session.get(EstadoInscripcion, datos["id_estado"])
 
             if not nuevo_estado:
+
                 logger.warning(f"El estado {datos['id_estado']} no existe.")
+
                 raise BusinessError("El estado de inscripción no existe.", 404)
 
+            estado_anterior = inscripcion.id_estado
+
             inscripcion.id_estado = datos["id_estado"]
+
+            # Cuando una inscripción pasa por primera vez
+            # a estado ACEPTADA se crea el ResultadoPlan.
+            if (
+                estado_anterior != nuevo_estado.id_estado
+                and nuevo_estado.nombre == "Aceptada"
+            ):
+
+                comision = obtener_comision(inscripcion.id_comision)
+
+                plan_asignatura = obtener_plan_asignatura(
+                    comision["id_plan_asignatura"]
+                )
+
+                actualizar_resultado_plan(
+                    inscripcion.id_legajo, plan_asignatura["id_plan"]
+                )
 
         # cambiar comision
         if "id_comision" in datos:
@@ -280,17 +302,17 @@ def eliminar_inscripcion(id_inscripcion):
     except IntegrityError:
 
         db.session.rollback()
-        
+
         logger.exception("Error de integridad al eliminar la inscripción.")
-        
+
         raise BusinessError("No fue posible eliminar la inscripción.", 500)
 
     except BusinessError:
 
         db.session.rollback()
-        
+
         raise
-    
+
     except Exception:
 
         db.session.rollback()
@@ -298,5 +320,3 @@ def eliminar_inscripcion(id_inscripcion):
         logger.exception("Ocurrió un error inesperado al eliminar la inscripción.")
 
         raise BusinessError("Ocurrió un error interno del servidor.", 500)
-
-    

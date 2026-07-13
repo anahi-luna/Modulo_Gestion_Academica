@@ -9,3 +9,4 @@ from .modelo_calificacion import Calificacion
 from .modelo_estado_academico import EstadoAcademico
 from .modelo_resultado_academico import ResultadoAcademico
 from .modelo_estado_resultado_plan import EstadoResultadoPlan
+from .modelo_resultado_plan import ResultadoPlan

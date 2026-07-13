@@ -38,52 +38,22 @@ def get_resultado_academico(id_resultado_academico):
     return success_response(data=datos, message="Resultado académico encontrado.")
 
 
-# Registra un resultado académico.
+# Genera los resultados académicos de una comisión finalizada.
 def agregar_resultado_academico():
 
     try:
 
         datos = resultado_academico_request_schema.load(request.get_json())
 
-        nuevo = crear_resultado_academico(datos)
+        nuevos = crear_resultado_academico(datos)
 
-        resultado = resultado_academico_schema.dump(nuevo)
+        resultado = resultados_academicos_schema.dump(nuevos)
 
         return success_response(
             data=resultado,
-            message="Resultado académico registrado correctamente.",
+            total=len(resultado),
+            message="Resultados académicos generados correctamente.",
             status_code=201,
-        )
-
-    except ValidationError as err:
-
-        return error_response(
-            message="Error de validación.", errors=err.messages, status_code=400
-        )
-
-    except BusinessError as e:
-
-        return error_response(message=e.message, status_code=e.status_code)
-
-
-# Modifica un resultado académico.
-def actualizar_resultado_academico(id_resultado_academico):
-
-    try:
-
-        datos = modificar_resultado_academico_schema.load(request.get_json())
-
-        resultado = modificar_resultado_academico(id_resultado_academico, datos)
-
-        if not resultado:
-
-            return error_response("Resultado académico no encontrado.", status_code=404)
-
-        datos_resultado = resultado_academico_schema.dump(resultado)
-
-        return success_response(
-            data=datos_resultado,
-            message=(f"Resultado académico " f"{id_resultado_academico} actualizado."),
         )
 
     except ValidationError as err:

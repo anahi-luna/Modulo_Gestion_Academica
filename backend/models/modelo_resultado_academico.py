@@ -37,29 +37,14 @@ class ResultadoAcademico(db.Model):
         nullable=False
     )
 
-    observacion = db.Column(
-        db.String(255),
-        nullable=True
-    )
-
     id_usuario_creacion = db.Column(
         db.Integer,
         nullable=False
     )
 
-    id_usuario_modificacion = db.Column(
-        db.Integer,
-        nullable=True
-    )
-
     ts_creacion = db.Column(
         db.DateTime,
         nullable=False
-    )
-
-    ts_modificacion = db.Column(
-        db.DateTime,
-        nullable=True
     )
 
     # Relaciones

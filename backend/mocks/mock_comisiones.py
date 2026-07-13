@@ -15,7 +15,7 @@ COMISIONES = [
 
     {
         "id_comision": 2,
-        "id_plan_asignatura": 1,
+        "id_plan_asignatura": 2,
         "codigo": "COM-202-B",
         "materia": "Matafuegos II",
         "docente": "Prof. López",
@@ -27,7 +27,7 @@ COMISIONES = [
     },
     {
         "id_comision": 3,
-        "id_plan_asignatura": 2,
+        "id_plan_asignatura": 3,
         "codigo": "COM-303-C",
         "materia": "Primeros auxilios",
         "docente": "Prof. Martínez",
@@ -40,7 +40,7 @@ COMISIONES = [
 
     {
         "id_comision": 4,
-        "id_plan_asignatura": 2,
+        "id_plan_asignatura": 3,
         "codigo": "COM-401-D",
         "materia": "Rescate Vehicular",
         "docente": "Prof. Benítez",
