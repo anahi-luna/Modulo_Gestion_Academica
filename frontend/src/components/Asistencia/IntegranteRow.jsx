@@ -1,4 +1,4 @@
-export default function IntegranteRow({ asistencia, onCambiarEstado }) {
+export default function IntegranteRow({ asistencia, onCambiarEstado, onCambiarObservacion }) {
   return (
     <tr className="border-b">
       <td className="py-4 pr-2">{asistencia.alumno}</td>
@@ -32,6 +32,21 @@ export default function IntegranteRow({ asistencia, onCambiarEstado }) {
             Tarde
           </button>
         </div>
+      </td>
+      {/* Celda nueva: input controlado para la observacion de este integrante.
+          value sale siempre del estado (asistencia.observacion) y cada
+          onChange llama a onCambiarObservacion para actualizar ese estado
+          en el componente padre (PanelDetalleClase). */}
+      <td>
+        <input
+          type="text"
+          value={asistencia.observacion ?? ""}
+          onChange={(e) =>
+            onCambiarObservacion(asistencia.id_inscripcion, e.target.value)
+          }
+          placeholder="Observacion"
+          className="w-full rounded-lg border border-gray-300 px-2 py-1 text-sm"
+        />
       </td>
     </tr>
   );

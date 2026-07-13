@@ -68,6 +68,22 @@ export default function PanelDetalleClase({ idComision }) {
         );
     }
 
+    // Actualiza la observacion de UN integrante puntual dentro del array de asistencias.
+    // Recibe el id_inscripcion (para saber a quien le cambio la observacion) y el
+    // texto nuevo que escribio el usuario en el input.
+    function cambiarObservacion(idInscripcion, observacion) {
+        setAsistencias(prev =>
+            prev.map(a =>
+                a.id_inscripcion === idInscripcion
+                    // Si es el integrante correcto, le pisamos solo el campo "observacion"
+                    // (con el spread ...a mantenemos el resto de sus datos igual)
+                    ? { ...a, observacion }
+                    // Si no es el integrante que estamos editando, lo dejamos igual
+                    : a
+            )
+        );
+    }
+
     async function guardarAsistencias() {
         const datos = {
             id_clase: claseSeleccionada.id,

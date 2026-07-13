@@ -9,6 +9,7 @@ export default function PanelesClase({
 }) {
     const [comisiones, setComisiones] = useState([]);
 
+    // Carga las comisiones al montar el componente
     useEffect(() => {
         async function cargarComisiones() {
             try {
@@ -28,9 +29,8 @@ export default function PanelesClase({
     return (
         // Antes: "col-span-3" fijo (rompía en mobile porque el grid
         // padre tiene 12 columnas incluso en pantallas chicas).
-        // Ahora: en mobile ocupa el ancho completo (no tiene col-span,
-        // así que llena la única columna del grid-cols-1 del padre),
-        // y recién en lg vuelve a ocupar 3 de las 12 columnas.
+        // Ahora: en mobile ocupa el ancho completo, y recién en lg
+        // vuelve a ocupar 3 de las 12 columnas.
         <div className="lg:col-span-3 bg-white rounded-xl shadow border p-4 sm:p-5">
 
             <div className="flex justify-between items-center mb-4 sm:mb-5">
@@ -49,11 +49,8 @@ export default function PanelesClase({
                 />
             </div>
 
-            {/*
-              max-h más chico en mobile (max-h-72 = 288px) para que la lista
-              de clases no ocupe media pantalla del celular; en desktop (lg)
-              vuelve a los 600px originales.
-            */}
+            {/* max-h más chico en mobile (max-h-72) para no ocupar media pantalla;
+                en desktop (lg) vuelve a los 600px originales. */}
             <div className="space-y-3 overflow-y-auto max-h-72 lg:max-h-[600px] pr-1">
                 {comisiones.map((comision) => (
                     <ComisionCard
