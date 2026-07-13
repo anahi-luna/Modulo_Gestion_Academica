@@ -169,6 +169,7 @@ export async function obtenerMisInscripciones(idLegajo) {
         const com = comisiones.find(c => c.id === ins.id_comision);
         return {
             id: ins.id_inscripcion,
+            id_comision: ins.id_comision,
             materia: com?.materia ?? "-",
             comision: com?.codigo ?? "-",
             horario: com?.horario ?? "-",

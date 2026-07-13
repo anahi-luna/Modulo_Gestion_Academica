@@ -38,7 +38,7 @@ export default function HomeAdmin() {
           </p>
 
           {/* Estadísticas rápidas */}
-          <div className="mt-5 grid grid-cols-3 gap-4">
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-red-900/50 rounded-xl px-4 py-3">
               <p className="text-red-200 text-xs">Total inscripciones</p>
               <p className="text-white text-2xl font-bold">{historial.length}</p>
@@ -64,7 +64,7 @@ export default function HomeAdmin() {
         <h2 className="text-base font-semibold text-gray-500 uppercase tracking-wide">
           Módulos
         </h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ModuloCard
             titulo="Gestionar inscripciones"
             descripcion="Alta, baja y modificación de inscripciones."
@@ -95,6 +95,22 @@ export default function HomeAdmin() {
             color="yellow"
             icono={<ClipboardDocumentListIcon className="h-6 w-6" />}
           />
+          <ModuloCard
+  titulo="Gestionar calificaciones"
+  descripcion="Carga y edicion de notas, evaluaciones y resultados de desempeño"
+  cantidad="12 Pendientes"
+  color="green"
+  ruta="/CalificacionesAdmin"
+  icono={<ClipboardDocumentListIcon className="h-6 w-6" />}
+/>
+<ModuloCard
+  titulo="Gestionar certificados"
+  descripcion="Generacion, emision y seguimiento de certificados"
+  cantidad="123 emitidos"
+  color="yellow"
+  ruta="/certificadosAdmin"
+  icono={<ClipboardDocumentListIcon className="h-6 w-6" />}
+/>
         </div>
 
       </div>

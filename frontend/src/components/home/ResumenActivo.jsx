@@ -38,7 +38,7 @@ export default function ResumenActivo({ inscripciones }) {
         <div className="space-y-6">
 
             {/* Estadísticas */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {stats.map(({ icono: Icono, titulo, valor, subtexto }) => (
                     <div key={titulo} className="bg-white rounded-xl shadow p-5 flex flex-col items-center gap-1 text-center">
                         <div className="p-2 bg-red-50 rounded-lg text-red-700">
