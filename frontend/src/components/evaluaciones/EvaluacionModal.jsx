@@ -1,0 +1,203 @@
+import { useEffect, useState } from "react";
+
+export default function EvaluacionModal({
+    abierto,
+    evaluacion,
+    comisiones,
+    onCerrar,
+    onGuardar,
+}) {
+
+    const [formulario, setFormulario] = useState({
+        id_comision: "",
+        titulo: "",
+        tipo: "Parcial",
+        fecha: "",
+        puntaje_maximo: 10,
+    });
+
+    useEffect(() => {
+
+        if (evaluacion) {
+
+            setFormulario({
+                id_comision: evaluacion.id_comision,
+                titulo: evaluacion.titulo,
+                tipo: evaluacion.tipo,
+                fecha: evaluacion.fecha,
+                puntaje_maximo: evaluacion.puntaje_maximo,
+            });
+
+        } else {
+
+            setFormulario({
+                id_comision: "",
+                titulo: "",
+                tipo: "Parcial",
+                fecha: "",
+                puntaje_maximo: 10,
+            });
+
+        }
+
+    }, [evaluacion]);
+
+    if (!abierto)
+        return null;
+
+    const comisionSeleccionada = comisiones.find(
+        c => c.id === Number(formulario.id_comision)
+    );
+
+    return (
+
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-xl p-6">
+
+                <h2 className="text-2xl font-bold text-red-700 mb-6">
+                    {evaluacion ? "Editar Evaluación" : "Nueva Evaluación"}
+                </h2>
+
+                <div className="space-y-5">
+
+                    {/* Comisión */}
+                    <div>
+                        <label className="block font-medium mb-2">
+                            Comisión
+                        </label>
+                        <select
+                            value={formulario.id_comision}
+                            onChange={(e) =>
+                                setFormulario({
+                                    ...formulario,
+                                    id_comision: Number(e.target.value),
+                                })
+                            }
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        >
+                            <option value="">Seleccione una comisión</option>
+                            {comisiones.map((comision) => (
+                                <option key={comision.id} value={comision.id}>
+                                    {comision.codigo} - {comision.materia}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Información de la comisión */}
+                    {comisionSeleccionada && (
+                        <div className="rounded-lg bg-gray-100 p-4 space-y-2">
+                            <p>
+                                <strong>Materia:</strong> {comisionSeleccionada.materia}
+                            </p>
+                            <p>
+                                <strong>Docente:</strong> {comisionSeleccionada.docente}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Tipo */}
+                    <div>
+                        <label className="block font-medium mb-2">
+                            Tipo
+                        </label>
+                        <select
+                            value={formulario.tipo}
+                            onChange={(e) =>
+                                setFormulario({
+                                    ...formulario,
+                                    tipo: e.target.value,
+                                })
+                            }
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        >
+                            <option value="Parcial">Parcial</option>
+                            <option value="TP">Trabajo Práctico</option>
+                            <option value="Final">Final</option>
+                        </select>
+                    </div>
+
+                    {/* Título */}
+                    <div>
+                        <label className="block font-medium mb-2">
+                            Título
+                        </label>
+                        <input
+                            type="text"
+                            value={formulario.titulo}
+                            placeholder="Ej: Parcial 1"
+                            onChange={(e) =>
+                                setFormulario({
+                                    ...formulario,
+                                    titulo: e.target.value,
+                                })
+                            }
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                    </div>
+
+                    {/* Fecha */}
+                    <div>
+                        <label className="block font-medium mb-2">
+                            Fecha
+                        </label>
+                        <input
+                            type="date"
+                            value={formulario.fecha}
+                            onChange={(e) =>
+                                setFormulario({
+                                    ...formulario,
+                                    fecha: e.target.value,
+                                })
+                            }
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                    </div>
+
+                    {/* Puntaje máximo */}
+                    <div>
+                        <label className="block font-medium mb-2">
+                            Puntaje máximo
+                        </label>
+                        <input
+                            type="number"
+                            min="1"
+                            value={formulario.puntaje_maximo}
+                            onChange={(e) =>
+                                setFormulario({
+                                    ...formulario,
+                                    puntaje_maximo: Number(e.target.value),
+                                })
+                            }
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                        />
+                    </div>
+
+                </div>
+
+                <div className="flex justify-end gap-3 mt-8">
+
+                    <button
+                        onClick={onCerrar}
+                        className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        onClick={() => onGuardar(formulario)}
+                        className="px-4 py-2 rounded-lg bg-red-700 hover:bg-red-800 text-white"
+                    >
+                        {evaluacion ? "Guardar cambios" : "Crear evaluación"}
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
+
+}

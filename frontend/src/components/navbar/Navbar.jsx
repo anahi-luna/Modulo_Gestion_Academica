@@ -61,6 +61,14 @@ export default function Navbar({ usuario, setUsuario, modulo }) {
                 {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.PROFESOR) && (
                     <NavLink to="/AsistenciaAdmin" className={linkClass} end>Asistencia</NavLink>
                 )}
+
+                {(usuario.rol === ROLES.ADMIN || usuario.rol === ROLES.PROFESOR) && (
+                    <NavLink to="/CalificacionesAdmin" className={linkClass} end>Calificaciones</NavLink>
+                )}
+
+                {(usuario.rol === ROLES.ALUMNO) && (
+                    <NavLink to="/calificaciones" className={linkClass} end>Mis calificaciones</NavLink>
+                )}
                 {/* aca metemos cuando tengamos mas modulos*/}
               </div>
             </div>
