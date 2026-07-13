@@ -3,7 +3,8 @@
 export default function IntegranteRow({
 
     asistencia,
-    onCambiarEstado
+    onCambiarEstado,
+    onCambiarObservacion
 
 }){
 
@@ -46,7 +47,7 @@ export default function IntegranteRow({
                     </button>
 
                     <button
-                        className="bg-red-100 text-red-700 rounded-lg px-3 py-1"
+                        className="bg-white-100 text-black-700 rounded-lg px-3 py-1"
                         onClick={() => onCambiarEstado(asistencia.id_inscripcion, 3)}
                     >
 
@@ -62,6 +63,21 @@ export default function IntegranteRow({
                         Tarde
 
                     </button>
+
+                    <td>
+                        <input 
+                            type="text"
+                            value={asistencia.observacion ?? ""}
+                            onChange={(e)=>
+                                onCambiarObservacion(
+                                    asistencia.id_inscripcion,
+                                    e.target.value
+                                )
+                            }
+                            placeholder="Observacion"
+                            className="w-full rounded-lg border border-gray-300 px-2 py-1"
+                         />
+                    </td>
 
                 </div>
 

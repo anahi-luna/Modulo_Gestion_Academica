@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import IntegranteRow from "./IntegranteRow";
 
-export default function AsistenciaTabla({idClase, asistencias, onCambiarEstado}) {
+export default function AsistenciaTabla({idClase, asistencias, onCambiarEstado, onCambiarObservacion}) {
   
 
   
@@ -14,6 +14,7 @@ export default function AsistenciaTabla({idClase, asistencias, onCambiarEstado})
             <th className="text-left py-3">Integrante</th>
             <th className="text-left">Legajo</th>
             <th className="text-left">Asistencia</th>
+            <th className="text-left">Observacion</th>
           </tr>
         </thead>
 
@@ -23,6 +24,7 @@ export default function AsistenciaTabla({idClase, asistencias, onCambiarEstado})
               key={a.id_inscripcion}
               asistencia={a}
               onCambiarEstado={onCambiarEstado}
+              onCambiarObservacion={onCambiarObservacion}
             />
           ))}
         </tbody>

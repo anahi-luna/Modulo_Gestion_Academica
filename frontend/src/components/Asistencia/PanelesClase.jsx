@@ -12,7 +12,7 @@ export default function PanelesClase({
 }) {
     const [comisiones, setComisiones] = useState([]);
     
-
+    {/*Carga las comisiones*/}
     useEffect(() =>{
     
             async function cargarComisiones() {
@@ -62,7 +62,7 @@ export default function PanelesClase({
             </div>
 
             <div className="space-y-3 overflow-y-auto max-h-[600px] pr-1">
-
+                {/*Busca las comisiones para ser seleccionadas */}
                 {comisiones.map((comision)=>(
                     <ComisionCard
                         key={comision.id}

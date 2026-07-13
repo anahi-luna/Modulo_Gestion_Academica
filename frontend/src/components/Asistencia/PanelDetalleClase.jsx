@@ -25,12 +25,17 @@ export default function PanelDetalleClase({idComision}){
 
         async function cargarClases() {
             try {
+                //Limpia los datos para cuando se elija otra comision
+                setClaseSeleccionada(null);
+                setClases([]);
+                setAsistencias([]);
 
+                //Obtiene las clases
                 const resultado = await getClases(idComision);
                 const clasesActualizadas = await Promise.all(
                     resultado.map(actualizarEstadoAutomaticamente)
                 );
-
+                //Guarda las clases dentro del array
                 setClases(clasesActualizadas);
 
                 if (resultado.length > 0) {
@@ -41,7 +46,7 @@ export default function PanelDetalleClase({idComision}){
                 console.error(error);
             }
         }
-
+        //Carga las clases segun la comision elejida
         if (idComision) {
             cargarClases();
         }
@@ -94,6 +99,23 @@ export default function PanelDetalleClase({idComision}){
         );
 
     }
+
+    function cambiarObservacion(idInscripcion, observacion){
+
+        setAsistencias(prev =>
+            prev.map(a =>
+                a.id_inscripcion === idInscripcion
+                    ? {
+                        ...a,
+                        observacion
+                    }
+                    : a
+            )
+        );
+
+    }
+
+
   
     async function guardarAsistencias(){
 
@@ -229,10 +251,12 @@ export default function PanelDetalleClase({idComision}){
             <TablaAsistencia 
                 asistencias={asistencias}
                 onCambiarEstado={cambiarEstado}
+                onCambiarObservacion={cambiarObservacion}
             />
 
             <button
                 onClick={guardarAsistencias}
+                className="flex items-center gap-5 rounded-lg bg-red-700 px-4 py-3 text-white hover:bg-red-800 transition"
             >
 
                 Guardar asistencias
