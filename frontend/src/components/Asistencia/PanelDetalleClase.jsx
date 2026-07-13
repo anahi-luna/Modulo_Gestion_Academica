@@ -159,6 +159,7 @@ export default function PanelDetalleClase({ idComision }) {
             <TablaAsistencia
                 asistencias={asistencias}
                 onCambiarEstado={cambiarEstado}
+                onCambiarObservacion={cambiarObservacion}
             />
 
             {/* Antes este botón no tenía className: se veía como un link de texto plano */}
