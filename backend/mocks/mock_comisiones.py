@@ -2,6 +2,7 @@ COMISIONES = [
 
     {
         "id_comision": 1,
+        "id_plan_asignatura": 1,
         "codigo": "COM-101-A",
         "materia": "Matafuegos I",
         "docente": "Prof. García",
@@ -14,6 +15,7 @@ COMISIONES = [
 
     {
         "id_comision": 2,
+        "id_plan_asignatura": 2,
         "codigo": "COM-202-B",
         "materia": "Matafuegos II",
         "docente": "Prof. López",
@@ -25,6 +27,7 @@ COMISIONES = [
     },
     {
         "id_comision": 3,
+        "id_plan_asignatura": 3,
         "codigo": "COM-303-C",
         "materia": "Primeros auxilios",
         "docente": "Prof. Martínez",
@@ -37,6 +40,7 @@ COMISIONES = [
 
     {
         "id_comision": 4,
+        "id_plan_asignatura": 3,
         "codigo": "COM-401-D",
         "materia": "Rescate Vehicular",
         "docente": "Prof. Benítez",
@@ -49,6 +53,7 @@ COMISIONES = [
 
     {
         "id_comision": 5,
+        "id_plan_asignatura": 3,
         "codigo": "COM-402-E",
         "materia": "Materiales Peligrosos",
         "docente": "Prof. Díaz",
@@ -61,6 +66,7 @@ COMISIONES = [
 
     {
         "id_comision": 6,
+        "id_plan_asignatura": 3,
         "codigo": "COM-403-F",
         "materia": "Incendios Forestales",
         "docente": "Prof. Romero",
@@ -73,6 +79,7 @@ COMISIONES = [
 
     {
         "id_comision": 7,
+        "id_plan_asignatura": 4,
         "codigo": "COM-404-G",
         "materia": "Rescate en Altura",
         "docente": "Prof. Sánchez",
@@ -85,6 +92,7 @@ COMISIONES = [
 
     {
         "id_comision": 8,
+        "id_plan_asignatura": 4,
         "codigo": "COM-405-H",
         "materia": "Emergencias Químicas",
         "docente": "Prof. Morales",
@@ -97,6 +105,7 @@ COMISIONES = [
 
     {
         "id_comision": 9,
+        "id_plan_asignatura": 5,
         "codigo": "COM-406-I",
         "materia": "Comando de Incidentes",
         "docente": "Prof. Fernández",
