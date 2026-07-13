@@ -19,7 +19,7 @@ export default function PanelDetalleCalificaciones({ idComision }) {
     useEffect(() => {
         async function cargarEvaluaciones() {
             try {
-                const resultado = await getEvaluaciones(idComision);
+                const resultado = await getEvaluaciones(idComision); // 
                 setEvaluaciones(resultado);
                 if (resultado.length > 0) {
                     setEvaluacionSeleccionada(resultado[0]);
