@@ -10,3 +10,6 @@ from .modelo_estado_academico import EstadoAcademico
 from .modelo_resultado_academico import ResultadoAcademico
 from .modelo_estado_resultado_plan import EstadoResultadoPlan
 from .modelo_resultado_plan import ResultadoPlan
+from .modelo_estado_certificado import EstadoCertificado
+from .modelo_tipo_certificado import TipoCertificado
+from .modelo_certificado import Certificado

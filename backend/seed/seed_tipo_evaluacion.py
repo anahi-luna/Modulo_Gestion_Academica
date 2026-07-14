@@ -8,7 +8,7 @@ def cargar_tipos_de_evaluacion():
     if TipoEvaluacion.query.count() > 0:
         return
     
-    # Crea la lista de estados de asistencia predeterminados.
+    # Crea la lista de tipos de evaluaciones predeterminados.
     tipos_evaluacion = [
         TipoEvaluacion(id_tipo_evaluacion = 1, nombre="Parcial"),
         TipoEvaluacion(id_tipo_evaluacion = 2, nombre="Recuperatorio"),

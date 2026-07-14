@@ -29,7 +29,7 @@ def create_app():
     app.register_blueprint(calificacion_bp,url_prefix ="/api/calificaciones")
     app.register_blueprint(resultado_academico_bp,url_prefix ="/api/resultados-academicos")
     app.register_blueprint(resultado_plan_bp, url_prefix ="/api/resultados-planes")
-
+    app.register_blueprint(certificado_bp, url_prefix ="/api/certificados")
     # Ruta de prueba
     @app.route("/")
     def home():

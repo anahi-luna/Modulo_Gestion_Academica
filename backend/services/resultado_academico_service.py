@@ -19,6 +19,7 @@ from services.comision_cliente import obtener_comision
 from services.plan_asignatura_cliente import obtener_plan_asignatura
 from services.inscripcion_service import obtener_inscripcion_por_id
 from services.resultado_plan_service import actualizar_resultado_plan
+from services.estado_inscripcion_service import obtener_estado_por_nombre
 
 ID_USUARIO_SIMULADO = 100
 
@@ -98,6 +99,18 @@ def obtener_asistencias(id_inscripcion):
 def obtener_calificaciones(id_inscripcion):
     return Calificacion.query.filter_by(id_inscripcion=id_inscripcion).all()
 
+#Cambia el estado a finalizado de una inscripcion
+def finalizar_inscripcion(inscripcion):
+
+    estado = obtener_estado_por_nombre(
+        "Finalizada"
+    )
+
+    if inscripcion.id_estado != estado.id_estado:
+
+        inscripcion.id_estado = estado.id_estado
+        inscripcion.id_usuario_modificacion = ID_USUARIO_SIMULADO
+        inscripcion.ts_modificacion = datetime.now()
 
 # -------------------CÁLCULOS-------------------#
 
@@ -294,6 +307,8 @@ def crear_resultado_academico(datos):
         for resultado in resultados:
 
             inscripcion = obtener_inscripcion_por_id(resultado.id_inscripcion)
+
+            finalizar_inscripcion(inscripcion)
 
             comision = obtener_comision(inscripcion.id_comision)
 
