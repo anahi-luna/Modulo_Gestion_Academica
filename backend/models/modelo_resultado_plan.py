@@ -29,9 +29,9 @@ class ResultadoPlan(db.Model):
         nullable=False
     )
 
-    materias_pendientes = db.Column(
-        db.Integer,
-        nullable=False
+    materias_finalizadas = db.Column(
+    db.Integer,
+    nullable=False
     )
 
     id_estado_resultado_plan = db.Column(

@@ -141,22 +141,26 @@ def calcular_materias_aprobadas(id_legajo, id_plan):
     return aprobadas
 
 
-# Calcula la cantidad de materias pendientes.
-def calcular_materias_pendientes(materias_totales, materias_aprobadas):
+# Calcula la cantidad de materias finalizadas
+def calcular_materias_finalizadas(id_legajo, id_plan):
 
-    return materias_totales - materias_aprobadas
+    resultados = obtener_resultados_academicos_plan(id_legajo, id_plan)
+
+    return len(resultados)
 
 
 # Determina el estado del plan.
-def determinar_estado_resultado_plan(materias_totales, materias_aprobadas):
+def determinar_estado_resultado_plan(
+    materias_totales, materias_finalizadas, materias_aprobadas
+):
+
+    if materias_finalizadas != materias_totales:
+
+        return obtener_estado_resultado_plan_por_nombre("En curso")
 
     if materias_aprobadas == materias_totales:
 
         return obtener_estado_resultado_plan_por_nombre("Finalizado")
-
-    if materias_aprobadas > 0:
-
-        return obtener_estado_resultado_plan_por_nombre("En curso")
 
     return obtener_estado_resultado_plan_por_nombre("Incompleto")
 
@@ -217,7 +221,7 @@ def preparar_datos_resultado_plan(
     id_plan,
     materias_totales,
     materias_aprobadas,
-    materias_pendientes,
+    materias_finalizadas,
     estado,
 ):
 
@@ -228,7 +232,7 @@ def preparar_datos_resultado_plan(
         "id_plan": id_plan,
         "materias_totales": materias_totales,
         "materias_aprobadas": materias_aprobadas,
-        "materias_pendientes": materias_pendientes,
+        "materias_finalizadas": materias_finalizadas,
         "id_estado_resultado_plan": estado.id_estado_resultado_plan,
         "fecha_actualizacion": ahora.date(),
         "id_usuario_creacion": ID_USUARIO_SIMULADO,
@@ -258,15 +262,13 @@ def actualizar_resultado_plan(id_legajo, id_plan):
 
         materias_aprobadas = calcular_materias_aprobadas(id_legajo, id_plan)
 
-        materias_pendientes = calcular_materias_pendientes(
-            materias_totales, materias_aprobadas
+        materias_finalizadas = calcular_materias_finalizadas(id_legajo, id_plan)
+
+        estado = determinar_estado_resultado_plan(
+            materias_totales, materias_finalizadas, materias_aprobadas
         )
 
-        estado = determinar_estado_resultado_plan(materias_totales, materias_aprobadas)
-
-        resultado = ResultadoPlan.query.filter_by(
-            id_legajo=id_legajo, id_plan=id_plan
-        ).first()
+        resultado = obtener_resultado_plan(id_legajo, id_plan)
 
         # Si todavía no existe, lo crea.
         if not resultado:
@@ -276,7 +278,7 @@ def actualizar_resultado_plan(id_legajo, id_plan):
                 id_plan,
                 materias_totales,
                 materias_aprobadas,
-                materias_pendientes,
+                materias_finalizadas,
                 estado,
             )
 
@@ -289,7 +291,7 @@ def actualizar_resultado_plan(id_legajo, id_plan):
 
             resultado.materias_totales = materias_totales
             resultado.materias_aprobadas = materias_aprobadas
-            resultado.materias_pendientes = materias_pendientes
+            resultado.materias_finalizadas = materias_finalizadas
             resultado.id_estado_resultado_plan = estado.id_estado_resultado_plan
             resultado.fecha_actualizacion = datetime.now().date()
 
