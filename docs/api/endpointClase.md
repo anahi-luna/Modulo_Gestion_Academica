@@ -1,88 +1,8 @@
-# API REST - Módulo de Clases
-
-## Base URL
-
-```text
-http://localhost:5000/api/clases/
-```
+# API REST - Módulo Clases
 
 ---
 
-# 1. Crear una clase
-
-## Endpoint
-
-```http
-POST /api/clases/
-```
-
-## Descripción
-
-Registra una nueva clase asociada a una comisión.
-
-## Campos que debe enviar el Frontend
-
-| Campo        | Tipo              | Obligatorio | Descripción                                           |
-| ------------ | ----------------- | ----------- | ----------------------------------------------------- |
-| id_comision  | Integer           | Sí          | Identificador de la comisión.                         |
-| numero_clase | Integer           | Sí          | Número correlativo de la clase dentro de la comisión. |
-| fecha        | Date (YYYY-MM-DD) | Sí          | Fecha en la que se dictará la clase.                  |
-| hora_inicio  | Time (HH:MM)      | Sí          | Hora de inicio de la clase.                           |
-| hora_fin     | Time (HH:MM)      | Sí          | Hora de finalización de la clase.                     |
-| tema         | String            | Sí          | Tema que se desarrollará durante la clase.            |
-
-## Request
-
-```json
-{
-    "id_comision": 2,
-    "numero_clase": 1,
-    "fecha": "2026-07-06",
-    "hora_inicio": "18:00:00",
-    "hora_fin": "20:00:00",
-    "tema": "Introducción bomberos voluntarios"
-}
-```
-
-## Campos generados automáticamente por el Backend
-
-> **No deben enviarse en el request.**
-
-| Campo                   | Descripción                                      |
-| ----------------------- | ------------------------------------------------ |
-| id_clase                | Identificador de la clase.                       |
-| estado                  | Se inicializa automáticamente como `PROGRAMADA`. |
-| id_usuario_creacion     | Usuario que creó el registro.                    |
-| id_usuario_modificacion | Inicialmente es `null`.                          |
-| ts_creacion             | Fecha y hora de creación.                        |
-| ts_modificacion         | Inicialmente es `null`.                          |
-
-## Response (201)
-
-```json
-{
-    "data": {
-        "estado": "PROGRAMADA",
-        "fecha": "2026-07-06",
-        "hora_fin": "20:00:00",
-        "hora_inicio": "18:00:00",
-        "id_clase": 2,
-        "id_comision": 2,
-        "id_usuario_creacion": 100,
-        "id_usuario_modificacion": null,
-        "numero_clase": 1,
-        "tema": "Introducción bomberos voluntarios",
-        "ts_creacion": "2026-07-06T09:13:21.252957",
-        "ts_modificacion": null
-    },
-    "message": "Clase creada correctamente.",
-    "status": "success"
-}
-```
-
----
-
-# 2. Obtener todas las clases
+# Obtener todas las clases
 
 ## Endpoint
 
@@ -92,18 +12,19 @@ GET /api/clases/
 
 ## Descripción
 
-Obtiene el listado de clases.
+Obtiene el listado de clases registradas.
+
+También permite aplicar filtros mediante parámetros de consulta.
 
 ## Parámetros opcionales
 
-| Parámetro   | Tipo    | Descripción                                             |
-| ----------- | ------- | ------------------------------------------------------- |
-| id_comision | Integer | Devuelve únicamente las clases de la comisión indicada. |
-| estado      | String  | Devuelve únicamente las clases con el estado indicado.  |
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| id_comision | Integer | Filtra las clases de una comisión. |
+| estado | String | Filtra por estado de la clase. |
 
 ### Ejemplos
 
-Obtiene el listado de todas las clases
 ```http
 GET /api/clases/
 ```
@@ -120,225 +41,231 @@ GET /api/clases?estado=PROGRAMADA
 GET /api/clases?id_comision=2&estado=PROGRAMADA
 ```
 
-## Response
+## Respuesta
 
 ```json
 {
+    "status": "success",
+    "message": "Listado de clases.",
+    "total": 2,
     "data": [
         {
-            "estado": "DICTADA",
-            "fecha": "2026-07-03",
-            "hora_fin": "20:00:00",
-            "hora_inicio": "18:00:00",
             "id_clase": 1,
             "id_comision": 1,
+            "numero_clase": 1,
+            "fecha": "2026-07-03",
+            "hora_inicio": "18:00:00",
+            "hora_fin": "20:00:00",
+            "tema": "Primeros Auxilios",
+            "estado": "DICTADA",
             "id_usuario_creacion": 100,
             "id_usuario_modificacion": 100,
-            "numero_clase": 1,
-            "tema": "Primeros Auxilios",
             "ts_creacion": "2026-07-03T18:29:48.749675",
             "ts_modificacion": "2026-07-03T18:37:03.943357"
-        },
-        {
-            "estado": "PROGRAMADA",
-            "fecha": "2026-07-06",
-            "hora_fin": "20:00:00",
-            "hora_inicio": "18:00:00",
-            "id_clase": 2,
-            "id_comision": 2,
-            "id_usuario_creacion": 100,
-            "id_usuario_modificacion": null,
-            "numero_clase": 1,
-            "tema": "Introducción bomberos voluntarios",
-            "ts_creacion": "2026-07-06T09:13:21.252957",
-            "ts_modificacion": null
         }
-    ],
-    "message": "Listado de clases.",
-    "status": "success",
-    "total": 2
+    ]
 }
 ```
 
 ---
 
-# 3. Obtener una clase
+# Obtener una clase
 
 ## Endpoint
 
 ```http
-GET /api/clases/{id_clase}
+GET /api/clases/{id}
 ```
 
 ## Descripción
 
-Obtiene la información de una clase a partir de su identificador.
+Obtiene una clase según su identificador.
 
-### Ejemplo
-
-```http
-GET /api/clases/1
-```
-
-## Response
+## Respuesta
 
 ```json
 {
+    "status": "success",
+    "message": "Clase encontrada.",
     "data": {
-        "estado": "DICTADA",
-        "fecha": "2026-07-03",
-        "hora_fin": "20:00:00",
-        "hora_inicio": "18:00:00",
         "id_clase": 1,
         "id_comision": 1,
+        "numero_clase": 1,
+        "fecha": "2026-07-03",
+        "hora_inicio": "18:00:00",
+        "hora_fin": "20:00:00",
+        "tema": "Primeros Auxilios",
+        "estado": "DICTADA",
         "id_usuario_creacion": 100,
         "id_usuario_modificacion": 100,
-        "numero_clase": 1,
-        "tema": "Primeros Auxilios",
         "ts_creacion": "2026-07-03T18:29:48.749675",
         "ts_modificacion": "2026-07-03T18:37:03.943357"
-    },
-    "message": "Clase encontrada.",
-    "status": "success"
+    }
 }
 ```
 
 ---
 
-# 4. Modificar una clase
+# Registrar una clase
 
 ## Endpoint
 
 ```http
-PUT /api/clases/{id_clase}
+POST /api/clases/
 ```
 
 ## Descripción
 
-Permite modificar los datos de una clase existente.
+Registra una nueva clase asociada a una comisión.
 
-## Campos que pueden actualizarse
-
-| Campo        | Obligatorio | Observaciones                         |
-| ------------ | ----------- | ------------------------------------- |
-| id_comision  | Sí          | Debe enviarse siempre.                |
-| numero_clase | No          | Debe ser único dentro de la comisión. |
-| fecha        | No          | Fecha de la clase.                    |
-| hora_inicio  | No          | Hora de inicio.                       |
-| hora_fin     | No          | Debe ser mayor que `hora_inicio`.     |
-| tema         | No          | Tema de la clase.                     |
-| estado       | No          | Estado de la clase.                   |
+Toda clase nueva se registra automáticamente con el estado **PROGRAMADA**.
 
 ## Request
 
 ```json
 {
-    "id_comision": 1,
+    "id_comision": 2,
+    "numero_clase": 1,
+    "fecha": "2026-07-06",
+    "hora_inicio": "18:00:00",
+    "hora_fin": "20:00:00",
+    "tema": "Introducción a Bomberos Voluntarios"
+}
+```
+
+## Respuesta exitosa
+
+```json
+{
+    "status": "success",
+    "message": "Clase creada correctamente.",
+    "data": {
+        "id_clase": 2,
+        "id_comision": 2,
+        "numero_clase": 1,
+        "fecha": "2026-07-06",
+        "hora_inicio": "18:00:00",
+        "hora_fin": "20:00:00",
+        "tema": "Introducción a Bomberos Voluntarios",
+        "estado": "PROGRAMADA",
+        "id_usuario_creacion": 100,
+        "id_usuario_modificacion": null,
+        "ts_creacion": "2026-07-06T09:13:21.252957",
+        "ts_modificacion": null
+    }
+}
+```
+
+## Validaciones
+
+Antes de registrar una clase el sistema verifica que:
+
+- La comisión exista.
+- El número de clase no se encuentre repetido dentro de la misma comisión.
+- La hora de finalización sea mayor que la hora de inicio.
+- Exista el usuario que realiza la operación.
+
+---
+
+# Actualizar clase
+
+## Endpoint
+
+```http
+PUT /api/clases/{id}
+```
+
+## Descripción
+
+Permite modificar una clase existente.
+
+Pueden actualizarse los siguientes campos:
+
+- numero_clase
+- fecha
+- hora_inicio
+- hora_fin
+- tema
+- estado
+
+## Ejemplo
+
+```json
+{
     "tema": "Matafuegos I",
     "estado": "PROGRAMADA"
 }
 ```
 
-## Response
+## También puede modificarse el número de clase
 
 ```json
 {
-    "data": {
-        "estado": "PROGRAMADA",
-        "fecha": "2026-07-03",
-        "hora_fin": "20:00:00",
-        "hora_inicio": "18:00:00",
-        "id_clase": 1,
-        "id_comision": 1,
-        "id_usuario_creacion": 100,
-        "id_usuario_modificacion": 100,
-        "numero_clase": 1,
-        "tema": "Matafuegos I",
-        "ts_creacion": "2026-07-03T18:29:48.749675",
-        "ts_modificacion": "2026-07-06T09:16:51.089947"
-    },
-    "message": "Clase 1 actualizada.",
-    "status": "success"
+    "numero_clase": 2
 }
 ```
 
+## Reglas de negocio
+
+Durante la actualización el sistema:
+
+- Verifica que la clase exista.
+- Valida que el nuevo número de clase no se encuentre repetido dentro de la misma comisión.
+- Verifica que la hora de finalización sea mayor que la hora de inicio.
+- Actualiza automáticamente el usuario y la fecha de modificación.
+
 ---
 
-# 5. Eliminar una clase
+# Eliminar clase
 
 ## Endpoint
 
 ```http
-DELETE /api/clases/{id_clase}
+DELETE /api/clases/{id}
 ```
 
 ## Descripción
 
-Elimina una clase del sistema.
+Elimina una clase registrada.
 
-### Ejemplo
+## Reglas de negocio
 
-```http
-DELETE /api/clases/2
-```
+No será posible eliminar una clase cuando posea asistencias registradas.
 
-## Response
-
-```json
-{
-    "data": [],
-    "message": "Clase 2 eliminada.",
-    "status": "success"
-}
-```
+En ese caso el sistema devolverá un error de validación.
 
 ---
 
-# Validaciones del Backend
+# Estados de clase
 
-## Al crear una clase
-
-El backend valida que:
-
-* Exista la comisión indicada.
-* Exista el usuario que registra la operación.
-* No exista otra clase con el mismo `numero_clase` dentro de la misma comisión.
-* La `hora_fin` sea mayor que la `hora_inicio`.
-* Todos los campos obligatorios hayan sido enviados.
-* El formato de la fecha sea válido.
-* El formato de las horas sea válido.
-
-## Al modificar una clase
-
-El backend valida que:
-
-* La clase exista.
-* Si se modifica el `numero_clase`, no esté repetido dentro de la misma comisión.
-* Si se modifican las horas, `hora_fin` sea mayor que `hora_inicio`.
-* El estado enviado corresponda a un valor válido del Enum `EstadoClase`.
-* Los datos enviados respeten los tipos definidos por la API.
-
----
-
-# Posibles estados de una clase
-
-Actualmente una clase puede encontrarse en alguno de los siguientes estados:
-
-| Estado        |
-| --------------|
-| PROGRAMADA    |
-| DICTADA       |
-| SUSPENDIDA    |
-| REPROGRAMADA  |
+| Estado |
+|---------|
+| PROGRAMADA |
+| DICTADA |
+| SUSPENDIDA |
+| REPROGRAMADA |
 
 ---
 
 # Códigos de respuesta
 
-| Código | Significado                             |
-| ------ | --------------------------------------- |
-| 200    | Operación realizada correctamente.      |
-| 201    | Recurso creado correctamente.           |
-| 400    | Error de validación o regla de negocio. |
-| 404    | Recurso no encontrado.                  |
-| 500    | Error interno del servidor.             |
+| Código | Descripción |
+|---------|-------------|
+|200|Operación realizada correctamente.|
+|201|Clase creada correctamente.|
+|400|Error de validación o regla de negocio.|
+|404|Recurso no encontrado.|
+|500|Error interno del servidor.|
+
+---
+
+# Integraciones
+
+Actualmente el microservicio utiliza **Mocks** para simular la comunicación con otros microservicios.
+
+Las consultas simuladas corresponden a:
+
+- Comisiones
+- Usuarios
+
+En futuras etapas estos Mocks serán reemplazados por llamadas HTTP a los microservicios correspondientes, sin modificar los endpoints documentados.
