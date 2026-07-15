@@ -1,4 +1,6 @@
-# API REST - Módulo de Asistencias
+# API REST - Módulo Asistencias
+
+---
 
 ## Base URL
 
@@ -22,7 +24,115 @@ Antes de registrar una asistencia el Frontend debe seguir el siguiente flujo:
 
 ---
 
-# 1. Registrar asistencias
+# Obtener todas las asistencias
+
+## Endpoint
+
+```http
+GET /api/asistencias/
+```
+
+## Descripción
+
+Obtiene el listado de asistencias registradas.
+
+También permite aplicar filtros mediante parámetros de consulta.
+
+## Parámetros opcionales
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| id_clase | Integer | Filtra las asistencias de una clase. |
+| id_inscripcion | Integer | Filtra las asistencias de una inscripción. |
+
+### Ejemplos
+
+```http
+GET /api/asistencias/
+```
+
+```http
+GET /api/asistencias?id_clase=2
+```
+
+```http
+GET /api/asistencias?id_inscripcion=3
+```
+
+## Respuesta
+
+```json
+{
+    "status": "success",
+    "message": "Listado de asistencias.",
+    "total": 3,
+    "data": [
+        {
+            "id_asistencia": 1,
+            "id_clase": 1,
+            "id_inscripcion": 1,
+            "id_estado": 2,
+            "estado": {
+                "id_estado_asistencia": 2,
+                "nombre": "Ausente"
+            },
+            "clase": {
+                "id_clase": 1,
+                "estado": "DICTADA"
+            },
+            "tipo_registro": "MANUAL",
+            "observacion": "No llegó",
+            "id_usuario_creacion": 100,
+            "id_usuario_modificacion": 100,
+            "ts_creacion": "2026-07-10T10:36:53",
+            "ts_modificacion": "2026-07-10T10:53:16"
+        }
+    ]
+}
+```
+
+---
+
+# Obtener una asistencia
+
+## Endpoint
+
+```http
+GET /api/asistencias/{id}
+```
+
+## Descripción
+
+Obtiene una asistencia según su identificador.
+
+## Respuesta
+
+```json
+{
+    "status": "success",
+    "message": "Asistencia encontrada.",
+    "data": {
+        "id_asistencia": 1,
+        "id_clase": 1,
+        "id_inscripcion": 1,
+        "id_estado": 2,
+        "estado": {
+            "id_estado_asistencia": 2,
+            "nombre": "Ausente"
+        },
+        "tipo_registro": "MANUAL",
+        "observacion": "No llegó",
+        "id_usuario_creacion": 100,
+        "id_usuario_modificacion": 100,
+        "ts_creacion": "2026-07-10T10:36:53",
+        "ts_modificacion": "2026-07-10T10:53:16"
+    }
+}
+```
+
+---
+
+# Registrar asistencias
 
 ## Endpoint
 
@@ -32,7 +142,9 @@ POST /api/asistencias/
 
 ## Descripción
 
-Registra la asistencia de todos los alumnos de una clase.
+Registra las asistencias correspondientes a una clase.
+
+Todas las asistencias enviadas se registran mediante una única solicitud.
 
 ## Request
 
@@ -54,190 +166,66 @@ Registra la asistencia de todos los alumnos de una clase.
 }
 ```
 
-## Campos generados por el Backend
+## Campos generados automáticamente
 
 - id_asistencia
-- tipo_registro (MANUAL)
+- tipo_registro (**MANUAL**)
 - id_usuario_creacion
 - id_usuario_modificacion
 - ts_creacion
 - ts_modificacion
 
-## Response (201)
+## Respuesta
 
 ```json
 {
+    "status": "success",
+    "message": "Asistencias registradas correctamente.",
+    "total": 2,
     "data": [
         {
-            "clase": {
-                "estado": "DICTADA",
-                "fecha": "2026-07-06",
-                "hora_fin": "20:00:00",
-                "hora_inicio": "18:00:00",
-                "id_clase": 2,
-                "id_comision": 1,
-                "id_usuario_creacion": 100,
-                "id_usuario_modificacion": 100,
-                "numero_clase": 2,
-                "tema": "Matafuegos I",
-                "ts_creacion": "2026-07-10T10:30:48.131004",
-                "ts_modificacion": "2026-07-10T10:39:47.905339"
-            },
-            "estado": {
-                "id_estado_asistencia": 1,
-                "nombre": "Presente"
-            },
             "id_asistencia": 2,
             "id_clase": 2,
-            "id_estado": 1,
             "id_inscripcion": 3,
+            "id_estado": 1,
+            "tipo_registro": "MANUAL",
+            "observacion": "Presente",
             "id_usuario_creacion": 100,
             "id_usuario_modificacion": null,
-            "observacion": "Presente",
-            "tipo_registro": "MANUAL",
-            "ts_creacion": "2026-07-10T10:47:49.004982",
+            "ts_creacion": "2026-07-10T10:47:49",
             "ts_modificacion": null
         }
-    ],
-    "message": "Asistencias registradas correctamente.",
-    "status": "success",
-    "total": 2
+    ]
 }
 ```
 
+## Validaciones
+
+Antes de registrar asistencias el sistema verifica que:
+
+- La clase exista.
+- La clase se encuentre en estado **DICTADA**.
+- Exista el usuario que realiza la operación.
+- La inscripción exista.
+- La inscripción pertenezca a la comisión de la clase.
+- El estado de asistencia exista.
+- No exista previamente una asistencia para esa inscripción y esa clase.
+
 ---
 
-# 2. Obtener todas las asistencias
+# Actualizar asistencia
 
 ## Endpoint
 
 ```http
-GET /api/asistencias/
+PUT /api/asistencias/{id}
 ```
 
-## Parámetros opcionales
+## Descripción
 
-| Parámetro | Tipo | Descripción |
-|-----------|------|-------------|
-| id_clase | Integer | Filtra por clase. |
-| id_inscripcion | Integer | Filtra por inscripción. |
+Permite modificar una asistencia existente.
 
-### Ejemplos
-
-```http
-GET /api/asistencias/
-```
-
-```http
-GET /api/asistencias?id_clase=2
-```
-
-```http
-GET /api/asistencias?id_inscripcion=3
-```
-
-## Response
-
-```json
-{
-    "data": [
-        {
-            "clase": {
-                "estado": "DICTADA",
-                "fecha": "2026-07-06",
-                "hora_fin": "20:00:00",
-                "hora_inicio": "18:00:00",
-                "id_clase": 1,
-                "id_comision": 2,
-                "id_usuario_creacion": 100,
-                "id_usuario_modificacion": 100,
-                "numero_clase": 1,
-                "tema": "Matafuegos I",
-                "ts_creacion": "2026-07-10T10:30:14.264854",
-                "ts_modificacion": "2026-07-10T10:32:21.678524"
-            },
-            "estado": {
-                "id_estado_asistencia": 2,
-                "nombre": "Ausente"
-            },
-            "id_asistencia": 1,
-            "id_clase": 1,
-            "id_estado": 2,
-            "id_inscripcion": 1,
-            "id_usuario_creacion": 100,
-            "id_usuario_modificacion": 100,
-            "observacion": "No llego",
-            "tipo_registro": "MANUAL",
-            "ts_creacion": "2026-07-10T10:36:53.265438",
-            "ts_modificacion": "2026-07-10T10:53:16.015214"
-        }
-    ],
-    "message": "Listado de asistencias.",
-    "status": "success",
-    "total": 3
-}
-```
-
----
-
-# 3. Obtener una asistencia
-
-## Endpoint
-
-```http
-GET /api/asistencias/{id_asistencia}
-```
-
-## Response
-
-```json
-{
-    "data": {
-        "clase": {
-            "estado": "DICTADA",
-            "fecha": "2026-07-06",
-            "hora_fin": "20:00:00",
-            "hora_inicio": "18:00:00",
-            "id_clase": 1,
-            "id_comision": 2,
-            "id_usuario_creacion": 100,
-            "id_usuario_modificacion": 100,
-            "numero_clase": 1,
-            "tema": "Matafuegos I",
-            "ts_creacion": "2026-07-10T10:30:14.264854",
-            "ts_modificacion": "2026-07-10T10:32:21.678524"
-        },
-        "estado": {
-            "id_estado_asistencia": 2,
-            "nombre": "Ausente"
-        },
-        "id_asistencia": 1,
-        "id_clase": 1,
-        "id_estado": 2,
-        "id_inscripcion": 1,
-        "id_usuario_creacion": 100,
-        "id_usuario_modificacion": 100,
-        "observacion": "No llego",
-        "tipo_registro": "MANUAL",
-        "ts_creacion": "2026-07-10T10:36:53.265438",
-        "ts_modificacion": "2026-07-10T10:53:16.015214"
-    },
-    "message": "Asistencia encontrada.",
-    "status": "success"
-}
-```
-
----
-
-# 4. Modificar una asistencia
-
-## Endpoint
-
-```http
-PUT /api/asistencias/{id_asistencia}
-```
-
-## Campos modificables
+Los únicos campos modificables son:
 
 - id_estado
 - observacion
@@ -247,80 +235,55 @@ PUT /api/asistencias/{id_asistencia}
 ```json
 {
     "id_estado": 2,
-    "observacion": "No llego"
+    "observacion": "No llegó"
 }
 ```
 
-## Response
+## Reglas de negocio
 
-```json
-{
-    "data": {
-        "clase": {
-            "estado": "DICTADA",
-            "id_clase": 1,
-            "id_comision": 2,
-            "numero_clase": 1,
-            "tema": "Matafuegos I"
-        },
-        "estado": {
-            "id_estado_asistencia": 2,
-            "nombre": "Ausente"
-        },
-        "id_asistencia": 1,
-        "id_clase": 1,
-        "id_estado": 2,
-        "id_inscripcion": 1,
-        "observacion": "No llego",
-        "tipo_registro": "MANUAL",
-        "id_usuario_modificacion": 100,
-        "ts_modificacion": "2026-07-10T10:53:16.015214"
-    },
-    "message": "Asistencia 1 actualizada.",
-    "status": "success"
-}
-```
+Durante la actualización el sistema:
+
+- Verifica que la asistencia exista.
+- Verifica que el usuario exista.
+- Verifica que la clase exista.
+- Solo permite modificar asistencias de clases con estado **DICTADA**.
+- Verifica que el estado de asistencia exista.
+- Si no hubo cambios en los datos enviados, no se realiza ninguna actualización en la base de datos.
 
 ---
 
-# Validaciones del Backend
+# Eliminar asistencia
 
-Al registrar una asistencia el sistema valida:
+## Endpoint
 
-- La clase existe.
-- La clase está en estado **DICTADA**.
-- El usuario existe.
-- La inscripción existe.
-- La inscripción pertenece a la comisión de la clase.
-- El estado de asistencia existe.
-- No exista una asistencia registrada para esa inscripción y clase.
+```http
+DELETE /api/asistencias/{id}
+```
 
-Al modificar una asistencia el sistema valida:
+## Descripción
 
-- La asistencia existe.
-- La clase asociada existe.
-- La clase continúa en estado **DICTADA**.
-- El estado de asistencia exista.
-- Solo puedan modificarse el estado y la observación.
+Elimina una asistencia registrada.
+
+> **Importante:** Este endpoint se encuentra disponible únicamente para tareas de desarrollo y pruebas.
 
 ---
 
 # Estados de asistencia
 
-| Id | Estado |
+| ID | Estado |
 |----|---------|
-| 1 | Presente |
-| 2 | Ausente |
-| 3 | Justificado |
-| 4 | Tarde |
+|1|Presente|
+|2|Ausente|
+|3|Justificado|
+|4|Tarde|
 
 ---
 
 # Tipo de registro
 
-Actualmente el sistema registra las asistencias mediante:
+Actualmente todas las asistencias son registradas mediante:
 
-- MANUAL
+- **MANUAL**
 
 > En futuras versiones se incorporará el registro mediante código QR.
 
@@ -330,8 +293,23 @@ Actualmente el sistema registra las asistencias mediante:
 
 | Código | Descripción |
 |---------|-------------|
-| 200 | Operación exitosa. |
-| 201 | Recurso creado correctamente. |
-| 400 | Error de validación o regla de negocio. |
-| 404 | Recurso no encontrado. |
-| 500 | Error interno del servidor. |
+|200|Operación realizada correctamente.|
+|201|Asistencia registrada correctamente.|
+|400|Error de validación o regla de negocio.|
+|404|Recurso no encontrado.|
+|500|Error interno del servidor.|
+
+---
+
+# Integraciones
+
+Actualmente el microservicio utiliza **Mocks** para simular la comunicación con otros microservicios.
+
+Las consultas simuladas corresponden a:
+
+- Clases
+- Inscripciones
+- Usuarios
+- Estados de asistencia
+
+En futuras etapas estos Mocks serán reemplazados por llamadas HTTP a los microservicios correspondientes, sin modificar los endpoints documentados.
