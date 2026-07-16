@@ -121,15 +121,27 @@ export default function PanelDetalleClase({ idComision }) {
     }
 
     async function guardarAsistencias() {
+
+        if(!claseSeleccionada?.id){
+            console.error("No hay una clase seleccionada")
+            return;
+        }
         const datos = {
             id_clase: claseSeleccionada.id,
             asistencias: asistencias.map(a => ({
                 id_inscripcion: a.id_inscripcion,
                 id_estado: a.id_estado,
-                observacion: a.observacion
-            }))
+                observacion: a.observacion ?? "",
+            })),
         };
-        await registrarAsistenciaService(datos);
+
+        try{
+            await registrarAsistenciaService(datos);
+        }catch(error){
+            console.error("Error al guardar", error)
+
+        }
+        
     }
 
     function cambiarComision(comision){
