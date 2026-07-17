@@ -3,7 +3,7 @@ import IntegranteRow from "./IntegranteRow";
 // Recibe onCambiarObservacion además de onCambiarEstado: son dos funciones
 // que vienen desde PanelDetalleClase.jsx (el padre) y se pasan hacia abajo
 // hasta llegar al input de cada fila.
-export default function AsistenciaTabla({ idClase, asistencias, onCambiarEstado, onCambiarObservacion }) {
+export default function AsistenciaTabla({ idClase, asistencias, onCambiarEstado, onCambiarObservacion, soloLectura = false }) {
   return (
     <div className="px-4 sm:px-6 pb-6">
       {/* overflow-x-auto: si la tabla no entra en el ancho de la pantalla,
@@ -26,6 +26,7 @@ export default function AsistenciaTabla({ idClase, asistencias, onCambiarEstado,
                 asistencia={a}
                 onCambiarEstado={onCambiarEstado}
                 onCambiarObservacion={onCambiarObservacion}
+                soloLectura={soloLectura}
               />
             ))}
           </tbody>

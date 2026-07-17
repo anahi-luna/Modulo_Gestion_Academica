@@ -2,6 +2,7 @@ export default function AlumnoNotaRow({
     calificacion,
     onCambiarNota,
     onCambiarObservacion,
+    soloLectura = false,
 }) {
 
     const estado = calificacion.nota === null || calificacion.nota === undefined || calificacion.nota === ""
@@ -34,10 +35,11 @@ export default function AlumnoNotaRow({
                     min="0"
                     max="10"
                     step="0.5"
+                    disabled={soloLectura}
                     value={calificacion.nota ?? ""}
                     onChange={(e) => onCambiarNota(calificacion.id_inscripcion, e.target.value)}
                     placeholder="-"
-                    className="w-20 rounded-lg border border-gray-300 px-2 py-1 focus:border-red-600 focus:ring-2 focus:ring-red-200 outline-none"
+                    className="w-20 rounded-lg border border-gray-300 px-2 py-1 focus:border-red-600 focus:ring-2 focus:ring-red-200 outline-none disabled:opacity-50 disabled:bg-gray-100"
                 />
             </td>
 
@@ -50,10 +52,11 @@ export default function AlumnoNotaRow({
             <td>
                 <input
                     type="text"
+                    disabled={soloLectura}
                     value={calificacion.observacion ?? ""}
                     onChange={(e) => onCambiarObservacion(calificacion.id_inscripcion, e.target.value)}
                     placeholder="Observación (opcional)"
-                    className="w-full rounded-lg border border-gray-300 px-2 py-1 focus:border-red-600 focus:ring-2 focus:ring-red-200 outline-none"
+                    className="w-full rounded-lg border border-gray-300 px-2 py-1 focus:border-red-600 focus:ring-2 focus:ring-red-200 outline-none disabled:opacity-50 disabled:bg-gray-100"
                 />
             </td>
 
