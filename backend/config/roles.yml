@@ -113,7 +113,7 @@ roles:
       - micro2.inscripciones.leer
       - micro2.clases.leer
       - micro2.asistencias.leer
-      - micro2.evaluaciones.leer
+      
       - micro2.calificaciones.leer
       - micro2.resultado_academico.leer
       - micro2.resultado_plan.leer

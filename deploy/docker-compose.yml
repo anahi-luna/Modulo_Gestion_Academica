@@ -10,14 +10,20 @@ services:
 
     container_name: gestion-academica-backend
 
+    restart: always
+
     ports:
       - "5000:5000"
+
+    environment:
+      - PORT=5000
 
     volumes:
       - ../backend:/app
 
-    restart: unless-stopped
-
+    networks:
+      red_bomberos_estatica:
+        ipv4_address: 172.10.10.21
 
   frontend:
 
@@ -27,6 +33,11 @@ services:
 
     container_name: gestion-academica-frontend
 
+    restart: always
+
+    depends_on:
+      - backend
+
     ports:
       - "5173:5173"
 
@@ -34,7 +45,15 @@ services:
       - ../frontend:/app
       - /app/node_modules
 
-    depends_on:
-      - backend
+    networks:
+      red_bomberos_estatica:
+        ipv4_address: 172.10.10.31
 
-    restart: unless-stopped
+networks:
+
+  red_bomberos_estatica:
+    driver: bridge
+
+    ipam:
+      config:
+        - subnet: 172.10.10.0/24
