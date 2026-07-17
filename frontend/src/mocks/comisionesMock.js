@@ -107,7 +107,40 @@ const COMISIONES = [
         horario: "Miércoles 08:00 - 11:00",
         correlativas: [1, 2],
         rango_minimo: "Suboficial Mayor",
-    }
+    },
+    {
+        id: 10,
+        codigo: "COM-101-A",
+        materia: "Matafuegos I",
+        docente: "Prof. García",
+        cupo: 30,
+        inscriptos: 20,
+        horario: "Martes 18:00 - 21:00",
+        correlativas: [],           // Sin correlativas: cualquiera puede inscribirse
+        rango_minimo: null,         //CUALQUIERA puede inscribirse
+    },
+    {
+    id: 11,
+    codigo: "COM-101-C",
+    materia: "Matafuegos I",
+    docente: "Prof. García",
+    cupo: 25,
+    inscriptos: 12,
+    horario: "Sábado 09:00 - 12:00",
+    correlativas: [],
+    rango_minimo: null,
+},
+{
+    id: 12,
+    codigo: "COM-404-H",
+    materia: "Rescate en Altura",
+    docente: "Prof. Sánchez",
+    cupo: 15,
+    inscriptos: 6,
+    horario: "Sábado 10:00 - 13:00",
+    correlativas: [1, 2],
+    rango_minimo: "Suboficial Mayor",
+},
 ];
 
 // -------------------------------------------------------

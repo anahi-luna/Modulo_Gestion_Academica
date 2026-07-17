@@ -8,18 +8,28 @@ import { getClase, getClases } from "../../Services/clasesAdminService";
 import { obtenerAsistenciasPorClase, modificarAsistencia, registrarAsistenciaService, actualizarEstadoAutomaticamente } from "../../Services/asistenciaAdminService";
 import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
 import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
+import { getComisiones } from "../../mocks/comisionesMock";
+import SelectorComisiones from "./SelectorComisiones";
 
 export default function PanelDetalleClase({ idComision }) {
     const [claseSeleccionada, setClaseSeleccionada] = useState(null);
-    const [clases, setClases] = useState([])
+    const [clases, setClases] = useState([]);
     const [asistencias, setAsistencias] = useState([]);
+    const [comisionSeleccionada, setComisionSeleccionada] = useState(null);
+    const [comisiones, setComisiones] = useState([]);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         async function cargarClases() {
             try {
-                const resultado = await getClases(idComision);
+                //Resetea las clases
+                setClaseSeleccionada(null);
+                setClases([]);
+                setAsistencias([]);
+
+
+                const resultado = await getClases(comisionSeleccionada.id);
                 const clasesActualizadas = await Promise.all(
                     resultado.map(actualizarEstadoAutomaticamente)
                 );
@@ -31,10 +41,10 @@ export default function PanelDetalleClase({ idComision }) {
                 console.error(error);
             }
         }
-        if (idComision) {
+        if (comisionSeleccionada?.id) {
             cargarClases();
         }
-    }, [idComision]);
+    }, [comisionSeleccionada?.id]);
 
     useEffect(() => {
         if (claseSeleccionada?.id) {
@@ -44,13 +54,39 @@ export default function PanelDetalleClase({ idComision }) {
         }
     }, [claseSeleccionada?.id]);
 
+    useEffect(() => {
+        async function cargarComisiones() {
+            try{
+                const resultado = await getComisiones();
+                setComisiones(resultado.data);
+
+            }catch(error){
+                console.error("Error al cargar comisiones:", error);
+            }
+        }
+        cargarComisiones();
+    }, []);
+
+    useEffect(() => {
+        if(!idComision || comisiones.length === 0) {
+            return;
+        }
+
+        const comisionActual = comisiones.find(
+            (comision) => comision.id === Number(idComision)
+        );
+
+        setComisionSeleccionada(comisionActual ?? null);
+    }, [idComision, comisiones]);
+
+
     async function cargarAsistencias() {
         try {
             const asistencias = await obtenerAsistenciasPorClase(claseSeleccionada.id);
             if (asistencias.length > 0) {
                 setAsistencias(asistencias);
             } else {
-                const inscriptos = await obtenerInscripcionesPorComision(idComision);
+                const inscriptos = await obtenerInscripcionesPorComision(comisionSeleccionada.id);
                 setAsistencias(inscriptos);
             }
         } catch (error) {
@@ -85,15 +121,31 @@ export default function PanelDetalleClase({ idComision }) {
     }
 
     async function guardarAsistencias() {
+
+        if(!claseSeleccionada?.id){
+            console.error("No hay una clase seleccionada")
+            return;
+        }
         const datos = {
             id_clase: claseSeleccionada.id,
             asistencias: asistencias.map(a => ({
                 id_inscripcion: a.id_inscripcion,
                 id_estado: a.id_estado,
-                observacion: a.observacion
-            }))
+                observacion: a.observacion ?? "",
+            })),
         };
-        await registrarAsistenciaService(datos);
+
+        try{
+            await registrarAsistenciaService(datos);
+        }catch(error){
+            console.error("Error al guardar", error)
+
+        }
+        
+    }
+
+    function cambiarComision(comision){
+        setComisionSeleccionada(comision);
     }
 
     const inscriptos = asistencias.length;
@@ -101,6 +153,10 @@ export default function PanelDetalleClase({ idComision }) {
     const ausentes = asistencias.filter(a => a.id_estado === 2).length;
     const justificado = asistencias.filter(a => a.id_estado === 3).length;
     const tarde = asistencias.filter(a => a.id_estado === 4).length;
+
+    const comisionesDeLaMateria = comisionSeleccionada ? comisiones.filter(
+        (comision) => comision.materia === comisionSeleccionada.materia
+    ) : [];
 
     return (
         // Antes: "col-span-9" fijo. En mobile no hace falta col-span
@@ -153,11 +209,19 @@ export default function PanelDetalleClase({ idComision }) {
 
                 </div>
             </div>
+            
 
+            <SelectorComisiones
+                comisiones={comisionesDeLaMateria}
+                comisionSeleccionada={comisionSeleccionada}
+                onCambiarComision={cambiarComision}
+                
+            />
             <ClaseSelect
                 clases={clases}
                 claseSeleccionada={claseSeleccionada}
                 setClaseSeleccionada={setClaseSeleccionada}
+                
             />
 
             {/*
