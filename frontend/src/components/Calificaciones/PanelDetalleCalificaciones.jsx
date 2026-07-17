@@ -8,28 +8,58 @@ import { getEvaluaciones } from "../../Services/evaluacionesAdminService";
 import { obtenerCalificacionesPorEvaluacion, registrarCalificacionesService } from "../../Services/calificacionesAdminService";
 import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
 
-export default function PanelDetalleCalificaciones({ idComision }) {
+// Le agrego soloLectura: cuando el usuario no tiene permiso para
+// cargar/actualizar calificaciones, deshabilito los inputs y escondo
+// el botón de guardar, pero sigue viendo la planilla igual.
+export default function PanelDetalleCalificaciones({ idComision, soloLectura = false }) {
     const [evaluacionSeleccionada, setEvaluacionSeleccionada] = useState(null);
     const [evaluaciones, setEvaluaciones] = useState([]);
     const [calificaciones, setCalificaciones] = useState([]);
     const [guardando, setGuardando] = useState(false);
+    const [cargandoEvaluaciones, setCargandoEvaluaciones] = useState(false);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         async function cargarEvaluaciones() {
             try {
+                // OJO ACÁ: esto es lo que faltaba. Antes, si la nueva
+                // comisión no tenía evaluaciones, "resultado" quedaba
+                // vacío pero evaluacionSeleccionada (y por lo tanto las
+                // calificaciones que se ven en pantalla) seguían siendo
+                // las de la comisión anterior, porque solo se llamaba
+                // a setEvaluacionSeleccionada cuando SÍ había resultado.
+                // Por eso al cambiar de comisión se quedaba pegada la
+                // evaluación vieja. Ahora limpio todo ANTES de pedir los
+                // datos nuevos, así se ve "sin evaluación" hasta que
+                // llega la respuesta correcta de la comisión actual.
+                setEvaluacionSeleccionada(null);
+                setEvaluaciones([]);
+                setCalificaciones([]);
+                setCargandoEvaluaciones(true);
+
                 const resultado = await getEvaluaciones(idComision);
                 setEvaluaciones(resultado);
                 if (resultado.length > 0) {
                     setEvaluacionSeleccionada(resultado[0]);
                 }
+                // Si resultado.length === 0, ya quedó todo limpio arriba:
+                // no hace falta un "else", evaluacionSeleccionada se
+                // queda en null y la vista muestra el aviso de que esta
+                // comisión no tiene evaluaciones.
             } catch (error) {
                 console.error(error);
+            } finally {
+                setCargandoEvaluaciones(false);
             }
         }
         if (idComision) {
             cargarEvaluaciones();
+        } else {
+            // Tampoco había comisión antes: limpio igual, por las dudas.
+            setEvaluacionSeleccionada(null);
+            setEvaluaciones([]);
+            setCalificaciones([]);
         }
     }, [idComision]);
 
@@ -137,13 +167,15 @@ export default function PanelDetalleCalificaciones({ idComision }) {
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => navigate("/GestionEvaluaciones")}
-                        className="flex items-center gap-2 self-start sm:self-auto border border-gray-300 rounded-lg px-4 py-2 text-sm hover:bg-gray-100 transition shrink-0"
-                    >
-                        <PencilSquareIcon className="h-5 w-5" />
-                        Gestionar Evaluaciones
-                    </button>
+                    {!soloLectura && (
+                        <button
+                            onClick={() => navigate("/GestionEvaluaciones")}
+                            className="flex items-center gap-2 self-start sm:self-auto border border-gray-300 rounded-lg px-4 py-2 text-sm hover:bg-gray-100 transition shrink-0"
+                        >
+                            <PencilSquareIcon className="h-5 w-5" />
+                            Gestionar Evaluaciones
+                        </button>
+                    )}
 
                 </div>
             </div>
@@ -154,28 +186,43 @@ export default function PanelDetalleCalificaciones({ idComision }) {
                 setEvaluacionSeleccionada={setEvaluacionSeleccionada}
             />
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6">
-                <EstadisticaCard titulo="Inscriptos" cantidad={inscriptos} />
-                <EstadisticaCard titulo="Aprobados" cantidad={aprobados} color="green" />
-                <EstadisticaCard titulo="Desaprobados" cantidad={desaprobados} color="red" />
-                <EstadisticaCard titulo="Promedio" cantidad={promedio} />
-            </div>
+            {/* Aviso explícito cuando la comisión no tiene evaluaciones
+                cargadas, en vez de dejar la tabla vacía sin explicación */}
+            {!cargandoEvaluaciones && idComision && evaluaciones.length === 0 && (
+                <div className="px-4 sm:px-8 py-6 text-sm text-gray-400">
+                    Esta comisión todavía no tiene evaluaciones cargadas.
+                </div>
+            )}
 
-            <CalificacionTabla
-                calificaciones={calificaciones}
-                onCambiarNota={cambiarNota}
-                onCambiarObservacion={cambiarObservacion}
-            />
+            {evaluacionSeleccionada && (
+                <>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6">
+                        <EstadisticaCard titulo="Inscriptos" cantidad={inscriptos} />
+                        <EstadisticaCard titulo="Aprobados" cantidad={aprobados} color="green" />
+                        <EstadisticaCard titulo="Desaprobados" cantidad={desaprobados} color="red" />
+                        <EstadisticaCard titulo="Promedio" cantidad={promedio} />
+                    </div>
 
-            <div className="px-4 sm:px-6 pb-6">
-                <button
-                    onClick={guardarCalificaciones}
-                    disabled={guardando || !evaluacionSeleccionada}
-                    className="w-full sm:w-auto bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white rounded-lg px-5 py-2 font-medium"
-                >
-                    {guardando ? "Guardando..." : "Guardar calificaciones"}
-                </button>
-            </div>
+                    <CalificacionTabla
+                        calificaciones={calificaciones}
+                        onCambiarNota={cambiarNota}
+                        onCambiarObservacion={cambiarObservacion}
+                        soloLectura={soloLectura}
+                    />
+
+                    {!soloLectura && (
+                        <div className="px-4 sm:px-6 pb-6">
+                            <button
+                                onClick={guardarCalificaciones}
+                                disabled={guardando || !evaluacionSeleccionada}
+                                className="w-full sm:w-auto bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white rounded-lg px-5 py-2 font-medium"
+                            >
+                                {guardando ? "Guardando..." : "Guardar calificaciones"}
+                            </button>
+                        </div>
+                    )}
+                </>
+            )}
 
         </div>
     );

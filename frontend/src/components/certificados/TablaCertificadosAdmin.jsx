@@ -14,7 +14,7 @@ export default function TablaCertificadosAdmin({ certificados, onEmitir, onRevoc
   function Acciones({ c }) {
     return (
       <div className="flex flex-wrap gap-2">
-        {c.estado !== "Emitido" && (
+        {c.estado !== "Emitido" && onEmitir && (
           <button
             onClick={() => onEmitir(c)}
             className="px-2 py-1 rounded-md bg-green-100 hover:bg-green-200 text-green-700 text-xs font-medium"
@@ -30,12 +30,14 @@ export default function TablaCertificadosAdmin({ certificados, onEmitir, onRevoc
             >
               Descargar
             </button>
-            <button
-              onClick={() => onRevocar(c)}
-              className="px-2 py-1 rounded-md bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium"
-            >
-              Revocar
-            </button>
+            {onRevocar && (
+              <button
+                onClick={() => onRevocar(c)}
+                className="px-2 py-1 rounded-md bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium"
+              >
+                Revocar
+              </button>
+            )}
           </>
         )}
       </div>

@@ -27,9 +27,13 @@ export default function ModuloCard({
         {descripcion}
       </p>
 
-      <div className="mt-4 inline-block rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
-        {cantidad}
-      </div>
+      {/* Si no me pasan cantidad (por ejemplo en los módulos que no
+          tienen un contador armado todavía), no muestro el chip vacío */}
+      {cantidad && (
+        <div className="mt-4 inline-block rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
+          {cantidad}
+        </div>
+      )}
 
       <ArrowRightIcon className="absolute bottom-5 right-5 h-5 w-5 text-gray-400" />
     </div>

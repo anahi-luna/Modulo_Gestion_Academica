@@ -11,12 +11,13 @@ import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
 import { getComisiones } from "../../mocks/comisionesMock";
 import SelectorComisiones from "./SelectorComisiones";
 
-export default function PanelDetalleClase({ idComision }) {
+export default function PanelDetalleClase({ idComision, soloLectura = false }) {
     const [claseSeleccionada, setClaseSeleccionada] = useState(null);
     const [clases, setClases] = useState([]);
     const [asistencias, setAsistencias] = useState([]);
     const [comisionSeleccionada, setComisionSeleccionada] = useState(null);
     const [comisiones, setComisiones] = useState([]);
+    const [cargandoClases, setCargandoClases] = useState(false);
 
     const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ export default function PanelDetalleClase({ idComision }) {
                 setClaseSeleccionada(null);
                 setClases([]);
                 setAsistencias([]);
-
+                setCargandoClases(true);
 
                 const resultado = await getClases(comisionSeleccionada.id);
                 const clasesActualizadas = await Promise.all(
@@ -39,10 +40,19 @@ export default function PanelDetalleClase({ idComision }) {
                 }
             } catch (error) {
                 console.error(error);
+            } finally {
+                setCargandoClases(false);
             }
         }
         if (comisionSeleccionada?.id) {
             cargarClases();
+        } else {
+            // Si no hay comisión seleccionada (por ejemplo, un instante
+            // mientras se resuelve el cambio de comisión), limpio todo
+            // para no dejar pegada la clase de la comisión anterior.
+            setClaseSeleccionada(null);
+            setClases([]);
+            setAsistencias([]);
         }
     }, [comisionSeleccionada?.id]);
 
@@ -221,36 +231,53 @@ export default function PanelDetalleClase({ idComision }) {
                 clases={clases}
                 claseSeleccionada={claseSeleccionada}
                 setClaseSeleccionada={setClaseSeleccionada}
-                
+
             />
 
-            {/*
-              Antes: "grid-cols-4" fijo, 4 tarjetas apretadísimas en un celular.
-              Ahora: 2 columnas en mobile (2 filas de 2), 4 columnas desde sm.
-            */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6">
-                <EstadisticaCard titulo="Inscriptos" cantidad={inscriptos} />
-                <EstadisticaCard titulo="Presentes" cantidad={presentes} color="green" />
-                <EstadisticaCard titulo="Ausentes" cantidad={ausentes} color="yellow" />
-                <EstadisticaCard titulo="Tarde" cantidad={tarde} color="red" />
-                <EstadisticaCard titulo="Justificados" cantidad={justificado} />
-            </div>
+            {/* Si ya terminé de buscar y la comisión no tiene ninguna
+                clase cargada, lo digo explícitamente en vez de dejar
+                la tabla vacía sin explicación. */}
+            {!cargandoClases && comisionSeleccionada && clases.length === 0 && (
+                <div className="px-4 sm:px-8 py-6 text-sm text-gray-400">
+                    Esta comisión todavía no tiene clases programadas.
+                </div>
+            )}
 
-            <TablaAsistencia
-                asistencias={asistencias}
-                onCambiarEstado={cambiarEstado}
-                onCambiarObservacion={cambiarObservacion}
-            />
+            {claseSeleccionada && (
+                <>
+                    {/*
+                      Antes: "grid-cols-4" fijo, 4 tarjetas apretadísimas en un celular.
+                      Ahora: 2 columnas en mobile (2 filas de 2), 4 columnas desde sm.
+                    */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6">
+                        <EstadisticaCard titulo="Inscriptos" cantidad={inscriptos} />
+                        <EstadisticaCard titulo="Presentes" cantidad={presentes} color="green" />
+                        <EstadisticaCard titulo="Ausentes" cantidad={ausentes} color="yellow" />
+                        <EstadisticaCard titulo="Tarde" cantidad={tarde} color="red" />
+                        <EstadisticaCard titulo="Justificados" cantidad={justificado} />
+                    </div>
 
-            {/* Antes este botón no tenía className: se veía como un link de texto plano */}
-            <div className="px-4 sm:px-6 pb-6">
-                <button
-                    onClick={guardarAsistencias}
-                    className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white rounded-lg px-5 py-2 font-medium"
-                >
-                    Guardar asistencias
-                </button>
-            </div>
+                    <TablaAsistencia
+                        asistencias={asistencias}
+                        onCambiarEstado={cambiarEstado}
+                        onCambiarObservacion={cambiarObservacion}
+                        soloLectura={soloLectura}
+                    />
+
+                    {/* El botón de guardar solo tiene sentido si el usuario
+                        tiene permiso para cargar/actualizar asistencias */}
+                    {!soloLectura && (
+                        <div className="px-4 sm:px-6 pb-6">
+                            <button
+                                onClick={guardarAsistencias}
+                                className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white rounded-lg px-5 py-2 font-medium"
+                            >
+                                Guardar asistencias
+                            </button>
+                        </div>
+                    )}
+                </>
+            )}
 
         </div>
     )

@@ -1,6 +1,6 @@
 import AlumnoNotaRow from "./AlumnoNotaRow";
 
-export default function CalificacionTabla({ calificaciones, onCambiarNota, onCambiarObservacion }) {
+export default function CalificacionTabla({ calificaciones, onCambiarNota, onCambiarObservacion, soloLectura = false }) {
     return (
         <div className="px-4 sm:px-6 pb-6">
             {/* overflow-x-auto: mismo criterio que AsistenciaTabla */}
@@ -22,6 +22,7 @@ export default function CalificacionTabla({ calificaciones, onCambiarNota, onCam
                                 calificacion={c}
                                 onCambiarNota={onCambiarNota}
                                 onCambiarObservacion={onCambiarObservacion}
+                                soloLectura={soloLectura}
                             />
                         ))}
                     </tbody>

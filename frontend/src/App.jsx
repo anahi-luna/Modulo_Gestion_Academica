@@ -2,150 +2,125 @@ import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import RutaProtegida from "./components/rutas/RutaProtegida";
-import HomeAlumno from "./pages/HomeAlumno";
-import HomeProfesor from "./pages/HomeProfesor";
+import { PermissionsProvider } from "./context/PermissionsContext";
+import { ACCIONES } from "./config/modulos";
+
+import Home from "./pages/Home";
 import Inscripciones from "./pages/Inscripciones";
-import HomeAdmin from "./pages/HomeAdmin";
 import InscripcionesAdmin from './pages/InscripcionesAdmin';
-import AsistenciaAdmin from './pages/AsistenciaAdmin';
+import Asistencia from './pages/Asistencia';
 import GestionClases from "./pages/GestionClases";
-import CalificacionesAdmin from "./pages/CalificacionesAdmin";
+import Calificaciones from "./pages/Calificaciones";
 import GestionEvaluaciones from "./pages/GestionEvaluaciones";
-import MisCalificaciones from "./pages/MisCalificaciones";
-import { ROLES, ADMIN_MOCK, ALUMNO_MOCK } from './mocks/usuariosMock';
-import MisCertificados from "./pages/MisCertificados";
-import GestionCertificados from "./pages/GestionCertificados";
-import { useState } from "react";
+import Certificados from "./pages/Certificados";
 
-
+// Antes esta app tenía un Home distinto por rol (HomeAdmin/HomeProfesor/
+// HomeAlumno) y un montón de rutas separadas para "la vista del admin"
+// y "la vista del alumno" de un mismo módulo (por ejemplo
+// CalificacionesAdmin vs MisCalificaciones). Ahora hay UNA sola ruta y
+// UNA sola página por módulo (Home, Asistencia, Calificaciones,
+// Certificados): la página de adentro decide qué mostrar según los
+// PERMISOS del usuario logueado, no según un rol fijo.
+//
+// El usuario ya no se guarda acá con useState: lo maneja el
+// PermissionsProvider, que le pregunta al back "quién sos y qué podés
+// hacer" (GET /api/auth/me) y se lo pasa a toda la app a través de un
+// contexto (usePermissions()). Así ni el Navbar ni las páginas
+// necesitan recibir "usuario" por props.
+//
+// Inscripciones sí sigue teniendo 2 páginas (Inscripciones.jsx para
+// pedir una inscripción e InscripcionesAdmin.jsx para gestionarlas):
+// son dos flujos de UI genuinamente distintos, no la misma tabla con
+// botones ocultos, así que no las unifiqué. Lo que sí cambié es que
+// ahora se protegen por PERMISO (micro2.inscripciones.leer/actualizar)
+// en vez de por rol hardcodeado.
 export default function App() {
-
-    const [usuario, setUsuario] = useState(ALUMNO_MOCK);
 
     return (
         <BrowserRouter>
-            <>
-                <Navbar usuario={usuario} setUsuario={setUsuario} />
+            <PermissionsProvider>
+                <Navbar />
 
                 <main>
                     <Routes>
 
-                        {/* Home: cambia según el rol */}
-                        <Route
-                            path="/"
-                            element={
-                                usuario.rol === ROLES.ADMIN
-                                    ? <HomeAdmin />
-                                    : usuario.rol === ROLES.PROFESOR
-                                        ? <HomeProfesor usuario={usuario} />
-                                        : <HomeAlumno usuario={usuario} />
-                            }
-                        />
+                        {/* Home: uno solo para todos, arma las cards de
+                            módulos según los permisos del usuario */}
+                        <Route path="/" element={<Home />} />
 
-                        {/* Pre-inscripción: sólo alumno */}
-                        <Route
-                            path="/inscripciones"
-                            element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
-                                    <Inscripciones />
-                                </RutaProtegida>
-                            }
-                        />
+                        {/* Pedir una inscripción: no depende de un permiso
+                            del microservicio, cualquiera autenticado
+                            puede solicitarla */}
+                        <Route path="/inscripciones" element={<Inscripciones />} />
 
-                        {/* Gestión de inscripciones: admin y administrativo */}
+                        {/* Gestión de inscripciones: requiere poder leerlas
+                            como personal de gestión */}
                         <Route
                             path="/inscripcionesAdmin"
                             element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
+                                <RutaProtegida permisoRequerido={ACCIONES.INSCRIPCIONES_LEER}>
                                     <InscripcionesAdmin />
                                 </RutaProtegida>
                             }
                         />
 
-                        {/* Asistencia: admin y profesor */}
+                        {/* Asistencia: unificada, adentro se gatea con
+                            permiso de crear/actualizar si puede editar */}
                         <Route
-                            path="/AsistenciaAdmin"
+                            path="/asistencia"
                             element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.PROFESOR]}>
-                                    <AsistenciaAdmin />
+                                <RutaProtegida permisoRequerido={ACCIONES.ASISTENCIAS_LEER}>
+                                    <Asistencia />
                                 </RutaProtegida>
                             }
                         />
 
-
-                        {/* Gestion de clases: admin */}
+                        {/* Gestión de clases: sigue siendo una sola vista,
+                            ahora protegida por permiso en vez de por rol */}
                         <Route
                             path="/GestionClases"
                             element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
+                                <RutaProtegida permisoRequerido={ACCIONES.CLASES_LEER}>
                                     <GestionClases />
                                 </RutaProtegida>
                             }
                         />
 
-                        {/* Calificaciones: admin y profesor (misma lógica que Asistencia) */}
+                        {/* Calificaciones: unificada (staff vs alumno se
+                            resuelve adentro de la página) */}
                         <Route
-                            path="/CalificacionesAdmin"
+                            path="/calificaciones"
                             element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN, ROLES.PROFESOR]}>
-                                    <CalificacionesAdmin />
+                                <RutaProtegida permisoRequerido={ACCIONES.CALIFICACIONES_LEER}>
+                                    <Calificaciones />
                                 </RutaProtegida>
                             }
                         />
 
-                        {/* Gestión de evaluaciones: admin (misma lógica que GestionClases) */}
+                        {/* Gestión de evaluaciones */}
                         <Route
                             path="/GestionEvaluaciones"
                             element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
+                                <RutaProtegida permisoRequerido={ACCIONES.EVALUACIONES_LEER}>
                                     <GestionEvaluaciones />
                                 </RutaProtegida>
                             }
                         />
 
-                        {/* Mis calificaciones: sólo alumno, solo lectura */}
-                        <Route
-                            path="/calificaciones"
-                            element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
-                                    <MisCalificaciones usuario={usuario} />
-                                </RutaProtegida>
-                            }
-                            
-                        />
-
-                        {/* Mis certificados: sólo alumno, solo lectura */}
+                        {/* Certificados: unificada (staff vs alumno se
+                            resuelve adentro de la página) */}
                         <Route
                             path="/certificados"
                             element={
-                                <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
-                                    <MisCertificados usuario={usuario} />
+                                <RutaProtegida permisoRequerido={ACCIONES.CERTIFICADOS_LEER}>
+                                    <Certificados />
                                 </RutaProtegida>
                             }
                         />
-                        {/* Mis certificados: sólo alumno */}
-<Route
-    path="/certificados"
-    element={
-        <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ALUMNO]}>
-            <MisCertificados usuario={usuario} />
-        </RutaProtegida>
-    }
-/>
-
-{/* Gestión de certificados: sólo admin (autoridad habilitada para emitir/firmar) */}
-<Route
-    path="/certificadosAdmin"
-    element={
-        <RutaProtegida usuario={usuario} rolesPermitidos={[ROLES.ADMIN]}>
-            <GestionCertificados usuario={usuario} />
-        </RutaProtegida>
-    }
-/>
 
                     </Routes>
                 </main>
-            </>
+            </PermissionsProvider>
         </BrowserRouter>
     );
 }
