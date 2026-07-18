@@ -4,7 +4,6 @@ roles:
     nombre: Administrador Microservicio
     descripcion: Acceso completo a todas las funcionalidades del microservicio.
     acciones:
-      - micro2.inscripciones.crear
       - micro2.inscripciones.leer
       - micro2.inscripciones.actualizar
       - micro2.inscripciones.eliminar
@@ -48,7 +47,6 @@ roles:
     nombre: Gestión de Inscripciones
     descripcion: Administración completa del módulo de inscripciones.
     acciones:
-      - micro2.inscripciones.crear
       - micro2.inscripciones.leer
       - micro2.inscripciones.actualizar
       - micro2.inscripciones.eliminar
@@ -73,29 +71,21 @@ roles:
 
   - id: 5
     nombre: Gestión de Evaluaciones
-    descripcion: Administración de evaluaciones y sus calificaciones.
+    descripcion: Administración de evaluaciones.
     acciones:
       - micro2.evaluaciones.crear
       - micro2.evaluaciones.leer
       - micro2.evaluaciones.actualizar
       - micro2.evaluaciones.eliminar
-
+      
+  - id: 6
+    nombre: Gestión de Calificaciones
+    descripcion: Administración de calificaciones.
+    acciones:
       - micro2.calificaciones.crear
       - micro2.calificaciones.leer
       - micro2.calificaciones.actualizar
       - micro2.calificaciones.eliminar
-
-  - id: 6
-    nombre: Gestión Académica
-    descripcion: Generación y consulta de resultados académicos y planes de estudio.
-    acciones:
-      - micro2.resultado_academico.generar
-      - micro2.resultado_academico.leer
-      - micro2.resultado_academico.eliminar
-
-      - micro2.resultado_plan.leer
-      - micro2.resultado_plan.actualizar
-      - micro2.resultado_plan.eliminar
 
   - id: 7
     nombre: Gestión de Certificados
@@ -107,9 +97,10 @@ roles:
       - micro2.certificados.eliminar
 
   - id: 8
-    nombre: Consulta Académica
+    nombre: Alumno
     descripcion: Acceso de solo lectura a la información académica.
     acciones:
+      - micro2.inscripciones.crear
       - micro2.inscripciones.leer
       - micro2.clases.leer
       - micro2.asistencias.leer
@@ -118,7 +109,6 @@ roles:
       - micro2.resultado_academico.leer
       - micro2.resultado_plan.leer
       - micro2.certificados.leer
-      - micro2.reportes.leer
 
   - id: 9
     nombre: Reportes

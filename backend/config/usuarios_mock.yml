@@ -3,7 +3,7 @@ usuarios:
   - id: 1
     usuario: admin
     nombre: Juan Pérez
-    cargo: Administrador del Sistema
+    cargo: Administrador del Microservicio
     email: juan.perez@instituto.edu.ar
     activo: true
     roles:
@@ -11,52 +11,6 @@ usuarios:
         nombre: Administrador Microservicio
 
   - id: 2
-    usuario: director
-    nombre: Carlos Fernández
-    cargo: Director General
-    email: carlos.fernandez@instituto.edu.ar
-    activo: true
-    roles:
-      - id: 6
-        nombre: Gestión Académica
-      - id: 7
-        nombre: Gestión de Certificados
-      - id: 8
-        nombre: Consulta Académica
-      - id: 9
-        nombre: Reportes
-
-  - id: 3
-    usuario: jefe_academico
-    nombre: María González
-    cargo: Jefa de Departamento Académico
-    email: maria.gonzalez@instituto.edu.ar
-    activo: true
-    roles:
-      - id: 5
-        nombre: Gestión de Evaluaciones
-      - id: 6
-        nombre: Gestión Académica
-      - id: 8
-        nombre: Consulta Académica
-      - id: 9
-        nombre: Reportes
-
-  - id: 4
-    usuario: coordinador
-    nombre: Diego Romero
-    cargo: Coordinador de Carrera
-    email: diego.romero@instituto.edu.ar
-    activo: true
-    roles:
-      - id: 2
-        nombre: Gestión de Inscripciones
-      - id: 6
-        nombre: Gestión Académica
-      - id: 8
-        nombre: Consulta Académica
-
-  - id: 5
     usuario: docente
     nombre: Laura Martínez
     cargo: Docente
@@ -66,31 +20,7 @@ usuarios:
       - id: 10
         nombre: Docencia
 
-  - id: 6
-    usuario: administrativo
-    nombre: Sofía López
-    cargo: Administrativo Académico
-    email: sofia.lopez@instituto.edu.ar
-    activo: true
-    roles:
-      - id: 2
-        nombre: Gestión de Inscripciones
-      - id: 7
-        nombre: Gestión de Certificados
-
-  - id: 7
-    usuario: auditor
-    nombre: Ricardo Suárez
-    cargo: Auditor
-    email: ricardo.suarez@instituto.edu.ar
-    activo: true
-    roles:
-      - id: 8
-        nombre: Consulta Académica
-      - id: 9
-        nombre: Reportes
-
-  - id: 8
+  - id: 3
     usuario: alumno
     nombre: Agustina Herrera
     cargo: Alumna
@@ -98,4 +28,14 @@ usuarios:
     activo: true
     roles:
       - id: 8
-        nombre: Consulta Académica
+        nombre: Alumno
+
+  - id: 4
+    usuario: alumno
+    nombre: Sofía López
+    cargo: Alumna
+    email: sofia.lopez@instituto.edu.ar
+    activo: true
+    roles:
+      - id: 8
+        nombre: Alumno
