@@ -1,6 +1,9 @@
 // Le agrego soloLectura: si es true (el usuario no tiene permiso para
 // crear/actualizar asistencias, por ejemplo un alumno mirando la
 // planilla) deshabilito los 4 botones de estado y el input de
+
+import EstadoSelect from "./EstadoSelect";
+
 // observación, pero sigo mostrando todo igual para que pueda consultar.
 export default function IntegranteRow({ asistencia, onCambiarEstado, onCambiarObservacion, soloLectura = false }) {
 
@@ -14,34 +17,16 @@ export default function IntegranteRow({ asistencia, onCambiarEstado, onCambiarOb
         {/* flex-wrap: si los 4 botones no entran en una fila, bajan a la siguiente
             en vez de forzar el ancho de toda la fila de la tabla */}
         <div className="flex flex-wrap gap-2 py-2">
-          <button
-            disabled={soloLectura}
-            className={`bg-green-100 text-green-700 rounded-lg px-3 py-1 text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${asistencia.id_estado === 1 ? estadoActivo : ""}`}
-            onClick={() => onCambiarEstado(asistencia.id_inscripcion, 1)}
-          >
-            Presente
-          </button>
-          <button
-            disabled={soloLectura}
-            className={`bg-yellow-100 text-yellow-700 rounded-lg px-3 py-1 text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${asistencia.id_estado === 2 ? estadoActivo : ""}`}
-            onClick={() => onCambiarEstado(asistencia.id_inscripcion, 2)}
-          >
-            Ausente
-          </button>
-          <button
-            disabled={soloLectura}
-            className={`bg-red-100 text-red-700 rounded-lg px-3 py-1 text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${asistencia.id_estado === 3 ? estadoActivo : ""}`}
-            onClick={() => onCambiarEstado(asistencia.id_inscripcion, 3)}
-          >
-            Justificado
-          </button>
-          <button
-            disabled={soloLectura}
-            className={`bg-red-100 text-red-700 rounded-lg px-3 py-1 text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${asistencia.id_estado === 4 ? estadoActivo : ""}`}
-            onClick={() => onCambiarEstado(asistencia.id_inscripcion, 4)}
-          >
-            Tarde
-          </button>
+          <EstadoSelect
+            idEstado={asistencia.id_estado}
+            soloLectura={soloLectura}
+            onCambiarEstado={(nuevoEstado) =>
+              onCambiarEstado(
+                asistencia.id_inscripcion,
+                nuevoEstado
+              )
+            }
+          />
         </div>
       </td>
       {/* Celda nueva: input controlado para la observacion de este integrante.

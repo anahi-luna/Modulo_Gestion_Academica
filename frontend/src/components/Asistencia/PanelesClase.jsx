@@ -35,7 +35,7 @@ export default function PanelesClase({
 
             <div className="flex justify-between items-center mb-4 sm:mb-5">
                 <h2 className="text-lg sm:text-xl font-semibold">
-                    Clases
+                    Comisiones
                 </h2>
             </div>
 

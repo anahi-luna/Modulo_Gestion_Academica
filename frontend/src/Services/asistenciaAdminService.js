@@ -79,6 +79,8 @@ export async function modificarAsistencia(idAsistencia, idEstado){
 
 }
 
+//Actualiza el estado de la clase automaticamente segun la hora y dia de la clase,
+//para poder tomar asistencia
 export async function actualizarEstadoAutomaticamente(clase) {
     const ahora = new Date();
     const inicio = new Date(`${clase.fecha}T${clase.hora_inicio}`);

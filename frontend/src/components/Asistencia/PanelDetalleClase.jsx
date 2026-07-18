@@ -9,15 +9,11 @@ import { obtenerAsistenciasPorClase, modificarAsistencia, registrarAsistenciaSer
 import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
 import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
 import { getComisiones } from "../../mocks/comisionesMock";
-import SelectorComisiones from "./SelectorComisiones";
 
-export default function PanelDetalleClase({ idComision, soloLectura = false }) {
+export default function PanelDetalleClase({ idComision }) {
     const [claseSeleccionada, setClaseSeleccionada] = useState(null);
     const [clases, setClases] = useState([]);
     const [asistencias, setAsistencias] = useState([]);
-    const [comisionSeleccionada, setComisionSeleccionada] = useState(null);
-    const [comisiones, setComisiones] = useState([]);
-    const [cargandoClases, setCargandoClases] = useState(false);
 
     const navigate = useNavigate();
 
@@ -28,9 +24,9 @@ export default function PanelDetalleClase({ idComision, soloLectura = false }) {
                 setClaseSeleccionada(null);
                 setClases([]);
                 setAsistencias([]);
-                setCargandoClases(true);
 
-                const resultado = await getClases(comisionSeleccionada.id);
+
+                const resultado = await getClases(idComision);
                 const clasesActualizadas = await Promise.all(
                     resultado.map(actualizarEstadoAutomaticamente)
                 );
@@ -40,21 +36,12 @@ export default function PanelDetalleClase({ idComision, soloLectura = false }) {
                 }
             } catch (error) {
                 console.error(error);
-            } finally {
-                setCargandoClases(false);
             }
         }
-        if (comisionSeleccionada?.id) {
+        if (idComision) {
             cargarClases();
-        } else {
-            // Si no hay comisión seleccionada (por ejemplo, un instante
-            // mientras se resuelve el cambio de comisión), limpio todo
-            // para no dejar pegada la clase de la comisión anterior.
-            setClaseSeleccionada(null);
-            setClases([]);
-            setAsistencias([]);
         }
-    }, [comisionSeleccionada?.id]);
+    }, [idComision]);
 
     useEffect(() => {
         if (claseSeleccionada?.id) {
@@ -64,30 +51,8 @@ export default function PanelDetalleClase({ idComision, soloLectura = false }) {
         }
     }, [claseSeleccionada?.id]);
 
-    useEffect(() => {
-        async function cargarComisiones() {
-            try{
-                const resultado = await getComisiones();
-                setComisiones(resultado.data);
 
-            }catch(error){
-                console.error("Error al cargar comisiones:", error);
-            }
-        }
-        cargarComisiones();
-    }, []);
 
-    useEffect(() => {
-        if(!idComision || comisiones.length === 0) {
-            return;
-        }
-
-        const comisionActual = comisiones.find(
-            (comision) => comision.id === Number(idComision)
-        );
-
-        setComisionSeleccionada(comisionActual ?? null);
-    }, [idComision, comisiones]);
 
 
     async function cargarAsistencias() {
@@ -96,7 +61,7 @@ export default function PanelDetalleClase({ idComision, soloLectura = false }) {
             if (asistencias.length > 0) {
                 setAsistencias(asistencias);
             } else {
-                const inscriptos = await obtenerInscripcionesPorComision(comisionSeleccionada.id);
+                const inscriptos = await obtenerInscripcionesPorComision(idComision);
                 setAsistencias(inscriptos);
             }
         } catch (error) {
@@ -154,9 +119,6 @@ export default function PanelDetalleClase({ idComision, soloLectura = false }) {
         
     }
 
-    function cambiarComision(comision){
-        setComisionSeleccionada(comision);
-    }
 
     const inscriptos = asistencias.length;
     const presentes = asistencias.filter(a => a.id_estado === 1).length;
@@ -164,9 +126,6 @@ export default function PanelDetalleClase({ idComision, soloLectura = false }) {
     const justificado = asistencias.filter(a => a.id_estado === 3).length;
     const tarde = asistencias.filter(a => a.id_estado === 4).length;
 
-    const comisionesDeLaMateria = comisionSeleccionada ? comisiones.filter(
-        (comision) => comision.materia === comisionSeleccionada.materia
-    ) : [];
 
     return (
         // Antes: "col-span-9" fijo. En mobile no hace falta col-span
@@ -221,63 +180,40 @@ export default function PanelDetalleClase({ idComision, soloLectura = false }) {
             </div>
             
 
-            <SelectorComisiones
-                comisiones={comisionesDeLaMateria}
-                comisionSeleccionada={comisionSeleccionada}
-                onCambiarComision={cambiarComision}
-                
-            />
             <ClaseSelect
                 clases={clases}
                 claseSeleccionada={claseSeleccionada}
                 setClaseSeleccionada={setClaseSeleccionada}
-
+                
             />
 
-            {/* Si ya terminé de buscar y la comisión no tiene ninguna
-                clase cargada, lo digo explícitamente en vez de dejar
-                la tabla vacía sin explicación. */}
-            {!cargandoClases && comisionSeleccionada && clases.length === 0 && (
-                <div className="px-4 sm:px-8 py-6 text-sm text-gray-400">
-                    Esta comisión todavía no tiene clases programadas.
-                </div>
-            )}
+            {/*
+              Antes: "grid-cols-4" fijo, 4 tarjetas apretadísimas en un celular.
+              Ahora: 2 columnas en mobile (2 filas de 2), 4 columnas desde sm.
+            */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6">
+                <EstadisticaCard titulo="Inscriptos" cantidad={inscriptos} />
+                <EstadisticaCard titulo="Presentes" cantidad={presentes} color="green" />
+                <EstadisticaCard titulo="Ausentes" cantidad={ausentes} color="yellow" />
+                <EstadisticaCard titulo="Tarde" cantidad={tarde} color="red" />
+                <EstadisticaCard titulo="Justificados" cantidad={justificado} />
+            </div>
 
-            {claseSeleccionada && (
-                <>
-                    {/*
-                      Antes: "grid-cols-4" fijo, 4 tarjetas apretadísimas en un celular.
-                      Ahora: 2 columnas en mobile (2 filas de 2), 4 columnas desde sm.
-                    */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6">
-                        <EstadisticaCard titulo="Inscriptos" cantidad={inscriptos} />
-                        <EstadisticaCard titulo="Presentes" cantidad={presentes} color="green" />
-                        <EstadisticaCard titulo="Ausentes" cantidad={ausentes} color="yellow" />
-                        <EstadisticaCard titulo="Tarde" cantidad={tarde} color="red" />
-                        <EstadisticaCard titulo="Justificados" cantidad={justificado} />
-                    </div>
+            <TablaAsistencia
+                asistencias={asistencias}
+                onCambiarEstado={cambiarEstado}
+                onCambiarObservacion={cambiarObservacion}
+            />
 
-                    <TablaAsistencia
-                        asistencias={asistencias}
-                        onCambiarEstado={cambiarEstado}
-                        onCambiarObservacion={cambiarObservacion}
-                        soloLectura={soloLectura}
-                    />
-
-                    {/* El botón de guardar solo tiene sentido si el usuario
-                        tiene permiso para cargar/actualizar asistencias */}
-                    {!soloLectura && (
-                        <div className="px-4 sm:px-6 pb-6">
-                            <button
-                                onClick={guardarAsistencias}
-                                className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white rounded-lg px-5 py-2 font-medium"
-                            >
-                                Guardar asistencias
-                            </button>
-                        </div>
-                    )}
-                </>
-            )}
+            {/* Antes este botón no tenía className: se veía como un link de texto plano */}
+            <div className="px-4 sm:px-6 pb-6">
+                <button
+                    onClick={guardarAsistencias}
+                    className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white rounded-lg px-5 py-2 font-medium"
+                >
+                    Guardar asistencias
+                </button>
+            </div>
 
         </div>
     )
