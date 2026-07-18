@@ -59,6 +59,7 @@ export default function Navbar({ modulo }) {
     { to: "/GestionEvaluaciones", label: "Evaluaciones", permiso: ACCIONES.EVALUACIONES_LEER },
     { to: "/calificaciones", label: "Calificaciones", permiso: ACCIONES.CALIFICACIONES_LEER },
     { to: "/certificados", label: "Certificados", permiso: ACCIONES.CERTIFICADOS_LEER },
+    { to: "/resultado-plan", label: "Resultado del plan", permiso: ACCIONES.REPORTES_LEER },
   ];
 
   // "Inscribirme" es un caso especial: es la vista donde alguien pide
@@ -80,6 +81,7 @@ export default function Navbar({ modulo }) {
       <nav className="bg-red-800 shadow-md sticky top-0 z-40 h-16" />
     );
   }
+  const esAlumno = usuario.usuario === "alumno";
 
   return (
     <Disclosure as="nav" className="bg-red-800 shadow-md sticky top-0 z-40">
@@ -115,6 +117,10 @@ export default function Navbar({ modulo }) {
             <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <div className="flex space-x-1 xl:space-x-2">
                 <NavLink to="/" className={linkClass} end>Home</NavLink>
+
+                {esAlumno && (
+                  <NavLink to="/mi-plan" className={linkClass} end>Mi plan</NavLink>
+                )}
 
                 {links.filter(debeMostrarse).map((link) => (
                   <NavLink key={link.to} to={link.to} className={linkClass} end>
@@ -193,6 +199,10 @@ export default function Navbar({ modulo }) {
       <DisclosurePanel className="lg:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
           <NavLink to="/" className={linkClassMobile} end>Home</NavLink>
+
+          {esAlumno && (
+            <NavLink to="/mi-plan" className={linkClassMobile} end>Mi plan</NavLink>
+          )}
 
           {links.filter(debeMostrarse).map((link) => (
             <NavLink key={link.to} to={link.to} className={linkClassMobile} end>

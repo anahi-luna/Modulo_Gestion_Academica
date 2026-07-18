@@ -1,5 +1,6 @@
 // Estado del alumno con inscripciones activas.
-// Muestra estadísticas y la lista de sus inscripciones.
+// Muestra estadísticas (inscripciones, asistencia, certificados) y la
+// lista de sus inscripciones.
 
 import {
     ClipboardDocumentListIcon,
@@ -9,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import EstadoBadge from "../inscripciones/EstadoBadge";
 
-export default function ResumenActivo({ inscripciones }) {
+export default function ResumenActivo({ inscripciones, porcentajeAsistencia = null, certificadosObtenidos = 0 }) {
 
     const navigate = useNavigate();
 
@@ -23,13 +24,13 @@ export default function ResumenActivo({ inscripciones }) {
         {
             icono: CalendarDaysIcon,
             titulo: "Asistencia",
-            valor: "—",
+            valor: porcentajeAsistencia !== null ? `${porcentajeAsistencia}%` : "—",
             subtexto: "promedio"
         },
         {
             icono: AcademicCapIcon,
             titulo: "Certificados",
-            valor: 0,
+            valor: certificadosObtenidos,
             subtexto: "obtenidos"
         },
     ];
