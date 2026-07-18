@@ -90,4 +90,16 @@ export const MODULOS = [
         permisoLeer: ACCIONES.CERTIFICADOS_LEER,
         color: "yellow",
     },
+    {
+        id: "resultado-plan",
+        titulo: "Resultado del plan",
+        descripcion: "Avance académico del alumno respecto de su plan de estudios.",
+        ruta: "/resultado-plan",
+        // Por ahora este permiso solo debería quedar en los roles Admin y
+        // Director General en roles.yml del back.
+        //  Reutilizo REPORTES_LEER en vez de inventar un
+        // permiso nuevo, porque conceptualmente es un reporte agregado.
+        permisoLeer: ACCIONES.REPORTES_LEER,
+        color: "red",
+    },
 ];

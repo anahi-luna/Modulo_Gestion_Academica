@@ -4,7 +4,8 @@ import Navbar from "./components/navbar/Navbar";
 import RutaProtegida from "./components/rutas/RutaProtegida";
 import { PermissionsProvider } from "./context/PermissionsContext";
 import { ACCIONES } from "./config/modulos";
-
+import MiPlan from "./pages/MiPlan";
+import ResultadoPlan from "./pages/ResultadoPlan";
 import Home from "./pages/Home";
 import Inscripciones from "./pages/Inscripciones";
 import InscripcionesAdmin from './pages/InscripcionesAdmin';
@@ -114,6 +115,15 @@ export default function App() {
                             element={
                                 <RutaProtegida permisoRequerido={ACCIONES.CERTIFICADOS_LEER}>
                                     <Certificados />
+                                </RutaProtegida>
+                            }
+                        />
+                        <Route path="/mi-plan" element={<MiPlan />} />
+                        <Route
+                            path="/resultado-plan"
+                            element={
+                                <RutaProtegida permisoRequerido={ACCIONES.REPORTES_LEER}>
+                                    <ResultadoPlan />
                                 </RutaProtegida>
                             }
                         />

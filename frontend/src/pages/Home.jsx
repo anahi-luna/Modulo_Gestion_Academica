@@ -1,14 +1,12 @@
-// Antes tenía 3 Home distintos (HomeAdmin, HomeProfesor, HomeAlumno) y en
-// App.jsx elegía cuál mostrar según el rol. Ahora tengo UN solo Home:
-// muestro la card de cada módulo solamente si el usuario tiene el
-// permiso de LECTURA de ese módulo (por eso antes se veían "Gestionar
-// calificaciones" y "Gestionar certificados" duplicados: había quedado
-// pegado un ModuloCard viejo sin ruta al lado del nuevo. Ahora ese
-// listado sale de MODULOS, una sola fuente de verdad, así que no se
-// puede duplicar por accidente).
+// si el usuario es el alumno de prueba, delega en HomeAlumno.jsx (el
+// dashboard personal con sus inscripciones, asistencia, plan y
+// próximas clases). Para cualquier otro usuario (personal de gestión),
+// muestro la card de cada módulo solamente si tiene el permiso de
+// LECTURA de ese módulo.
 
 import { useState, useEffect } from "react";
 import ModuloCard from "../components/ModuloCard";
+import HomeAlumno from "../components/home/HomeAlumno";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { obtenerInscripciones } from "../Services/inscripcionesAdminService";
 import { usePermissions } from "../context/PermissionsContext";
@@ -18,10 +16,13 @@ export default function Home() {
   const { usuario, hasPermission } = usePermissions();
   const [historial, setHistorial] = useState([]);
 
+  const esAlumno = usuario?.usuario === "alumno";
+
   // Las estadísticas de inscripciones solo tienen sentido si el usuario
-  // puede leer ese módulo (si no, ni siquiera le pido el endpoint).
+  // puede leer ese módulo (si no, ni siquiera le pido el endpoint), y
+  // no aplican al alumno (que tiene su propio dashboard en HomeAlumno).
   useEffect(() => {
-    if (hasPermission("micro2.inscripciones.leer")) {
+    if (!esAlumno && hasPermission("micro2.inscripciones.leer")) {
       cargarDatos();
     }
   }, [usuario]);
@@ -43,11 +44,13 @@ export default function Home() {
     );
   }
 
-  // Filtro los módulos: solo entran los que el usuario puede leer.
-  // A un alumno con el rol "Consulta Académica" le van a aparecer
-  // TODOS los módulos en modo lectura (así está armado ese rol en
-  // roles.yml); a un docente con el rol "Docencia" le van a aparecer
-  // solo Asistencia, Evaluaciones y Calificaciones, por ejemplo.
+  // El alumno tiene su propio dashboard, con inscripciones, plan,
+  // asistencia y próximas clases: no tiene sentido mostrarle el
+  // listado de módulos de gestión.
+  if (esAlumno) {
+    return <HomeAlumno usuario={usuario} />;
+  }
+
   const modulosVisibles = MODULOS.filter((m) => hasPermission(m.permisoLeer));
 
   const pendientes = historial.filter((i) => i.estado === "Pendiente").length;
