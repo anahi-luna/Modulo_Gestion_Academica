@@ -56,6 +56,7 @@ export default function Navbar({ modulo }) {
     { to: "/inscripcionesAdmin", label: "Inscripciones", permiso: ACCIONES.INSCRIPCIONES_LEER },
     { to: "/inscripciones", label: "Inscribirme", permiso: null, soloSiNoTieneOtroPermiso: ACCIONES.INSCRIPCIONES_LEER },
     { to: "/asistencia", label: "Asistencia", permiso: ACCIONES.ASISTENCIAS_LEER },
+    { to: "/GestionClases", label: "Clases", permiso: ACCIONES.CLASES_LEER},
     { to: "/GestionEvaluaciones", label: "Evaluaciones", permiso: ACCIONES.EVALUACIONES_LEER },
     { to: "/calificaciones", label: "Calificaciones", permiso: ACCIONES.CALIFICACIONES_LEER },
     { to: "/certificados", label: "Certificados", permiso: ACCIONES.CERTIFICADOS_LEER },
