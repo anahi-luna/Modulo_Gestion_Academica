@@ -1,9 +1,9 @@
 import * as legajosMock from "../mocks/legajosMock";
 import * as comisionesMock from "../mocks/comisionesMock";
-import { getAsistenciaPorClase, getAsistenciaPorId, actualizarAsistencia, registrarAsistencia} from "../api/asistenciasApi";
+import { getAsistenciaPorClase, getAsistenciaPorId, actualizarAsistencia, registrarAsistencia, eliminarAsistencia} from "../api/asistenciasApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
 import { modificarClase } from "./clasesAdminService";
-
+import { getClases } from "./clasesAdminService";
 
 //Obtiene todas las asistencias dependiendo de la comision
 
@@ -74,8 +74,8 @@ export async function registrarAsistenciaService(datos) {
 
 //Actualiza la asistencia
 
-export async function modificarAsistencia(idAsistencia, idEstado){
-    return await actualizarAsistencia(idAsistencia, idEstado);
+export async function modificarAsistencia(idAsistencia, datos){
+    return await actualizarAsistencia(idAsistencia, datos);
 
 }
 
@@ -101,4 +101,62 @@ export async function actualizarEstadoAutomaticamente(clase) {
     }
 
     return clase;
+}
+
+//Devuelve las clases que ya se les tomo asistencias
+export async function obtenerHistorialPorComision(idComision){
+    const clases = await getClases(idComision);
+
+    console.log("Clases de la comisión:", clases);
+
+    const resultados = await Promise.all(
+        clases.map(async (clase) => {
+            const asistencias = await obtenerAsistenciasPorClase(clase.id);
+
+            console.log(
+                `Asistencias de clase ${clase.id}:`,
+                asistencias
+            );
+
+            if(asistencias.length === 0){
+                return null;
+            }
+
+            return{
+                ...clase,
+                    cantidad_asistencias: asistencias.length,
+            };
+        })
+    );
+
+    return resultados.filter(Boolean)
+}
+
+//Elimina asistencia
+export async function eliminarAsistenciaService(idAsistencia) {
+    return await eliminarAsistencia(idAsistencia);
+}
+
+//Elimina todas las asistencias por clase, yendo una por una.
+export async function eliminarAsistenciasPorClase(
+    idClase
+) {
+    const asistencias =
+        await obtenerAsistenciasPorClase(idClase);
+
+    if (asistencias.length === 0) {
+        return {
+            cantidadEliminada: 0,
+        };
+    }
+
+    await Promise.all(
+        asistencias.map((asistencia) =>
+            eliminarAsistenciaService(asistencia.id)
+        )
+    );
+
+    return {
+        cantidadEliminada: asistencias.length,
+    };
 }

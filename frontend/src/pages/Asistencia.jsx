@@ -29,6 +29,8 @@ export default function Asistencia() {
     ACCIONES.ASISTENCIAS_ACTUALIZAR,
   ]);
 
+  
+
   if (esAlumno) {
     return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
   }

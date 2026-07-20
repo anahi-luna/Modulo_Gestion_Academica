@@ -12,13 +12,13 @@ export default function Alert ({
     };
 
     return(
-        <div className={`rounded-x1 border-1-4 p-4 ${estilos[tipo]}`}
+        <div className={`rounded-x1 border-l-4 p-4 ${estilos[tipo]}`}
             
         >
             <div className="flex justify-between items-start">
                 <div>
                     {titulo &&(
-                        <h3 classname= "font-semibold">
+                        <h3 className= "font-semibold">
                             {titulo}
                         </h3>
                     )}
@@ -31,7 +31,7 @@ export default function Alert ({
                 {onCerrar &&(
                     <button 
                         onClick={onCerrar}
-                        className="m1-4 text-lg"
+                        className="ml-4 text-lg"
                     >
                         x
                     </button>
