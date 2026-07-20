@@ -1,6 +1,6 @@
 import EstadoCertificadoBadge from "./EstadoCertificadoBadge";
 
-export default function TablaCertificadosAdmin({ certificados, onEmitir, onRevocar, onDescargar }) {
+export default function TablaCertificadosAdmin({ certificados, onEmitir, onRevocar, onDescargar, onGenerarResultado }) {
   if (certificados.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow px-6 py-10 text-center text-sm text-gray-400">
@@ -20,6 +20,18 @@ export default function TablaCertificadosAdmin({ certificados, onEmitir, onRevoc
             className="px-2 py-1 rounded-md bg-green-100 hover:bg-green-200 text-green-700 text-xs font-medium"
           >
             Emitir
+          </button>
+        )}
+        {/* Botón nuevo: genera (o corrige) el ResultadoAcademico de esta
+            materia cursada. No tiene sentido para "Finalización de
+            Plan" (id_comision null, no es UNA materia puntual), por
+            eso también reviso que c.id_comision exista. */}
+        {c.id_comision && onGenerarResultado && (
+          <button
+            onClick={() => onGenerarResultado(c)}
+            className="px-2 py-1 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium"
+          >
+            Generar resultado académico
           </button>
         )}
         {c.estado === "Emitido" && (

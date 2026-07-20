@@ -1,12 +1,5 @@
-// Mismo criterio que en Calificaciones.jsx: unifico GestionCertificados
-// (staff: emite, revoca y descarga certificados de cualquier alumno) y
-// MisCertificados (alumno: consulta y descarga SOLO los propios) en una
-// única ruta /certificados. Adentro decido qué mostrar según si el
-// usuario es el alumno de prueba o es personal, y dentro de la vista de
-// personal, si puede emitir/revocar según sus permisos.
-//
-// TODO: mismo pendiente que en Calificaciones.jsx sobre el id_legajo
-// del usuario "alumno" (hoy no viene desde el back).
+//vista de certificados: si el usuario es un alumno, ve solo sus propios certificados; 
+// si es personal, ve la tabla con todos los certificados y puede emitir/revocar según sus permisos.
 
 import { useEffect, useState } from "react";
 import { usePermissions } from "../context/PermissionsContext";
@@ -21,6 +14,11 @@ import {
 import CertificadoCard from "../components/certificados/CertificadoCard";
 import TablaCertificadosAdmin from "../components/certificados/TablaCertificadosAdmin";
 import ModalEmitirCertificado from "../components/certificados/ModalEmitirCertificado";
+import ModalGenerarResultadoAcademico from "../components/certificados/ModalGenerarResultadoAcademico";
+import {
+  obtenerResultadoAcademico,
+  generarResultadoAcademico,
+} from "../Services/resultadoAcademicoService";
 
 const ID_LEGAJO_ALUMNO_MOCK = 1; // ver TODO arriba
 
@@ -30,18 +28,25 @@ export default function Certificados() {
 
   const puedeEmitir = hasPermission(ACCIONES.CERTIFICADOS_EMITIR);
   const puedeActualizar = hasPermission(ACCIONES.CERTIFICADOS_ACTUALIZAR);
+  const puedeGenerarResultado = hasPermission(ACCIONES.RESULTADO_ACADEMICO_GENERAR);
 
   if (esAlumno) {
     return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} usuario={usuario} />;
   }
 
-  return <VistaPersonal puedeEmitir={puedeEmitir} puedeActualizar={puedeActualizar} />;
+  return (
+    <VistaPersonal
+      puedeEmitir={puedeEmitir}
+      puedeActualizar={puedeActualizar}
+      puedeGenerarResultado={puedeGenerarResultado}
+    />
+  );
 }
 
 // Vista del personal: tabla con todos los certificados. Si tiene el
 // permiso de emitir/actualizar, ve los botones de acción; si solo tiene
 // el de leer (por ejemplo un auditor), ve la tabla sin poder tocar nada.
-function VistaPersonal({ puedeEmitir, puedeActualizar }) {
+function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) {
   const { usuario } = usePermissions();
   const [certificados, setCertificados] = useState([]);
   const [error, setError] = useState(null);
@@ -49,6 +54,13 @@ function VistaPersonal({ puedeEmitir, puedeActualizar }) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [seleccionado, setSeleccionado] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("");
+
+  // Estado para el modal de "Generar resultado académico": necesito
+  // guardar el certificado sobre el que se clickeó Y, si ya existía un
+  // resultado académico para esa materia, precargarlo en el modal.
+  const [modalResultadoAbierto, setModalResultadoAbierto] = useState(false);
+  const [certParaResultado, setCertParaResultado] = useState(null);
+  const [resultadoExistente, setResultadoExistente] = useState(null);
 
   useEffect(() => { cargarDatos(); }, []);
 
@@ -88,6 +100,27 @@ function VistaPersonal({ puedeEmitir, puedeActualizar }) {
 
   function handleDescargar(cert) {
     descargarCertificado(cert, cert.alumno);
+  }
+
+  // Al clickear "Generar resultado académico" primero busco si esa
+  // materia ya tenía uno cargado (para precargar el modal en modo
+  // corrección) y recién ahí abro el modal.
+  async function abrirModalResultado(cert) {
+    setCertParaResultado(cert);
+    try {
+      const existente = await obtenerResultadoAcademico(cert.id_legajo, cert.id_comision);
+      setResultadoExistente(existente);
+    } catch (err) {
+      setResultadoExistente(null);
+    }
+    setModalResultadoAbierto(true);
+  }
+
+  async function handleGenerarResultado(datos) {
+    await generarResultadoAcademico(datos);
+    setModalResultadoAbierto(false);
+    setCertParaResultado(null);
+    setResultadoExistente(null);
   }
 
   const filtrados = filtroEstado
@@ -134,6 +167,7 @@ function VistaPersonal({ puedeEmitir, puedeActualizar }) {
             onEmitir={puedeEmitir ? abrirModalEmitir : null}
             onRevocar={puedeActualizar ? handleRevocar : null}
             onDescargar={handleDescargar}
+            onGenerarResultado={puedeGenerarResultado ? abrirModalResultado : null}
           />
         )}
 
@@ -146,13 +180,23 @@ function VistaPersonal({ puedeEmitir, puedeActualizar }) {
             onEmitir={handleEmitir}
           />
         )}
+
+        {puedeGenerarResultado && (
+          <ModalGenerarResultadoAcademico
+            abierto={modalResultadoAbierto}
+            certificado={certParaResultado}
+            resultadoExistente={resultadoExistente}
+            usuario={usuario}
+            onCerrar={() => setModalResultadoAbierto(false)}
+            onGenerar={handleGenerarResultado}
+          />
+        )}
       </main>
     </div>
   );
 }
 
-// Vista del alumno: solo consulta y descarga de SUS certificados. Es
-// el mismo contenido que antes vivía en pages/MisCertificados.jsx.
+// Vista del alumno: solo consulta y descarga de SUS certificados. 
 function VistaAlumno({ idLegajo, usuario }) {
   const [certificados, setCertificados] = useState([]);
   const [cargando, setCargando] = useState(true);

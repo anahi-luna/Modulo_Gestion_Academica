@@ -1,25 +1,6 @@
-// Unifico acá lo que antes eran DOS páginas separadas:
-// - CalificacionesAdmin.jsx (admin/profesor: elegía una comisión y
-//   cargaba notas de TODOS los alumnos de esa evaluación)
-// - MisCalificaciones.jsx (alumno: veía SUS PROPIAS notas en todas las
-//   comisiones en las que está inscripto)
-//
-// Ojo con algo importante: estas dos vistas no son "lo mismo pero con
-// botones ocultos", son dos formas de mirar los datos totalmente
-// distintas (una es "toda la planilla de una comisión", la otra es
-// "mi propio historial en varias comisiones"). Por eso decidí que la
-// MISMA ruta /calificaciones muestre una u otra cosa según el tipo de
-// usuario, en vez de forzar todo dentro de una sola tabla que no
-// tendría sentido para ninguno de los dos casos.
-//
-// TODO importante para cuando el back linkee usuario <-> legajo:
-// hoy en usuarios_mock.yml el usuario "alumno" no tiene un id_legajo
-// asociado, así que distingo "es alumno" mirando el username
-// (usuario.usuario === "alumno") y le pongo un id_legajo fijo (1) para
-// poder mostrar la pantalla. El día que el back devuelva el id_legajo
-// real dentro de /api/auth/me, esta parte se simplifica: se saca el
-// id_legajo directo de ahí en vez de hardcodearlo.
-
+//vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión en la que está inscripto. Es exactamente el contenido
+// que antes vivía en pages/MiAsistencia.jsx. 
+//vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de todos los alumnos de una clase.
 import { useEffect, useState } from "react";
 import { usePermissions } from "../context/PermissionsContext";
 import { ACCIONES } from "../config/modulos";
@@ -91,8 +72,7 @@ function VistaComisiones({ puedeEditar }) {
 }
 
 // Vista para el alumno: solo lectura, muestra sus propias notas en
-// cada comisión en la que está inscripto. Es exactamente el contenido
-// que antes vivía en pages/MisCalificaciones.jsx.
+// cada comisión en la que está inscripto.
 function VistaAlumno({ idLegajo }) {
   const [comisiones, setComisiones] = useState([]);
   const [cargando, setCargando] = useState(true);

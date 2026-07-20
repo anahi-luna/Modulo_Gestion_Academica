@@ -1,3 +1,5 @@
+// Vista para personal: gestión completa de evaluaciones (crear, editar, eliminar).
+// Vista para alumno: solo consulta de sus propias evaluaciones (solo lectura).
 import { useEffect, useState } from "react";
 import EvaluacionesTable from "../components/evaluaciones/EvaluacionTable";
 import EvaluacionModal from "../components/evaluaciones/EvaluacionModal";
@@ -129,34 +131,37 @@ export default function GestionEvaluaciones() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
-            <div className="flex justify-between items-center mb-6">
+            {/* Título en columna en mobile, en fila desde sm. Botones con
+                flex-wrap y flex-1 para que no se salgan del margen en
+                pantallas angostas. */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
 
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
                         Gestión de Evaluaciones
                     </h1>
 
-                    <p className="text-gray-500 mt-1">
+                    <p className="text-gray-500 mt-1 text-sm sm:text-base">
                         Crear, editar y eliminar evaluaciones (parciales, TPs y finales).
                     </p>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
 
                     <button
                         onClick={limpiarFiltros}
-                        className="rounded-lg border border-gray-300 px-4 py-3 hover:bg-gray-100"
+                        className="flex-1 sm:flex-none rounded-lg border border-gray-300 px-4 py-2.5 sm:py-3 hover:bg-gray-100 whitespace-nowrap"
                     >
                         Limpiar filtros
                     </button>
 
                     <button
                         onClick={nuevaEvaluacion}
-                        className="flex items-center gap-2 rounded-lg bg-red-700 px-4 py-3 text-white hover:bg-red-800 transition"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-lg bg-red-700 px-4 py-2.5 sm:py-3 text-white hover:bg-red-800 transition whitespace-nowrap"
                     >
-                        <PlusIcon className="h-5 w-5" />
+                        <PlusIcon className="h-5 w-5 shrink-0" />
                         Nueva Evaluación
                     </button>
 

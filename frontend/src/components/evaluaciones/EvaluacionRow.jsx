@@ -18,27 +18,27 @@ export default function EvaluacionRow({
                 {evaluacion.materia}
             </td>
 
-            <td className="text-center text-gray-700">
+            <td className="px-3 py-4 text-center text-gray-700 whitespace-nowrap">
                 {evaluacion.codigo}
             </td>
 
-            <td className="text-gray-700">
+            <td className="px-3 py-4 text-gray-700 whitespace-nowrap">
                 {evaluacion.docente}
             </td>
 
-            <td className="text-center text-gray-700">
+            <td className="px-3 py-4 text-center text-gray-700 whitespace-nowrap">
                 {evaluacion.tipo}
             </td>
 
-            <td className="text-gray-700">
+            <td className="px-3 py-4 text-gray-700">
                 {evaluacion.titulo}
             </td>
 
-            <td className="text-center text-gray-700">
+            <td className="px-3 py-4 text-center text-gray-700 whitespace-nowrap">
                 {formatearFecha(evaluacion.fecha)}
             </td>
 
-            <td>
+            <td className="px-3 py-4">
                 <div className="flex justify-center gap-2">
                     <button
                         title="Editar evaluación"

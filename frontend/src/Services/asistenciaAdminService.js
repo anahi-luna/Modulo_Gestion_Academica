@@ -1,3 +1,4 @@
+// Servicio para manejar la lógica de negocio de asistencias, incluyendo llamadas a la API y procesamiento de datos.
 import * as legajosMock from "../mocks/legajosMock";
 import * as comisionesMock from "../mocks/comisionesMock";
 import { getAsistenciaPorClase, getAsistenciaPorId, actualizarAsistencia, registrarAsistencia, eliminarAsistencia} from "../api/asistenciasApi";

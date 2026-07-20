@@ -7,6 +7,8 @@
 import { getPlanPorLegajo, getPlanes, actualizarEstadoPlan } from "../mocks/planesMock";
 import { getLegajoPorId } from "../mocks/legajosMock";
 import { emitir } from "./certificadosService";
+import { obtenerMisCalificaciones } from "./calificacionesAlumnoService";
+import { obtenerResultadosAcademicos, nombreEstadoAcademico } from "./resultadoAcademicoService";
 
 // Le agrego el % de avance calculado (finalizadas / totales) para no
 // tener que repetir esta cuenta en cada página que lo necesite.
@@ -58,5 +60,38 @@ export async function generarCertificadoDePlan(plan, firmadoPor) {
     id_comision: null, // la finalización de plan no es de UNA materia puntual
     tipo: "Finalización de Plan",
     firmado_por: firmadoPor,
+  });
+}
+
+// Arma, materia por materia, el detalle que se ve en "Mi plan":
+// reutilizo obtenerMisCalificaciones (que ya trae, por cada comisión
+// en la que el alumno está inscripto, sus evaluaciones y notas) y le
+// cruzo el ResultadoAcademico si ya se generó. Si existe resultado
+// académico para esa (legajo, comisión), la materia está FINALIZADA y
+// muestro ese cierre; si no existe todavía, está PENDIENTE (cursando)
+// y muestro las evaluaciones cargadas hasta ahora, igual que en Mis
+// Calificaciones.
+export async function obtenerMisMateriasDePlan(idLegajo) {
+  const [materias, resultados] = await Promise.all([
+    obtenerMisCalificaciones(idLegajo),
+    obtenerResultadosAcademicos(idLegajo),
+  ]);
+
+  return materias.map((materia) => {
+    const resultado = resultados.find((r) => r.id_comision === materia.id_comision);
+
+    if (!resultado) {
+      // Todavía no se generó el resultado académico: pendiente/cursando.
+      return { ...materia, finalizada: false };
+    }
+
+    return {
+      ...materia,
+      finalizada: true,
+      resultado: {
+        ...resultado,
+        estado_academico: nombreEstadoAcademico(resultado.id_estado_academico),
+      },
+    };
   });
 }
