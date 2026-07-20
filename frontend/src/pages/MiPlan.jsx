@@ -1,13 +1,10 @@
-// Vista "Mi plan": el alumno consulta el avance de su propio plan de
-// estudios. Es la contracara, del lado del alumno, de "Resultado del
-// plan" (pages/ResultadoPlan.jsx), que ve el personal del instituto.
-// No depende de ningún permiso del microservicio: cualquier alumno ve
-// su propio plan, igual que ya pasa con /inscripciones (pedir una
-// inscripción) y con la vista de alumno de Certificados.jsx.
-
+// vista de plan de estudios del alumno: resumen general del plan y detalle materia por materia. Solo lectura.
+// Mismo patrón que en Calificaciones.jsx y Asistencia.jsx: si el usuario es un alumno, ve solo su propio plan; 
+// si es personal, ve la vista de "Resultado del plan" (que es otra ruta).
 import { useEffect, useState } from "react";
 import { usePermissions } from "../context/PermissionsContext";
-import { obtenerMiPlan } from "../Services/planesService";
+import { obtenerMiPlan, obtenerMisMateriasDePlan } from "../Services/planesService";
+import ResumenMateriaPlanCard from "../components/planes/ResumenMateriaPlanCard";
 
 const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx
 
@@ -23,6 +20,7 @@ export default function MiPlan() {
   const esAlumno = usuario?.usuario === "alumno";
 
   const [plan, setPlan] = useState(null);
+  const [materias, setMaterias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,7 +33,15 @@ export default function MiPlan() {
       setCargando(true);
       setError(null);
       try {
-        setPlan(await obtenerMiPlan(ID_LEGAJO_ALUMNO_MOCK));
+        // Traigo en paralelo el resumen general del plan (materias
+        // totales/aprobadas/finalizadas) y el detalle materia por
+        // materia (finalizada o pendiente) que se despliega más abajo.
+        const [planData, materiasData] = await Promise.all([
+          obtenerMiPlan(ID_LEGAJO_ALUMNO_MOCK),
+          obtenerMisMateriasDePlan(ID_LEGAJO_ALUMNO_MOCK),
+        ]);
+        setPlan(planData);
+        setMaterias(materiasData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -130,6 +136,25 @@ export default function MiPlan() {
                 ✓ Completaste tu plan de estudios. Revisá tu certificado en la sección "Mis certificados".
               </div>
             )}
+
+            {/* Detalle materia por materia: para cada una en la que
+                estoy/estuve inscripto, muestro si ya está finalizada
+                (con su resultado académico real) o si todavía está
+                pendiente/cursando (con las notas cargadas hasta ahora,
+                igual que en Mis Calificaciones). */}
+            <div>
+              <h2 className="text-base font-semibold text-gray-700 mb-3">Materias</h2>
+
+              {materias.length === 0 && (
+                <div className="bg-white rounded-xl shadow px-6 py-8 text-center text-sm text-gray-400">
+                  Todavía no tenés materias cursadas.
+                </div>
+              )}
+
+              {materias.map((materia) => (
+                <ResumenMateriaPlanCard key={materia.id_comision} materia={materia} />
+              ))}
+            </div>
           </>
         )}
 

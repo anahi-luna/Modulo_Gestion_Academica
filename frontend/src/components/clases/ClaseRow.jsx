@@ -24,35 +24,35 @@ export default function ClaseRow({
             </td>
 
             {/* Comisión */}
-            <td className="text-center text-gray-700">
+            <td className="px-3 py-4 text-center text-gray-700 whitespace-nowrap">
 
                 {clase.codigo}
 
             </td>
 
             {/* Docente */}
-            <td className="text-gray-700">
+            <td className="px-3 py-4 text-gray-700 whitespace-nowrap">
 
                 {clase.docente}
 
             </td>
 
             {/* Fecha */}
-            <td className="text-center text-gray-700">
+            <td className="px-3 py-4 text-center text-gray-700 whitespace-nowrap">
 
                 {formatearFecha(clase.fecha)}
 
             </td>
 
             {/* Tema */}
-            <td className="text-gray-700">
+            <td className="px-3 py-4 text-gray-700">
 
                 {clase.tema}
 
             </td>
 
             {/* Acciones */}
-            <td>
+            <td className="px-3 py-4">
 
                 <div className="flex justify-center gap-2">
                     {/* Boton que permite editar la clase */}

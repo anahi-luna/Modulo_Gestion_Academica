@@ -1,5 +1,5 @@
-// Acá centralizo los strings de permisos tal cual los definió mi
-// compañera en permisos.yml del back, para no andar tipeando
+// Acá centralizo los strings de permisos tal cual los definió 
+// rebe en permisos.yml del back, para no andar tipeando
 // "micro2.asistencias.crear" repetido por todos lados y equivocarme
 // en algún archivo. Si el día de mañana el back agrega un permiso
 // nuevo, lo agrego acá y ya está disponible en toda la app.
@@ -33,6 +33,15 @@ export const ACCIONES = {
     CERTIFICADOS_LEER: "micro2.certificados.leer",
     CERTIFICADOS_ACTUALIZAR: "micro2.certificados.actualizar",
     CERTIFICADOS_ELIMINAR: "micro2.certificados.eliminar",
+
+    // Estos ya existen del lado del back (roles.yml los tiene en el rol
+    // Administrador y en Jefatura Académica), pero acá en el front
+    // todavía no estaban declarados. Los agrego para poder usar
+    // hasPermission(ACCIONES.RESULTADO_ACADEMICO_GENERAR) en el botón
+    // nuevo de "Generar resultado académico".
+    RESULTADO_ACADEMICO_GENERAR: "micro2.resultado_academico.generar",
+    RESULTADO_ACADEMICO_LEER: "micro2.resultado_academico.leer",
+    RESULTADO_ACADEMICO_ELIMINAR: "micro2.resultado_academico.eliminar",
 
     REPORTES_LEER: "micro2.reportes.leer",
 };
@@ -95,10 +104,7 @@ export const MODULOS = [
         titulo: "Resultado del plan",
         descripcion: "Avance académico del alumno respecto de su plan de estudios.",
         ruta: "/resultado-plan",
-        // Por ahora este permiso solo debería quedar en los roles Admin y
-        // Director General en roles.yml del back.
-        //  Reutilizo REPORTES_LEER en vez de inventar un
-        // permiso nuevo, porque conceptualmente es un reporte agregado.
+
         permisoLeer: ACCIONES.REPORTES_LEER,
         color: "red",
     },

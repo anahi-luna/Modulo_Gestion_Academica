@@ -8,7 +8,7 @@
 // Los permisos no los invento yo en el front: se los pido al back
 // (GET /api/auth/me?usuario=X), que ya me arma el usuario con su array
 // de permisos resuelto a partir de sus roles (ver roles.yml y
-// permisos.yml que dejó mi compañera en el back).
+// permisos.yml que dejó Rebca en el back).
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import {

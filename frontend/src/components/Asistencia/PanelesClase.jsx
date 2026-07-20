@@ -27,10 +27,6 @@ export default function PanelesClase({
     }, []);
 
     return (
-        // Antes: "col-span-3" fijo (rompía en mobile porque el grid
-        // padre tiene 12 columnas incluso en pantallas chicas).
-        // Ahora: en mobile ocupa el ancho completo, y recién en lg
-        // vuelve a ocupar 3 de las 12 columnas.
         <div className="lg:col-span-3 bg-white rounded-xl shadow border p-4 sm:p-5">
 
             <div className="flex justify-between items-center mb-4 sm:mb-5">

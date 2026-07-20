@@ -1,6 +1,4 @@
-// Antes esta vista solo mostraba la pantalla de gestión (elegir una
-// comisión y tomar asistencia). Ahora, mismo criterio que
-// Calificaciones.jsx: si el usuario es el alumno de prueba, ve SU
+//si el usuario es el alumno de prueba, ve SU
 // PROPIA asistencia (solo lectura, agrupada por comisión); si es
 // personal, ve la pantalla de gestión de siempre (con o sin poder
 // editar, según sus permisos).
