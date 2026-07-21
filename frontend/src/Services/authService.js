@@ -5,7 +5,7 @@
 // con sus roles Y ya resueltos en un array de permisos tipo
 // "micro2.asistencias.crear". Con eso arma después el hasPermission.
 
-import API_URL from "./api";
+import API_URL from "../api/api";
 
 // Con esto simulo "quién soy" hasta que exista un login de verdad.
 // Lo guardo en localStorage para no perder la sesión simulada si
@@ -23,7 +23,7 @@ export function guardarUsuarioSimulado(username) {
 // Le pido al back el usuario actual (con roles + permisos ya armados).
 export async function obtenerUsuarioActual(username) {
     try {
-        const response = await fetch(`${API_URL}/auth/me?usuario=${username}`);
+        const response = await fetch(`${API_URL}/mock/auth/me?usuario=${username}`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -42,7 +42,7 @@ export async function obtenerUsuarioActual(username) {
 // prueba que definió mi compañera en el back (admin, docente, alumno, etc).
 export async function obtenerUsuarios() {
     try {
-        const response = await fetch(`${API_URL}/auth/usuarios`);
+        const response = await fetch(`${API_URL}/mock/auth/usuarios`);
         const data = await response.json();
 
         if (!response.ok) {

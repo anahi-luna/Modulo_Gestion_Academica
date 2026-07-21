@@ -22,18 +22,18 @@ def create_app():
     ma.init_app(app)
 
 
-    app.register_blueprint(inscripcion_bp, url_prefix="/api/inscripciones")
-    app.register_blueprint(clase_bp, url_prefix="/api/clases")
-    app.register_blueprint(asistencia_bp, url_prefix ="/api/asistencias")
-    app.register_blueprint(evaluacion_bp,url_prefix ="/api/evaluaciones")
-    app.register_blueprint(calificacion_bp,url_prefix ="/api/calificaciones")
-    app.register_blueprint(resultado_academico_bp,url_prefix ="/api/resultados-academicos")
-    app.register_blueprint(resultado_plan_bp, url_prefix ="/api/resultados-planes")
-    app.register_blueprint(certificado_bp, url_prefix ="/api/certificados")
+    app.register_blueprint(inscripcion_bp, url_prefix="/inscripciones")
+    app.register_blueprint(clase_bp, url_prefix="/clases")
+    app.register_blueprint(asistencia_bp, url_prefix ="/asistencias")
+    app.register_blueprint(evaluacion_bp,url_prefix ="/evaluaciones")
+    app.register_blueprint(calificacion_bp,url_prefix ="/calificaciones")
+    app.register_blueprint(resultado_academico_bp,url_prefix ="/resultados-academicos")
+    app.register_blueprint(resultado_plan_bp, url_prefix ="/resultados-planes")
+    app.register_blueprint(certificado_bp, url_prefix ="/certificados")
     app.register_blueprint(auth_bp)
     
     # Ruta de prueba
-    @app.route("/")
+    @app.route("/status")
     def home():
         return {
             "status":"success",

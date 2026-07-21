@@ -38,7 +38,7 @@ import Certificados from "./pages/Certificados";
 export default function App() {
 
     return (
-        <BrowserRouter>
+        <BrowserRouter basename='/inscripciones'>
             <PermissionsProvider>
                 <Navbar />
 
