@@ -1,7 +1,7 @@
 // Vista para personal: gestión completa de clases (crear, editar, eliminar).
 // Vista para alumno: solo consulta de sus propias clases (solo lectura).
 import { useEffect, useState } from "react";
-import ClasesTable from "../components/Clases/ClaseTable";
+import ClasesTable from "../components/clases/ClaseTable";
 import ModalClase from "../components/clases/ClaseModal";
 import EliminarClaseModal from "../components/clases/EliminarClaseModal";
 import { PlusIcon } from "@heroicons/react/24/outline";
