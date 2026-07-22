@@ -11,7 +11,7 @@ export default function CertificadoCard({ certificado, onDescargar }) {
     <div className="bg-white rounded-xl shadow p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
         <p className="font-semibold text-gray-800">{certificado.tipo}</p>
-        <p className="text-sm text-gray-500">{certificado.materia} · {certificado.comision}</p>
+        <p className="text-sm text-gray-500">Plan Nº {certificado.id_plan ?? "-"}</p>
         {emitido ? (
           <p className="text-xs text-gray-400 mt-1">
             Emitido el {certificado.fecha_emision} · Código {certificado.codigo_verificacion}

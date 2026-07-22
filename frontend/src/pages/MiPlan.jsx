@@ -9,10 +9,10 @@ import ResumenMateriaPlanCard from "../components/planes/ResumenMateriaPlanCard"
 const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx
 
 const ESTILOS_ESTADO = {
-  Aprobado: "bg-green-100 text-green-700",
+  Finalizado: "bg-green-100 text-green-700",
   "En curso": "bg-blue-100 text-blue-700",
   Incompleto: "bg-yellow-100 text-yellow-700",
-  Abandono: "bg-red-100 text-red-700",
+  Abandonado: "bg-red-100 text-red-700",
 };
 
 export default function MiPlan() {
@@ -95,7 +95,7 @@ export default function MiPlan() {
         {!cargando && plan && (
           <>
             <div className="bg-white rounded-xl shadow p-5 sm:p-6">
-              <p className="font-bold text-gray-800">{plan.codigo_plan}</p>
+              <p className="font-bold text-gray-800">Plan Nº {plan.id_plan}</p>
               <p className="text-xs text-gray-400 mb-4">Estado general de tu plan</p>
 
               <div className="flex items-center justify-between mb-1">
@@ -131,7 +131,7 @@ export default function MiPlan() {
               </div>
             </div>
 
-            {plan.estado === "Aprobado" && (
+            {plan.estado === "Finalizado" && (
               <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm">
                 ✓ Completaste tu plan de estudios. Revisá tu certificado en la sección "Mis certificados".
               </div>

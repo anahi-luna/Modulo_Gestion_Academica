@@ -18,7 +18,7 @@ export default function TablaResultadoPlan({ planes, onMarcarAbandono, onGenerar
   // ningún estado final, ofrezco marcarlo como abandono; si ya está
   // Abandono, no hay ninguna acción más para hacer.
   function Accion({ p }) {
-    if (p.estado === "Aprobado") {
+    if (p.estado === "Finalizado" || p.estado === "Incompleto") {
       return (
         <button
           onClick={() => onGenerarCertificado(p)}
@@ -28,7 +28,7 @@ export default function TablaResultadoPlan({ planes, onMarcarAbandono, onGenerar
         </button>
       );
     }
-    if (p.estado === "Abandono") {
+    if (p.estado === "Abandonado") {
       return <span className="text-xs text-gray-300">—</span>;
     }
     return (
@@ -46,7 +46,7 @@ export default function TablaResultadoPlan({ planes, onMarcarAbandono, onGenerar
       {/*MOBILE tarjetas */}
       <div className="md:hidden space-y-3">
         {planes.map((p) => (
-          <div key={p.id_plan} className="bg-white rounded-xl shadow p-4">
+          <div key={p.id} className="bg-white rounded-xl shadow p-4">
             <div className="flex justify-between items-start gap-2 mb-2">
               <div>
                 <p className="font-semibold text-gray-800">{p.numero_legajo}</p>
@@ -55,7 +55,7 @@ export default function TablaResultadoPlan({ planes, onMarcarAbandono, onGenerar
               <EstadoPlanBadge estado={p.estado} />
             </div>
 
-            <p className="text-xs text-gray-400 mb-2">Plan {p.codigo_plan}</p>
+            <p className="text-xs text-gray-400 mb-2">Plan Nº {p.id_plan}</p>
 
             <div className="flex items-center gap-2 mb-1">
               <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -91,12 +91,12 @@ export default function TablaResultadoPlan({ planes, onMarcarAbandono, onGenerar
             </thead>
             <tbody>
               {planes.map((p) => (
-                <tr key={p.id_plan} className="border-b border-gray-100 hover:bg-gray-50">
+                <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="px-4 py-3 font-semibold text-gray-800">
                     {p.numero_legajo}
                     <span className="block text-xs font-normal text-gray-400">{p.alumno}</span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{p.codigo_plan}</td>
+                  <td className="px-4 py-3 text-gray-600">Plan Nº {p.id_plan}</td>
                   <td className="px-4 py-3 text-gray-600">{p.materias_totales}</td>
                   <td className="px-4 py-3 text-gray-600">{p.materias_aprobadas}</td>
                   <td className="px-4 py-3 text-gray-600">{p.materias_finalizadas}</td>

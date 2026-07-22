@@ -1,97 +1,118 @@
-// Servicio de Planes. Las páginas (MiPlan.jsx y ResultadoPlan.jsx) solo
-// consumen estas funciones, nunca importan el mock directamente. Mismo
-// criterio que certificadosService.js: cuando exista el microservicio
-// real, se reescribe este archivo para hacer fetch a `${API_URL}/planes...`
-// sin tocar ni una línea de las páginas.
-
-import { getPlanPorLegajo, getPlanes, actualizarEstadoPlan } from "../mocks/planesMock";
+// Ya está conectado a la API real de "resultado de plan" del back.
+// Sigo usando legajosMock.js para resolver nombre/número de legajo,
+// porque Legajo es una entidad de OTRO microservicio (el de
+// legajos/personal) que todavía no está integrado; ese mock representa
+// justamente esa dependencia externa, no algo que "falte conectar" acá.
+//
+// OJO con un límite real del back: la ruta POST de resultados-planes
+// está comentada en resultado_plan_routes.py. Un resultado de plan se
+// crea/actualiza SOLO como efecto automático de generar un resultado
+// académico (ver resultadoAcademicoService.js). Por eso acá no hay
+// ninguna función para "crear" un resultado de plan a mano.
+import { getListaResultadosPlan, actualizarEstadoResultadoPlan } from "../api/resultadoPlanApi";
 import { getLegajoPorId } from "../mocks/legajosMock";
 import { emitir } from "./certificadosService";
 import { obtenerMisCalificaciones } from "./calificacionesAlumnoService";
-import { obtenerResultadosAcademicos, nombreEstadoAcademico } from "./resultadoAcademicoService";
+import { obtenerResultadosAcademicos } from "./resultadoAcademicoService";
 
-// Le agrego el % de avance calculado (finalizadas / totales) para no
-// tener que repetir esta cuenta en cada página que lo necesite.
-function conAvance(plan) {
-  if (!plan) return null;
-  const avance =
-    plan.materias_totales > 0
-      ? Math.round((plan.materias_finalizadas / plan.materias_totales) * 100)
-      : 0;
-  return { ...plan, avance };
+// Coincide con seed/seed_estado_resultado_plan.py del back.
+const ESTADOS_RESULTADO_PLAN = {
+    1: "En curso",
+    2: "Finalizado",
+    3: "Incompleto",
+    4: "Abandonado",
+};
+
+const ID_ESTADO_ABANDONADO = 4;
+
+function mapearResultadoPlan(r) {
+    const avance =
+        r.materias_totales > 0
+            ? Math.round((r.materias_finalizadas / r.materias_totales) * 100)
+            : 0;
+
+    return {
+        id: r.id_resultado_plan,
+        id_legajo: r.id_legajo,
+        id_plan: r.id_plan,
+        materias_totales: r.materias_totales,
+        materias_aprobadas: r.materias_aprobadas,
+        materias_finalizadas: r.materias_finalizadas,
+        estado: r.estado?.nombre ?? ESTADOS_RESULTADO_PLAN[r.id_estado_resultado_plan] ?? "-",
+        fecha_actualizacion: r.fecha_actualizacion,
+        avance,
+    };
 }
 
-// El plan de UN alumno (para "Mi plan")
+// El resultado del plan de UN alumno (para "Mi plan"). Como el back no
+// tiene un filtro por id_legajo en la URL, traigo la lista completa y
+// filtro acá; con el volumen de datos de este sistema no es un
+// problema, y evita tener que tocar el back para agregar un query param.
 export async function obtenerMiPlan(idLegajo) {
-  const respuesta = await getPlanPorLegajo(idLegajo);
-  return conAvance(respuesta.data);
+    const respuesta = await getListaResultadosPlan();
+    const plan = respuesta.data.find((r) => r.id_legajo === idLegajo);
+    return plan ? mapearResultadoPlan(plan) : null;
 }
 
-// Todos los planes, con nombre y número de legajo ya resueltos (para
-// "Resultado del plan")
+// Todos los resultados de plan, con nombre y número de legajo ya
+// resueltos (para "Resultado del plan", vista de gestión)
 export async function obtenerTodosLosPlanes() {
-  const respuesta = await getPlanes();
+    const respuesta = await getListaResultadosPlan();
 
-  return Promise.all(
-    respuesta.data.map(async (plan) => {
-      const legajoRes = await getLegajoPorId(plan.id_legajo);
-      const legajo = legajoRes.data;
-      return {
-        ...conAvance(plan),
-        numero_legajo: legajo.numero_legajo,
-        alumno: `${legajo.nombre} ${legajo.apellido}`,
-      };
-    })
-  );
+    return Promise.all(
+        respuesta.data.map(async (r) => {
+            const legajo = (await getLegajoPorId(r.id_legajo)).data;
+            return {
+                ...mapearResultadoPlan(r),
+                numero_legajo: legajo.numero_legajo,
+                alumno: `${legajo.nombre} ${legajo.apellido}`,
+            };
+        })
+    );
 }
 
-// Marca un plan como abandonado
-export async function marcarAbandono(idPlan) {
-  const respuesta = await actualizarEstadoPlan(idPlan, "Abandono");
-  return respuesta.data;
+// Marca un resultado de plan como Abandonado. idResultadoPlan es el
+// id_resultado_plan real (plan.id en el objeto ya mapeado).
+export async function marcarAbandono(idResultadoPlan) {
+    const respuesta = await actualizarEstadoResultadoPlan(idResultadoPlan, {
+        id_estado_resultado_plan: ID_ESTADO_ABANDONADO,
+    });
+    return respuesta.data;
 }
 
-// Genera (emite) el certificado de "Finalización de Plan" para un
-// alumno que ya completó el 100%. Reutiliza directamente el módulo de
-// Certificados que ya existe, no duplico lógica de emisión.
-export async function generarCertificadoDePlan(plan, firmadoPor) {
-  return emitir({
-    id_legajo: plan.id_legajo,
-    id_comision: null, // la finalización de plan no es de UNA materia puntual
-    tipo: "Finalización de Plan",
-    firmado_por: firmadoPor,
-  });
+// Emite el certificado correspondiente a un resultado de plan ya
+// cerrado (Finalizado o Incompleto). El back decide solo si el
+// certificado es de "Aprobación" o "Participación" según ese estado.
+export async function generarCertificadoDePlan(plan) {
+    return emitir(plan.id);
 }
 
 // Arma, materia por materia, el detalle que se ve en "Mi plan":
 // reutilizo obtenerMisCalificaciones (que ya trae, por cada comisión
 // en la que el alumno está inscripto, sus evaluaciones y notas) y le
 // cruzo el ResultadoAcademico si ya se generó. Si existe resultado
-// académico para esa (legajo, comisión), la materia está FINALIZADA y
-// muestro ese cierre; si no existe todavía, está PENDIENTE (cursando)
-// y muestro las evaluaciones cargadas hasta ahora, igual que en Mis
-// Calificaciones.
+// académico para esa comisión, la materia está FINALIZADA y muestro
+// ese cierre (calculado por el back); si no existe todavía, está
+// PENDIENTE (cursando) y muestro las evaluaciones cargadas hasta
+// ahora, igual que en Mis Calificaciones.
 export async function obtenerMisMateriasDePlan(idLegajo) {
-  const [materias, resultados] = await Promise.all([
-    obtenerMisCalificaciones(idLegajo),
-    obtenerResultadosAcademicos(idLegajo),
-  ]);
+    const [materias, resultados] = await Promise.all([
+        obtenerMisCalificaciones(idLegajo),
+        obtenerResultadosAcademicos(idLegajo),
+    ]);
 
-  return materias.map((materia) => {
-    const resultado = resultados.find((r) => r.id_comision === materia.id_comision);
+    return materias.map((materia) => {
+        const resultado = resultados.find((r) => r.id_comision === materia.id_comision);
 
-    if (!resultado) {
-      // Todavía no se generó el resultado académico: pendiente/cursando.
-      return { ...materia, finalizada: false };
-    }
+        if (!resultado) {
+            // Todavía no se generó el resultado académico: pendiente/cursando.
+            return { ...materia, finalizada: false };
+        }
 
-    return {
-      ...materia,
-      finalizada: true,
-      resultado: {
-        ...resultado,
-        estado_academico: nombreEstadoAcademico(resultado.id_estado_academico),
-      },
-    };
-  });
+        return {
+            ...materia,
+            finalizada: true,
+            resultado,
+        };
+    });
 }

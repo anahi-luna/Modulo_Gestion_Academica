@@ -118,6 +118,10 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
         const datos = {
             id_evaluacion: evaluacionSeleccionada.id,
             calificaciones: calificaciones.map(c => ({
+                // Si la fila ya tenía una calificación cargada (viene con
+                // id), lo mando para que el service sepa que va por PUT
+                // en vez de por POST.
+                id: c.id,
                 id_inscripcion: c.id_inscripcion,
                 nota: c.nota === "" || c.nota === null ? null : Number(c.nota),
                 observacion: c.observacion,

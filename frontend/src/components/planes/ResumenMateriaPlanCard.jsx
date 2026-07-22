@@ -88,7 +88,7 @@ export default function ResumenMateriaPlanCard({ materia }) {
               <div>
                 <p className="text-xs text-gray-400">Fecha de cierre</p>
                 <p className="font-semibold text-gray-800">
-                  {materia.resultado.fecha_cierre}
+                  {materia.resultado.fecha_resultado}
                 </p>
               </div>
               <div>
@@ -97,12 +97,6 @@ export default function ResumenMateriaPlanCard({ materia }) {
                   {materia.resultado.estado_academico}
                 </p>
               </div>
-              {materia.resultado.observaciones && (
-                <div className="col-span-2 sm:col-span-4">
-                  <p className="text-xs text-gray-400">Observaciones</p>
-                  <p className="text-gray-700">{materia.resultado.observaciones}</p>
-                </div>
-              )}
             </div>
           ) : (
             // Materia PENDIENTE (todavía cursando): la misma tabla de
