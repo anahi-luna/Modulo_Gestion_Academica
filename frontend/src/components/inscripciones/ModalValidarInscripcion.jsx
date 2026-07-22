@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
 /*
  * Modal utilizado para validar una inscripción.
@@ -48,6 +49,9 @@ export default function ModalValidarInscripcion({
         }
     },[inscripcion]);
 
+    // El hook se llama siempre, antes de cualquier "return" condicional.
+    const modalRef = useModalAccessibility(abierto, onCerrar);
+
     // Si el modal está cerrado no se renderiza.
     if (!abierto || !inscripcion)
         return null;
@@ -55,36 +59,39 @@ export default function ModalValidarInscripcion({
     return (
 
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+            <div ref={modalRef} className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
                 <h2 className="text-xl font-bold mb-5">
                     Validar inscripción
                 </h2>
                 <div className="space-y-4">
                     <div>
-                        <label className="text-sm font-medium">
+                        <label htmlFor="validar-alumno" className="text-sm font-medium">
                             Alumno
                         </label>
                         <input
+                            id="validar-alumno"
                             disabled
                             value={inscripcion.alumno}
                             className="w-full mt-1 border rounded-lg px-3 py-2 bg-gray-100"
                         />
                     </div>
                     <div>
-                        <label className="text-sm font-medium">
+                        <label htmlFor="validar-materia" className="text-sm font-medium">
                             Materia
                         </label>
                         <input
+                            id="validar-materia"
                             disabled
                             value={inscripcion.materia}
                             className="w-full mt-1 border rounded-lg px-3 py-2 bg-gray-100"
                         />
                     </div>
                     <div>
-                        <label className="text-sm font-medium">
+                        <label htmlFor="validar-comision" className="text-sm font-medium">
                             Comisión
                         </label>
                         <select
+                            id="validar-comision"
                             value={comision}
                             onChange={(e) =>
                                 setComision(Number(e.target.value))
@@ -102,10 +109,11 @@ export default function ModalValidarInscripcion({
                         </select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium">
+                        <label htmlFor="validar-estado" className="text-sm font-medium">
                             Estado
                         </label>
                         <select
+                            id="validar-estado"
                             value={estado}
                             onChange={(e) =>
                                 setEstado(e.target.value)

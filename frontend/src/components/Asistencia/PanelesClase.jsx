@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getComisiones } from "../../mocks/comisionesMock";
 import ComisionCard from "./ComisionCard";
+import Alert from "../Alert";
 
 export default function PanelesClase({
     comisionSeleccionada,
     setComisionSeleccionada
 }) {
     const [comisiones, setComisiones] = useState([]);
+    // Antes esto solo se logueaba a consola: la lista se quedaba vacía
+    // sin explicar por qué.
+    const [error, setError] = useState(null);
 
     // Carga las comisiones al montar el componente
     useEffect(() => {
@@ -21,6 +25,7 @@ export default function PanelesClase({
                 }
             } catch (error) {
                 console.error(error);
+                setError("No se pudieron cargar las comisiones.");
             }
         }
         cargarComisiones();
@@ -34,6 +39,12 @@ export default function PanelesClase({
                     Comisiones
                 </h2>
             </div>
+
+            {error && (
+                <div className="mb-4 sm:mb-5">
+                    <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />
+                </div>
+            )}
 
             <div className="relative mb-4 sm:mb-5">
                 <MagnifyingGlassIcon

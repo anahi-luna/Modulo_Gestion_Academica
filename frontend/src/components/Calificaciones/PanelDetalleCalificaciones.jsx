@@ -1,6 +1,7 @@
 import EvaluacionSelect from "./EvaluacionSelect";
 import EstadisticaCard from "../Asistencia/EstadisticaCard";
 import CalificacionTabla from "./CalificacionTabla";
+import Alert from "../Alert";
 import { useNavigate } from "react-router-dom";
 import { AcademicCapIcon, CalendarDaysIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
@@ -17,6 +18,12 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
     const [calificaciones, setCalificaciones] = useState([]);
     const [guardando, setGuardando] = useState(false);
     const [cargandoEvaluaciones, setCargandoEvaluaciones] = useState(false);
+    // Mismo sistema que ya usa PanelDetalleClase.jsx (Asistencia): antes
+    // acá los errores solo se logueaban a consola y el docente se
+    // quedaba sin saber si algo había fallado (por ejemplo, si
+    // "Guardar calificaciones" fallaba, la pantalla se quedaba igual y
+    // parecía que había guardado bien).
+    const [alerta, setAlerta] = useState(null);
 
     const navigate = useNavigate();
 
@@ -49,6 +56,11 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
                 // comisión no tiene evaluaciones.
             } catch (error) {
                 console.error(error);
+                setAlerta({
+                    tipo: "error",
+                    titulo: "Error",
+                    mensaje: "No se pudieron cargar las evaluaciones de esta comisión.",
+                });
             } finally {
                 setCargandoEvaluaciones(false);
             }
@@ -91,6 +103,11 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
             }
         } catch (error) {
             console.error(error);
+            setAlerta({
+                tipo: "error",
+                titulo: "Error",
+                mensaje: "No se pudieron cargar las calificaciones de esta evaluación.",
+            });
         }
     }
 
@@ -131,8 +148,18 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
             setGuardando(true);
             await registrarCalificacionesService(datos);
             await cargarCalificaciones();
+            setAlerta({
+                tipo: "success",
+                titulo: "Calificaciones guardadas",
+                mensaje: "Las calificaciones se registraron con éxito.",
+            });
         } catch (error) {
             console.error(error);
+            setAlerta({
+                tipo: "error",
+                titulo: "Error",
+                mensaje: "Ocurrió un error al guardar las calificaciones. Volvé a intentar.",
+            });
         } finally {
             setGuardando(false);
         }
@@ -150,6 +177,17 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
 
     return (
         <div className="lg:col-span-9 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+
+            {alerta && (
+                <div className="p-4 pb-0 sm:p-8 sm:pb-0">
+                    <Alert
+                        tipo={alerta.tipo}
+                        titulo={alerta.titulo}
+                        mensaje={alerta.mensaje}
+                        onCerrar={() => setAlerta(null)}
+                    />
+                </div>
+            )}
 
             <div className="p-4 sm:p-8">
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-3">

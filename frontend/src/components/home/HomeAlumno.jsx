@@ -7,6 +7,7 @@ import BannerAlumno from "./BannerAlumno";
 import ResumenActivo from "./ResumenActivo";
 import ResumenVacio from "./ResumenVacio";
 import ProximasClasesPorComision from "./ProximasClasesPorComision";
+import Alert from "../Alert";
 import { obtenerMisInscripciones } from "../../Services/inscripcionesService";
 import { obtenerMiPlan } from "../../Services/planesService";
 import { obtenerMisClases } from "../../Services/clasesAlumnoService";
@@ -15,11 +16,13 @@ import { obtenerMisCertificados } from "../../Services/certificadosService";
 
 const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx y Certificados.jsx
 
+// Coincide con seed/seed_estado_resultado_plan.py del back (ver
+// MiPlan.jsx, que tiene esta misma corrección).
 const ESTILOS_ESTADO_PLAN = {
-  Aprobado: "bg-green-100 text-green-700",
+  Finalizado: "bg-green-100 text-green-700",
   "En curso": "bg-blue-100 text-blue-700",
   Incompleto: "bg-yellow-100 text-yellow-700",
-  Abandono: "bg-red-100 text-red-700",
+  Abandonado: "bg-red-100 text-red-700",
 };
 
 export default function HomeAlumno({ usuario }) {
@@ -29,10 +32,15 @@ export default function HomeAlumno({ usuario }) {
   const [porcentajeAsistencia, setPorcentajeAsistencia] = useState(null);
   const [certificadosObtenidos, setCertificadosObtenidos] = useState(0);
   const [cargando, setCargando] = useState(true);
+  // Antes esto solo se logueaba a consola: el alumno se quedaba
+  // viendo "Todavía no tenés..." en todos lados sin saber que en
+  // realidad hubo un error cargando sus datos.
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function cargar() {
       setCargando(true);
+      setError(null);
       try {
         const [misInscripciones, miPlan, misClases, miAsistencia, misCertificados] =
           await Promise.all([
@@ -51,6 +59,7 @@ export default function HomeAlumno({ usuario }) {
         );
       } catch (error) {
         console.error("No pude cargar el resumen del alumno", error);
+        setError("No se pudo cargar tu resumen. Probá recargar la página.");
       } finally {
         setCargando(false);
       }
@@ -65,6 +74,8 @@ export default function HomeAlumno({ usuario }) {
       <BannerAlumno usuario={usuario} tieneInscripciones={tieneInscripciones} />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+        {error && <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />}
 
         {cargando && <p className="text-sm text-gray-400">Cargando tu resumen...</p>}
 
@@ -94,7 +105,7 @@ export default function HomeAlumno({ usuario }) {
                   <span className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${ESTILOS_ESTADO_PLAN[plan.estado] ?? "bg-gray-100 text-gray-600"}`}>
                     {plan.estado}
                   </span>
-                  <p className="text-xs text-gray-400 mt-2">Plan {plan.codigo_plan}</p>
+                  <p className="text-xs text-gray-400 mt-2">Plan Nº {plan.id_plan}</p>
                 </>
               ) : (
                 <p className="text-sm text-gray-400">Todavía no tenés un plan asignado.</p>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ClasesTable from "../components/Clases/ClaseTable";
 import ModalClase from "../components/clases/ClaseModal";
 import EliminarClaseModal from "../components/clases/EliminarClaseModal";
+import Alert from "../components/Alert";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getClases, registrarClase, modificarClase, borrarClase } from "../Services/clasesAdminService";
 import { getComisiones } from "../mocks/comisionesMock";
@@ -19,6 +20,11 @@ export default function GestionClases() {
     const [mostrarEliminar, setMostrarEliminar] = useState(false);
 
     const [comisiones, setComisiones] = useState([]);
+
+    // Antes, si fallaba cargar/crear/editar/borrar una clase, el único
+    // rastro quedaba en la consola del navegador: el docente/admin no
+    // se enteraba de que algo salió mal.
+    const [error, setError] = useState(null);
 
     const [filtroMateria, setFiltroMateria] = useState("");
     const [filtroComision, setFiltroComision] = useState("");
@@ -41,6 +47,7 @@ export default function GestionClases() {
         } catch (error) {
 
             console.error(error);
+            setError("No se pudieron cargar las clases.");
 
         }
 
@@ -48,9 +55,16 @@ export default function GestionClases() {
 
     async function cargarComisiones(){
 
-        const resultado = await getComisiones();
+        // Antes esta función no tenía try/catch: si fallaba, quedaba
+        // una promesa rechazada sin manejar (ni siquiera se logueaba).
+        try {
+            const resultado = await getComisiones();
 
-        setComisiones(resultado.data);
+            setComisiones(resultado.data);
+        } catch (error) {
+            console.error(error);
+            setError("No se pudieron cargar las comisiones.");
+        }
 
     }
 
@@ -114,6 +128,7 @@ export default function GestionClases() {
 
         }catch(error){
             console.error(error);
+            setError("No se pudo eliminar la clase.");
         }
 
     }
@@ -148,12 +163,21 @@ export default function GestionClases() {
         } catch (error) {
 
             console.error(error);
+            setError(
+                claseSeleccionada
+                    ? "No se pudo actualizar la clase."
+                    : "No se pudo crear la clase."
+            );
 
         }
 
     }
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+            {error && (
+                <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />
+            )}
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
 

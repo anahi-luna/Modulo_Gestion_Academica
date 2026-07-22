@@ -3,8 +3,14 @@
 // Modal que muestra el resultado de una inscripción y los
 // datos devueltos por el backend.
 // ============================================================
+import { useModalAccessibility } from "../hooks/useModalAccessibility";
 
 export default function ResultadoInscripcion({ resultado, onCerrar, onNueva }) {
+  // Este componente no tiene un prop "abierto": el padre lo
+  // renderiza (monta) solo cuando corresponde mostrarlo, así que acá
+  // adentro se considera "siempre abierto" mientras está montado.
+  const modalRef = useModalAccessibility(true, onCerrar);
+
   // resultado es el objeto data que devuelve el mock/API
   const esAceptada =
     resultado?.estado === "Pendiente" ||
@@ -14,7 +20,7 @@ export default function ResultadoInscripcion({ resultado, onCerrar, onNueva }) {
     // Fondo oscuro semitransparente que cubre toda la pantalla
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
 
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center animate-fade-in">
+      <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center animate-fade-in">
 
         {/* Ícono grande según resultado */}
         <div className={`

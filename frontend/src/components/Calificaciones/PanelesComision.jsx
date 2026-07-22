@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ComisionCard from "../Asistencia/ComisionCard";
+import Alert from "../Alert";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getComisiones } from "../../mocks/comisionesMock";
 
@@ -9,6 +10,9 @@ export default function PanelesComision({
 }) {
     const [comisiones, setComisiones] = useState([]);
     const [busqueda, setBusqueda] = useState("");
+    // Antes esto solo se logueaba a consola: la lista se quedaba vacía
+    // sin explicar por qué.
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         async function cargarComisiones() {
@@ -20,6 +24,7 @@ export default function PanelesComision({
                 }
             } catch (error) {
                 console.error(error);
+                setError("No se pudieron cargar las comisiones.");
             }
         }
         cargarComisiones();
@@ -38,6 +43,12 @@ export default function PanelesComision({
             <div className="flex justify-between items-center mb-4 sm:mb-5">
                 <h2 className="text-lg sm:text-xl font-semibold">Comisiones</h2>
             </div>
+
+            {error && (
+                <div className="mb-4">
+                    <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />
+                </div>
+            )}
 
             <div className="relative mb-4 sm:mb-5">
                 <MagnifyingGlassIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
