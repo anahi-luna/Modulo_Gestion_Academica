@@ -8,11 +8,12 @@ export default function EvaluacionSelect({
 
         <div className="border-b bg-gray-50 px-8 py-4">
 
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="select-evaluacion" className="block text-sm font-medium text-gray-700 mb-2">
                 Evaluación
             </label>
 
             <select
+                id="select-evaluacion"
                 value={evaluacionSeleccionada?.id ?? ""}
                 onChange={(e) => {
 

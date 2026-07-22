@@ -8,11 +8,12 @@ export default function ClaseSelect({
 
         <div className="border-b bg-gray-50 px-8 py-4">
 
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="select-clase" className="block text-sm font-medium text-gray-700 mb-2">
                 Clase
             </label>
 
             <select
+                id="select-clase"
                 value={claseSeleccionada?.id ?? ""}
                 onChange={(e) => {
 

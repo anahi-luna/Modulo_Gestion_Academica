@@ -21,11 +21,12 @@ export default function PasoLegajo({
 
                 <form onSubmit={onSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                        <label htmlFor="numero-legajo" className="block text-xs font-medium text-gray-600 mb-1">
                             Nro. de Legajo *
                         </label>
                         <div className="flex gap-2">
                             <input
+                                id="numero-legajo"
                                 type="text"
                                 value={nroLegajo}
                                 onChange={onChange}

@@ -209,8 +209,9 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
         {puedeGenerarResultado && <GenerarResultadosAcademicos />}
 
         <div className="bg-white rounded-xl shadow p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
-          <label className="text-xs text-gray-500">Estado del plan:</label>
+          <label htmlFor="filtro-estado-plan" className="text-xs text-gray-500">Estado del plan:</label>
           <select
+            id="filtro-estado-plan"
             value={filtroEstado}
             onChange={(e) => setFiltroEstado(e.target.value)}
             className="border border-gray-200 rounded-md px-3 py-2 text-sm w-full sm:w-auto"

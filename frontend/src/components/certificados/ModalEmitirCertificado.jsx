@@ -5,10 +5,14 @@
 // simple antes de generar el certificado real.
 
 import { useState } from "react";
+import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
 export default function ModalEmitirCertificado({ abierto, fila, onCerrar, onEmitir }) {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
+
+  // El hook se llama siempre, antes de cualquier "return" condicional.
+  const modalRef = useModalAccessibility(abierto, onCerrar);
 
   if (!abierto || !fila) return null;
 
@@ -26,7 +30,7 @@ export default function ModalEmitirCertificado({ abierto, fila, onCerrar, onEmit
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+      <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
         <h2 className="text-lg font-bold text-gray-800 mb-1">Emitir certificado</h2>
         <p className="text-sm text-gray-500 mb-4">
           El tipo de certificado (Aprobación o Participación) lo determina

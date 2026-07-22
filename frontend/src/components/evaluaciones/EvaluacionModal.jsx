@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
 export default function EvaluacionModal({
     abierto,
@@ -42,6 +43,9 @@ export default function EvaluacionModal({
 
     }, [evaluacion]);
 
+    // El hook se llama siempre, antes de cualquier "return" condicional.
+    const modalRef = useModalAccessibility(abierto, onCerrar);
+
     if (!abierto)
         return null;
 
@@ -53,7 +57,7 @@ export default function EvaluacionModal({
 
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-xl p-6">
+            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-xl p-6">
 
                 <h2 className="text-2xl font-bold text-red-700 mb-6">
                     {evaluacion ? "Editar Evaluación" : "Nueva Evaluación"}
@@ -63,10 +67,11 @@ export default function EvaluacionModal({
 
                     {/* Comisión */}
                     <div>
-                        <label className="block font-medium mb-2">
+                        <label htmlFor="evaluacion-comision" className="block font-medium mb-2">
                             Comisión
                         </label>
                         <select
+                            id="evaluacion-comision"
                             value={formulario.id_comision}
                             onChange={(e) =>
                                 setFormulario({
@@ -99,10 +104,11 @@ export default function EvaluacionModal({
 
                     {/* Tipo */}
                     <div>
-                        <label className="block font-medium mb-2">
+                        <label htmlFor="evaluacion-tipo" className="block font-medium mb-2">
                             Tipo
                         </label>
                         <select
+                            id="evaluacion-tipo"
                             value={formulario.tipo}
                             onChange={(e) =>
                                 setFormulario({
@@ -120,10 +126,11 @@ export default function EvaluacionModal({
 
                     {/* Título */}
                     <div>
-                        <label className="block font-medium mb-2">
+                        <label htmlFor="evaluacion-titulo" className="block font-medium mb-2">
                             Título
                         </label>
                         <input
+                            id="evaluacion-titulo"
                             type="text"
                             value={formulario.titulo}
                             placeholder="Ej: Parcial 1"
@@ -139,10 +146,11 @@ export default function EvaluacionModal({
 
                     {/* Fecha */}
                     <div>
-                        <label className="block font-medium mb-2">
+                        <label htmlFor="evaluacion-fecha" className="block font-medium mb-2">
                             Fecha
                         </label>
                         <input
+                            id="evaluacion-fecha"
                             type="date"
                             value={formulario.fecha}
                             onChange={(e) =>
@@ -157,10 +165,11 @@ export default function EvaluacionModal({
 
                     {/* Puntaje máximo */}
                     <div>
-                        <label className="block font-medium mb-2">
+                        <label htmlFor="evaluacion-puntaje" className="block font-medium mb-2">
                             Puntaje máximo
                         </label>
                         <input
+                            id="evaluacion-puntaje"
                             type="number"
                             min="1"
                             value={formulario.puntaje_maximo}

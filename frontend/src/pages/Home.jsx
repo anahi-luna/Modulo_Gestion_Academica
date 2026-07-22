@@ -7,6 +7,7 @@
 import { useState, useEffect } from "react";
 import ModuloCard from "../components/ModuloCard";
 import HomeAlumno from "../components/home/HomeAlumno";
+import Alert from "../components/Alert";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { obtenerInscripciones } from "../Services/inscripcionesAdminService";
 import { usePermissions } from "../context/PermissionsContext";
@@ -15,6 +16,10 @@ import { MODULOS } from "../config/modulos";
 export default function Home() {
   const { usuario, hasPermission } = usePermissions();
   const [historial, setHistorial] = useState([]);
+  // Antes esto solo se logueaba a consola: si fallaba la carga, el
+  // usuario solo veía "0 inscripciones" sin enterarse de que hubo un
+  // error real (parecía que simplemente no había datos).
+  const [error, setError] = useState(null);
 
   const esAlumno = usuario?.usuario === "alumno";
 
@@ -33,6 +38,7 @@ export default function Home() {
       setHistorial(data);
     } catch (err) {
       console.error(err);
+      setError("No se pudieron cargar las estadísticas de inscripciones.");
     }
   }
 
@@ -87,6 +93,10 @@ export default function Home() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+        {error && (
+          <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />
+        )}
+
         <h2 className="text-base font-semibold text-gray-500 uppercase tracking-wide">
           Módulos
         </h2>
