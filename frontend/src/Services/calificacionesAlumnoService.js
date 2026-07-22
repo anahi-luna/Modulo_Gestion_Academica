@@ -7,10 +7,8 @@
 import { obtenerMisInscripciones } from "./inscripcionesService";
 import { getEvaluaciones } from "./evaluacionesAdminService";
 
-// TODO: cuando el back tenga listo /api/calificaciones, comento esta
-// línea y descomento la de la api real.
-// import { getCalificacionesPorInscripcion } from "../api/calificacionesApi";
-import { getCalificacionesPorInscripcion } from "../mocks/calificacionesMock";
+// Ya está conectado a la API real (getCalificacionesPorInscripcion).
+import { getCalificacionesPorInscripcion } from "../api/calificacionesApi";
 
 const NOTA_APROBACION = 6;
 
@@ -56,7 +54,9 @@ export async function obtenerMisCalificaciones(idLegajo) {
                     tipo: ev.tipo,
                     fecha: ev.fecha,
                     puntaje_maximo: ev.puntaje_maximo,
-                    nota: calif?.nota ?? null,
+                    // El back llama a este campo "puntaje"; toda la UI de
+                    // acá para adentro sigue hablando de "nota".
+                    nota: calif?.puntaje ?? null,
                     observacion: calif?.observacion ?? "",
                 };
             });

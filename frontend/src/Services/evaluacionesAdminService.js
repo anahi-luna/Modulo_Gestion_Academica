@@ -1,11 +1,42 @@
-// TODO: cuando el back tenga listo /api/evaluaciones, comento la línea
-// de abajo y descomento la de la api real. Nada más de este archivo
-// cambia porque el mock devuelve exactamente la misma forma de datos.
-// import { getListaEvaluaciones, getEvaluacionPorId, crearEvaluacion, editarEvaluacion, eliminarEvaluacion } from "../api/evaluacionesApi";
-import { getListaEvaluaciones, getEvaluacionPorId, crearEvaluacion, editarEvaluacion, eliminarEvaluacion } from "../mocks/evaluacionesMock";
+// Ya está conectado a la API real del back. La única vuelta extra acá
+// es traducir entre lo que maneja la UI (tipo como texto: "Parcial",
+// "TP", "Final") y lo que espera/devuelve el back (id_tipo_evaluacion,
+// un número, con su nombre completo resuelto en tipo_evaluacion.nombre).
+// Así no tuve que tocar nada del formulario (EvaluacionModal.jsx) ni de
+// la tabla, todo el mapeo queda encapsulado acá.
+import {
+    getListaEvaluaciones,
+    getEvaluacionPorId,
+    crearEvaluacion,
+    editarEvaluacion,
+    eliminarEvaluacion,
+} from "../api/evaluacionesApi";
 
 import { getComisiones } from "../mocks/comisionesMock";
 
+// Coincide con seed/seed_tipo_evaluacion.py del back.
+const TIPOS_EVALUACION = {
+    1: "Parcial",
+    2: "Recuperatorio",
+    3: "Final",
+    4: "TP", // "Trabajo Práctico" en el back, lo dejo corto para la UI
+};
+
+// El formulario solo ofrece Parcial/TP/Final (ver EvaluacionModal.jsx),
+// así que el mapeo inverso cubre esos 3 + Recuperatorio por si se
+// necesita más adelante.
+const ID_POR_TIPO = {
+    Parcial: 1,
+    Recuperatorio: 2,
+    Final: 3,
+    TP: 4,
+    "Trabajo Práctico": 4,
+};
+
+function idATipo(idTipoEvaluacion, tipoEvaluacionNombre) {
+    if (tipoEvaluacionNombre === "Trabajo Práctico") return "TP";
+    return tipoEvaluacionNombre ?? TIPOS_EVALUACION[idTipoEvaluacion] ?? "-";
+}
 
 export async function getEvaluaciones(idComision) {
 
@@ -33,9 +64,9 @@ export async function getEvaluaciones(idComision) {
 
             titulo: evaluacion.titulo,
 
-            tipo: evaluacion.tipo,
+            tipo: idATipo(evaluacion.id_tipo_evaluacion, evaluacion.tipo_evaluacion?.nombre),
 
-            fecha: evaluacion.fecha,
+            fecha: evaluacion.fecha_evaluacion,
 
             puntaje_maximo: evaluacion.puntaje_maximo,
 
@@ -71,9 +102,9 @@ export async function getEvaluacion(id) {
 
         titulo: response.data.titulo,
 
-        tipo: response.data.tipo,
+        tipo: idATipo(response.data.id_tipo_evaluacion, response.data.tipo_evaluacion?.nombre),
 
-        fecha: response.data.fecha,
+        fecha: response.data.fecha_evaluacion,
 
         puntaje_maximo: response.data.puntaje_maximo,
 
@@ -81,15 +112,28 @@ export async function getEvaluacion(id) {
 
 }
 
+// datos viene del formulario con { id_comision, titulo, tipo, fecha,
+// puntaje_maximo }. Acá lo traduzco a lo que pide el back:
+// { id_comision, id_tipo_evaluacion, titulo, fecha_evaluacion, puntaje_maximo }.
+function aPayloadBack(datos) {
+    return {
+        id_comision: datos.id_comision,
+        id_tipo_evaluacion: ID_POR_TIPO[datos.tipo] ?? 1,
+        titulo: datos.titulo,
+        fecha_evaluacion: datos.fecha,
+        puntaje_maximo: datos.puntaje_maximo,
+    };
+}
+
 export async function registrarEvaluacion(datos) {
 
-    return await crearEvaluacion(datos);
+    return await crearEvaluacion(aPayloadBack(datos));
 
 }
 
 export async function modificarEvaluacion(id, datos) {
 
-    return await editarEvaluacion(id, datos);
+    return await editarEvaluacion(id, aPayloadBack(datos));
 
 }
 

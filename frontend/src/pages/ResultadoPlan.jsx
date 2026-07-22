@@ -39,7 +39,7 @@ export default function ResultadoPlan() {
   async function handleMarcarAbandono(plan) {
     if (!confirm(`¿Marcar como abandono el plan de ${plan.alumno}?`)) return;
     try {
-      await marcarAbandono(plan.id_plan);
+      await marcarAbandono(plan.id); // plan.id es el id_resultado_plan real
       cargarDatos();
     } catch (err) {
       setError(err.message);
@@ -48,7 +48,7 @@ export default function ResultadoPlan() {
 
   async function handleGenerarCertificado(plan) {
     try {
-      await generarCertificadoDePlan(plan, usuario?.nombre ?? "Administración");
+      await generarCertificadoDePlan(plan);
       alert(`Certificado de finalización generado para ${plan.alumno}. Ya está disponible en el módulo de Certificados.`);
     } catch (err) {
       setError(err.message);
@@ -56,9 +56,9 @@ export default function ResultadoPlan() {
   }
 
   const enCurso = planes.filter((p) => p.estado === "En curso").length;
-  const aprobados = planes.filter((p) => p.estado === "Aprobado").length;
+  const finalizados = planes.filter((p) => p.estado === "Finalizado").length;
   const incompletos = planes.filter((p) => p.estado === "Incompleto").length;
-  const abandonos = planes.filter((p) => p.estado === "Abandono").length;
+  const abandonados = planes.filter((p) => p.estado === "Abandonado").length;
 
   const filtrados = planes.filter((p) => {
     const coincideEstado = filtroEstado ? p.estado === filtroEstado : true;
@@ -82,9 +82,9 @@ export default function ResultadoPlan() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 mb-6">
         <EstadisticaCard titulo="En curso" cantidad={enCurso} />
-        <EstadisticaCard titulo="Aprobados" cantidad={aprobados} color="green" />
+        <EstadisticaCard titulo="Finalizados" cantidad={finalizados} color="green" />
         <EstadisticaCard titulo="Incompletos" cantidad={incompletos} color="yellow" />
-        <EstadisticaCard titulo="Abandonos" cantidad={abandonos} color="red" />
+        <EstadisticaCard titulo="Abandonados" cantidad={abandonados} color="red" />
       </div>
 
       {error && (
@@ -107,9 +107,9 @@ export default function ResultadoPlan() {
         >
           <option value="">Todos los estados</option>
           <option value="En curso">En curso</option>
-          <option value="Aprobado">Aprobado</option>
+          <option value="Finalizado">Finalizado</option>
           <option value="Incompleto">Incompleto</option>
-          <option value="Abandono">Abandono</option>
+          <option value="Abandonado">Abandonado</option>
         </select>
       </div>
 
