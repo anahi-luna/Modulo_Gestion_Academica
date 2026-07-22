@@ -7,7 +7,7 @@ from controllers.auth_controller import (
     get_usuario_logueado,
 )
 
-auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
+auth_bp = Blueprint("auth", __name__, url_prefix="/mock/auth")
 
 auth_bp.route("/usuarios", methods=["GET"])(get_usuarios)
 
