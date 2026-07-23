@@ -17,8 +17,9 @@ import * as comisionesMock from "../mocks/comisionesMock";
 //    como antes: separa las filas SIN nota previa (recién cargadas,
 //    van por POST en bloque) de las filas que YA tenían una
 //    calificación (van por PUT una por una, solo si cambiaron).
-import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones } from "../api/calificacionesApi";
+import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones, eliminarCalificacion } from "../api/calificacionesApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
+import { getListaEvaluaciones } from "../api/evaluacionesApi";
 
 const NOTA_APROBACION = 6;
 
@@ -131,4 +132,57 @@ export async function modificarCalificacion(idCalificacion, nota, observacion) {
 export function estadoDeNota(nota) {
     if (nota === null || nota === undefined || nota === "") return "Pendiente";
     return Number(nota) >= NOTA_APROBACION ? "Aprobado" : "Desaprobado";
+}
+
+
+export async function eliminarCalificacionService(idCalificacion) {
+    return await eliminarCalificacion(idCalificacion);
+}
+
+export async function eliminarCalificacionesPorEvaluacion(idEvaluacion) {
+
+    const calificaciones = await obtenerCalificacionesPorEvaluacion(idEvaluacion);
+
+    if (calificaciones.length === 0) {
+        return {
+            cantidadEliminada: 0,
+        };
+    }
+
+    await Promise.all(
+        calificaciones.map((calificacion) => eliminarCalificacionService(calificacion.id))
+    );
+
+    return {
+        cantidadEliminada: calificaciones.length,
+    };
+}
+
+export async function obtenerHistorialCalificacionesPorComision(idComision) {
+    const response = await getListaEvaluaciones(idComision);
+
+    const evaluaciones = response.data ?? [];
+
+    const evaluacionesConCalificaciones =
+        await Promise.all(
+            evaluaciones.map(async (evaluacion) => {
+                const calificaciones = await obtenerCalificacionesPorEvaluacion(evaluacion.id_evaluacion);
+
+                if (calificaciones.length === 0) {
+                    return null;
+                }
+
+                return {
+                    id: evaluacion.id_evaluacion,
+                    id_comision: evaluacion.id_comision,
+                    titulo: evaluacion.titulo,
+                    tipo: evaluacion.tipo_evaluacion?.nombre ?? "-",
+                    fecha: evaluacion.fecha_evaluacion,
+                    puntaje_maximo: evaluacion.puntaje_maximo,
+                    cantidad_calificaciones: calificaciones.length,
+                };
+            })
+        );
+
+    return evaluacionesConCalificaciones.filter(Boolean);
 }

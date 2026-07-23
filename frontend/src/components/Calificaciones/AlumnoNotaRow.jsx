@@ -1,7 +1,10 @@
+import { TrashIcon } from "@heroicons/react/24/outline";
+
 export default function AlumnoNotaRow({
     calificacion,
     onCambiarNota,
     onCambiarObservacion,
+    onEliminarCalificacion,
     soloLectura = false,
 }) {
 
@@ -58,6 +61,19 @@ export default function AlumnoNotaRow({
                     placeholder="Observación (opcional)"
                     className="w-full rounded-lg border border-gray-300 px-2 py-1 focus:border-red-600 focus:ring-2 focus:ring-red-200 outline-none disabled:opacity-50 disabled:bg-gray-100"
                 />
+            </td>
+
+            <td className="pl-2">
+                {!soloLectura && calificacion.id &&(
+                    <button
+                        type="button"
+                        onClick={() => onEliminarCalificacion(calificacion)}
+                        className="flex items-center justify-center gap-2 rounded-lg bg-red-700 px-3 py-2 text-sm font-medium text-white hover:bg-red-800"
+                    >
+                        <TrashIcon className="h-5 w-5" />
+                    </button>
+                )}
+
             </td>
 
         </tr>

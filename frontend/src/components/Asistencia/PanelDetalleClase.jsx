@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { CalendarDaysIcon, ClockIcon, FlagIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { getClase, getClases } from "../../Services/clasesAdminService";
-import { obtenerAsistenciasPorClase, modificarAsistencia, registrarAsistenciaService, actualizarEstadoAutomaticamente, eliminarAsistenciasPorClase, obtenerHistorialPorComision } from "../../Services/asistenciaAdminService";
+import { obtenerAsistenciasPorClase, modificarAsistencia, registrarAsistenciaService, actualizarEstadoAutomaticamente, eliminarAsistenciasPorClase, obtenerHistorialPorComision, eliminarAsistenciaService } from "../../Services/asistenciaAdminService";
 import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
 import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
 import { getComisiones } from "../../mocks/comisionesMock";
@@ -30,8 +30,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                 setClaseSeleccionada(null);
                 setClases([]);
                 setAsistencias([]);
-
-
+                
                 const resultado = await getClases(idComision);
                 const clasesActualizadas = await Promise.all(
                     resultado.map(actualizarEstadoAutomaticamente)
@@ -252,6 +251,78 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
         })
     }
 
+    async function eliminarUnaAsistencia(asistencia){
+        if (!asistencia?.id) {
+            console.error(
+                "La asistencia no tiene un identificador válido"
+            );
+            return;
+        }
+
+        const confirmar = window.confirm(
+            `¿Querés eliminar la asistencia de ${asistencia.alumno}?`
+        );
+
+        if (!confirmar) {
+            return;
+        }
+
+        try {
+            await eliminarAsistenciaService(asistencia.id);
+            //Busca las asistenicas y las carga
+            setAsistencias((asistenciasRestantes) =>
+                asistenciasRestantes.filter(
+                    (item) => item.id !== asistencia.id
+                )
+            );
+
+            setAsistencias(asistenciasRestantes);
+
+            await cargarHistorial();
+            if (asistenciasRestantes.length === 0 && claseSeleccionada
+            ) {
+                setClases((clasesActuales) => {
+                    const yaExiste =
+                        clasesActuales.some(
+                            (clase) =>
+                                clase.id ===
+                                claseSeleccionada.id
+                        );
+
+                    if (yaExiste) {
+                        return clasesActuales;
+                    }
+
+                    return [
+                        ...clasesActuales,
+                        claseSeleccionada,
+                    ];
+                });
+
+                setClaseSeleccionada(null);
+                setAsistenciaRegistrada(false);
+                setModoEdicion(false);
+            }
+
+            setAlerta({
+                tipo: "success",
+                titulo: "Asistencia eliminada",
+                mensaje: `Se eliminó la asistencia de ${asistencia.alumno}.`,
+            });
+        } catch (error) {
+            console.error(
+                "Error al eliminar la asistencia:",
+                error
+            );
+
+            setAlerta({
+                tipo: "error",
+                titulo: "Error",
+                mensaje: "No se pudo eliminar la asistencia.",
+            });
+        }
+    }
+
     async function eliminarDesdeHistorial(clase) {
         const confirmar = window.confirm(`¿Queres eliminar todas las asistencias de ${clase.tema}`)
 
@@ -389,7 +460,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                     clases={clases}
                     claseSeleccionada={claseSeleccionada}
                     setClaseSeleccionada={seleccionarClaseNormal}
-                
+
                 />
             )}
             
@@ -422,6 +493,9 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                         asistencias={asistencias}
                         onCambiarEstado={cambiarEstado}
                         onCambiarObservacion={cambiarObservacion}
+                        onEliminarAsistencia={eliminarUnaAsistencia}
+                        soloLectura={ asistenciaRegistrada && !modoEdicion}
+
                     />
 
                     {/* Antes este botón no tenía className: se veía como un link de texto plano.

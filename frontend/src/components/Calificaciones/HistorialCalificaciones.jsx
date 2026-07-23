@@ -3,37 +3,37 @@ import {
     TrashIcon,
 } from "@heroicons/react/24/outline";
 
-export default function HistorialAsistencias({
+export default function HistorialCalificaciones({
     historial = [],
     onEditar,
     onEliminar,
-    claseEditandoId = null,
+    evaluacionEditandoId = null,
 }) {
     return (
         <section className="border-t border-gray-200 bg-gray-50 px-4 py-6 sm:px-8">
             <div className="mb-4">
                 <h2 className="text-xl font-bold text-gray-800">
-                    Historial de asistencias
+                    Historial de calificaciones
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-500">
-                    Seleccioná una clase para modificar su asistencia.
+                    Seleccioná una evaluacion para modificar su calificacion.
                 </p>
             </div>
 
             {historial.length === 0 ? (
                 <div className="rounded-xl border border-gray-200 bg-white p-6 text-center text-sm text-gray-500">
-                    No hay asistencias registradas.
+                    No hay calificaciones registradas.
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {historial.map((clase) => {
+                    {historial.map((evaluacion) => {
                         const editando =
-                            claseEditandoId === clase.id;
+                            evaluacionEditandoId === evaluacion.id;
 
                         return (
                             <article
-                                key={clase.id}
+                                key={evaluacion.id}
                                 className={`
                                     rounded-xl border bg-white p-4
                                     ${
@@ -47,7 +47,7 @@ export default function HistorialAsistencias({
                                     <div>
                                         <div className="flex flex-wrap items-center gap-2">
                                             <h3 className="font-semibold text-gray-900">
-                                                {clase.tema}
+                                                {evaluacion.titulo}
                                             </h3>
 
                                             {editando && (
@@ -58,13 +58,11 @@ export default function HistorialAsistencias({
                                         </div>
 
                                         <p className="mt-1 text-sm text-gray-500">
-                                            {clase.fecha} ·{" "}
-                                            {clase.hora_inicio} a{" "}
-                                            {clase.hora_fin}
+                                            {evaluacion.tipo} · {evaluacion.fecha}
                                         </p>
 
                                         <p className="mt-1 text-xs text-gray-400">
-                                            {clase.cantidad_asistencias} asistencias registradas
+                                            {evaluacion.cantidad_calificaciones}{" "} calificaciones registradas
                                         </p>
                                     </div>
 
@@ -73,7 +71,7 @@ export default function HistorialAsistencias({
                                             type="button"
                                             disabled={editando}
                                             onClick={() =>
-                                                onEditar(clase)
+                                                onEditar(evaluacion)
                                             }
                                             className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
                                         >
@@ -86,7 +84,7 @@ export default function HistorialAsistencias({
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                onEliminar(clase)
+                                                onEliminar(evaluacion)
                                             }
                                             className="flex items-center justify-center gap-2 rounded-lg bg-red-700 px-3 py-2 text-sm font-medium text-white hover:bg-red-800"
                                         >

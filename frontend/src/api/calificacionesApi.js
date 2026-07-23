@@ -108,3 +108,27 @@ export async function registrarCalificaciones(datos) {
     }
 
 }
+
+export async function eliminarCalificacion(idCalificacion) {
+    try {
+        const response = await fetch(
+            `${API_URL}/calificaciones/${idCalificacion}`,
+            {
+                method: "DELETE",
+            }
+        );
+
+        
+        const data = await response.text();
+
+        if (!response.ok) {
+            throw new Error("Error al eliminar la calificación");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error al eliminar la calificación", error);
+
+        throw error;
+    }
+}
