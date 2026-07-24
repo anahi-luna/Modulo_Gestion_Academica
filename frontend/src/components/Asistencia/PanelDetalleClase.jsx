@@ -185,7 +185,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
             setAlerta({
                 tipo: "success",
                 titulo: "Asistencia registrada",
-                mensaje: "La asistencia se registro con exito", 
+                mensaje: "La asistencia se registró con éxito", 
             });
 
             
@@ -193,7 +193,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
             setAlerta({
                 tipo: "error",
                 titulo: "Error",
-                mensaje: "Ocurrio un error al guardar la asistencia", 
+                mensaje: "Ocurrió un error al guardar la asistencia", 
             });
             console.error("Error al guardar", error)
 
@@ -324,7 +324,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
     }
 
     async function eliminarDesdeHistorial(clase) {
-        const confirmar = window.confirm(`¿Queres eliminar todas las asistencias de ${clase.tema}`)
+        const confirmar = window.confirm(`¿Querés eliminar todas las asistencias de ${clase.tema}`)
 
         if(!confirmar){
             return;
@@ -347,7 +347,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
             setAlerta({
                 tipo: "success",
                 titulo: "Asistencia eliminada",
-                mensaje: "La asistencia se elimino con exito", 
+                mensaje: "La asistencia se eliminó con éxito", 
             });
         }catch(error){
             console.error("Error al eliminar las asistencias", error)
@@ -436,7 +436,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p className="font-semibold text-blue-800">
-                                Estas editando  una asistencia registrada
+                                Estás editando  una asistencia registrada
                             </p>
 
                             <p>

@@ -16,7 +16,7 @@ export default function AsistenciaTabla({ idClase, asistencias, onCambiarEstado,
               <th className="text-left">Legajo</th>
               <th className="text-left">Asistencia</th>
               {/* Columna nueva: para escribir una observacion por integrante */}
-              <th className="text-left">Observacion</th>
+              <th className="text-left">Observación</th>
               <th className="text-left">Acciones</th>
             </tr>
           </thead>
