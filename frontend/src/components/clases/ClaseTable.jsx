@@ -25,6 +25,11 @@ export default function ClasesTable({
 
     onEditar,
     onEliminar,
+    // Cuando el usuario no tiene permiso para crear/editar/eliminar
+    // clases (por ejemplo un alumno, que solo tiene "clases.leer"), se
+    // sigue viendo la tabla/tarjetas igual, pero sin ningún botón de
+    // acción.
+    soloLectura = false,
 }) {
 
     const materias = [...new Set(clases.map(c => c.materia))];
@@ -117,20 +122,24 @@ export default function ClasesTable({
                                         <p className="text-xs text-gray-400">{clase.codigo} · {clase.docente}</p>
                                     </div>
                                     <div className="flex gap-2 shrink-0">
-                                        <button
-                                            title="Editar clase"
-                                            onClick={() => onEditar(clase)}
-                                            className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:bg-gray-100 hover:text-blue-600"
-                                        >
-                                            <PencilSquareIcon className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            title="Eliminar clase"
-                                            onClick={() => onEliminar(clase)}
-                                            className="rounded-lg border border-red-300 p-2 text-red-600 hover:bg-red-50"
-                                        >
-                                            <TrashIcon className="h-4 w-4" />
-                                        </button>
+                                        {!soloLectura && (
+                                            <>
+                                                <button
+                                                    title="Editar clase"
+                                                    onClick={() => onEditar(clase)}
+                                                    className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:bg-gray-100 hover:text-blue-600"
+                                                >
+                                                    <PencilSquareIcon className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    title="Eliminar clase"
+                                                    onClick={() => onEliminar(clase)}
+                                                    className="rounded-lg border border-red-300 p-2 text-red-600 hover:bg-red-50"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
@@ -152,7 +161,9 @@ export default function ClasesTable({
                                         <th className="text-left px-3 py-4 whitespace-nowrap">Docente</th>
                                         <th className="text-left px-3 py-4 whitespace-nowrap">Fecha</th>
                                         <th className="text-left px-3 py-4">Tema</th>
-                                        <th className="text-center px-3 py-4 whitespace-nowrap">Acciones</th>
+                                        {!soloLectura && (
+                                            <th className="text-center px-3 py-4 whitespace-nowrap">Acciones</th>
+                                        )}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -162,6 +173,7 @@ export default function ClasesTable({
                                             clase={clase}
                                             onEditar={onEditar}
                                             onEliminar={onEliminar}
+                                            soloLectura={soloLectura}
                                         />
                                     ))}
                                 </tbody>

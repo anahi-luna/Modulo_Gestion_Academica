@@ -101,10 +101,8 @@ roles:
     descripcion: Acceso de solo lectura a la información académica.
     acciones:
       - micro2.inscripciones.crear
-      - micro2.inscripciones.leer
       - micro2.clases.leer
       - micro2.asistencias.leer
-      
       - micro2.calificaciones.leer
       - micro2.resultado_academico.leer
       - micro2.resultado_plan.leer

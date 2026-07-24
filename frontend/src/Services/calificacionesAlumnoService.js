@@ -1,44 +1,28 @@
-// Esto arma "mis calificaciones" del lado del cliente: agarro mis
+// Arma "mis calificaciones" del lado del cliente: agarro mis
 // inscripciones, para cada una busco las evaluaciones de esa comisión,
-// y les cruzo la nota si ya la cargaron. El día que exista un endpoint
-// tipo /api/calificaciones?id_legajo=X esto se simplifica mucho, pero
-// mientras tanto lo armo así.
+// y les cruzo la nota si ya la cargaron.
 
 import { obtenerMisInscripciones } from "./inscripcionesService";
 import { getEvaluaciones } from "./evaluacionesAdminService";
-
-// Ya está conectado a la API real (getCalificacionesPorInscripcion).
 import { getCalificacionesPorInscripcion } from "../api/calificacionesApi";
 
 const NOTA_APROBACION = 6;
 
-// Datos de prueba para poder ver la pantalla del alumno andando aunque
-// todavía no haya inscripciones cargadas en el back (obtenerMisInscripciones
-// pega contra /api/inscripciones real, así que si el back está caído o
-// vacío para este legajo, no rompo la vista: uso este fallback).
-const INSCRIPCIONES_FALLBACK = [
-    { id: 1, id_comision: 1, materia: "Matafuegos I", comision: "COM-101-A" },
-];
-
-async function obtenerMisInscripcionesConFallback(idLegajo) {
-    try {
-        const inscripciones = await obtenerMisInscripciones(idLegajo);
-        if (inscripciones.length > 0) return inscripciones;
-        return INSCRIPCIONES_FALLBACK;
-    } catch (error) {
-        console.warn("No pude traer inscripciones reales, uso datos de prueba:", error);
-        return INSCRIPCIONES_FALLBACK;
-    }
-}
-
 export async function obtenerMisCalificaciones(idLegajo) {
+    // si no hay inscripciones, la vista muestra estado vacío
+    let inscripciones = [];
 
-    const inscripciones = await obtenerMisInscripcionesConFallback(idLegajo);
+    try {
+        inscripciones = await obtenerMisInscripciones(idLegajo);
+    } catch (error) {
+        console.error("No pude traer inscripciones:", error);
+        return [];
+    }
+
+    if (inscripciones.length === 0) return [];
 
     const resultado = await Promise.all(
-
         inscripciones.map(async (inscripcion) => {
-
             const [evaluaciones, calificacionesRes] = await Promise.all([
                 getEvaluaciones(inscripcion.id_comision),
                 getCalificacionesPorInscripcion(inscripcion.id),
@@ -54,8 +38,7 @@ export async function obtenerMisCalificaciones(idLegajo) {
                     tipo: ev.tipo,
                     fecha: ev.fecha,
                     puntaje_maximo: ev.puntaje_maximo,
-                    // El back llama a este campo "puntaje"; toda la UI de
-                    // acá para adentro sigue hablando de "nota".
+                   //nosotros lo llamamos "nota" en la vista, pero en el backend se llama "puntaje"
                     nota: calif?.puntaje ?? null,
                     observacion: calif?.observacion ?? "",
                 };
@@ -80,9 +63,7 @@ export async function obtenerMisCalificaciones(idLegajo) {
                 promedio,
                 estado,
             };
-
         })
-
     );
 
     return resultado;
