@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getComisiones } from "../../mocks/comisionesMock";
 import ComisionCard from "./ComisionCard";
+import Alert from "../Alert";
 
 export default function PanelesClase({
     comisionSeleccionada,
     setComisionSeleccionada
 }) {
     const [comisiones, setComisiones] = useState([]);
+    // Antes esto solo se logueaba a consola: la lista se quedaba vacía
+    // sin explicar por qué.
+    const [error, setError] = useState(null);
 
     // Carga las comisiones al montar el componente
     useEffect(() => {
@@ -21,23 +25,26 @@ export default function PanelesClase({
                 }
             } catch (error) {
                 console.error(error);
+                setError("No se pudieron cargar las comisiones.");
             }
         }
         cargarComisiones();
     }, []);
 
     return (
-        // Antes: "col-span-3" fijo (rompía en mobile porque el grid
-        // padre tiene 12 columnas incluso en pantallas chicas).
-        // Ahora: en mobile ocupa el ancho completo, y recién en lg
-        // vuelve a ocupar 3 de las 12 columnas.
         <div className="lg:col-span-3 bg-white rounded-xl shadow border p-4 sm:p-5">
 
             <div className="flex justify-between items-center mb-4 sm:mb-5">
                 <h2 className="text-lg sm:text-xl font-semibold">
-                    Clases
+                    Comisiones
                 </h2>
             </div>
+
+            {error && (
+                <div className="mb-4 sm:mb-5">
+                    <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />
+                </div>
+            )}
 
             <div className="relative mb-4 sm:mb-5">
                 <MagnifyingGlassIcon

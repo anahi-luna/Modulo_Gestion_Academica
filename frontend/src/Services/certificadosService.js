@@ -1,95 +1,114 @@
-// Servicio de Certificados. Las vistas (pages) SOLO consumen estas funciones,
-// nunca importan el mock directamente. Cuando exista el microservicio real,
-// se reescribe este archivo para hacer fetch a `${API_URL}/certificados...`
-// sin tener que tocar ni una línea de las pages ni de los componentes.
+// Ya está conectado a la API real del back. El certificado es por
+// RESULTADO DE PLAN completo, no por materia. El back decide el tipo
+// (Aprobación o Participación) según el estado del plan.
 
-import { getLegajoPorId } from "../mocks/legajosMock";
-import { getComisiones } from "../mocks/comisionesMock";
 import {
-  getCertificadosPorLegajo,
-  getCertificados,
-  emitirCertificado,
-  revocarCertificado,
-} from "../mocks/certificadosMock";
+    getListaCertificados,
+    crearCertificado,
+    editarCertificado,
+} from "../api/certificadosApi";
+import { obtenerTodosLosPlanes } from "./planesService";
 
-// Certificados de un alumno, con el nombre de la materia/comisión ya resuelto
-// (para no tener que hacer el cruce de datos en la vista)
-export async function obtenerMisCertificados(idLegajo) {
-  const [certRes, comisionesRes] = await Promise.all([
-    getCertificadosPorLegajo(idLegajo),
-    getComisiones(),
-  ]);
-  const comisiones = comisionesRes.data;
+// coincide con seed/seed_estado_certificado.py del back
+const ID_ESTADO_REVOCADO = 2;
 
-  return certRes.data.map((cert) => {
-    const comision = comisiones.find((c) => c.id === cert.id_comision);
+function mapearCertificado(c) {
     return {
-      ...cert,
-      comision: comision?.codigo ?? "-",
-      materia: comision?.materia ?? "-",
+        id:                  c.id_certificado,
+        id_resultado_plan:   c.id_resultado_plan,
+        tipo:                c.tipo?.nombre    ?? "-",
+        estado:              c.estado?.nombre  ?? "-",
+        codigo_verificacion: c.codigo_verificacion,
+        fecha_emision:       c.fecha_emision,
+        fecha_vencimiento:   c.fecha_vencimiento,
     };
-  });
 }
 
-// Todos los certificados, con nombre de alumno y materia resueltos (vista Admin)
-export async function obtenerTodosLosCertificados() {
-  const [certRes, comisionesRes] = await Promise.all([
-    getCertificados(),
-    getComisiones(),
-  ]);
-  const comisiones = comisionesRes.data;
+// una fila por alumno (por su resultado de plan), cruzando si ya tiene
+// o no un certificado emitido. Esta es la lista que consume la vista de gestión.
+export async function obtenerFilasCertificados() {
+    const [planes, certificadosRes] = await Promise.all([
+        obtenerTodosLosPlanes(),
+        getListaCertificados(),
+    ]);
 
-  return Promise.all(
-    certRes.data.map(async (cert) => {
-      const legajoRes = await getLegajoPorId(cert.id_legajo);
-      const legajo = legajoRes.data;
-      const comision = comisiones.find((c) => c.id === cert.id_comision);
-      return {
-        ...cert,
-        alumno: `${legajo.nombre} ${legajo.apellido}`,
-        numero_legajo: legajo.numero_legajo,
-        comision: comision?.codigo ?? "-",
-        materia: comision?.materia ?? "-",
-      };
-    })
-  );
+    const certificados = certificadosRes.data.map(mapearCertificado);
+
+    return planes.map((plan) => {
+        const certificado = certificados.find(
+            (c) => c.id_resultado_plan === plan.id
+        ) ?? null;
+
+        // solo se puede emitir si el plan ya cerró (Finalizado o Incompleto)
+        const elegiblePararCertificado =
+            (plan.estado === "Finalizado" || plan.estado === "Incompleto") && !certificado;
+
+        return {
+            id_resultado_plan: plan.id,
+            id_legajo:         plan.id_legajo,
+            alumno:            plan.alumno,
+            numero_legajo:     plan.numero_legajo,
+            estado_plan:       plan.estado,
+            avance:            plan.avance,
+            certificado,
+            elegiblePararCertificado,
+        };
+    });
 }
 
-export async function emitir(datos) {
-  const response = await emitirCertificado(datos);
-  return response.data;
+// certificados de UN alumno (para "Mis certificados")
+export async function obtenerMisCertificados(idLegajo) {
+    const [planes, certificadosRes] = await Promise.all([
+        obtenerTodosLosPlanes(),
+        getListaCertificados(),
+    ]);
+
+    const certificados    = certificadosRes.data.map(mapearCertificado);
+    const planesDelAlumno = planes.filter((p) => p.id_legajo === idLegajo);
+
+    return planesDelAlumno
+        .map((plan) => {
+            const certificado = certificados.find((c) => c.id_resultado_plan === plan.id);
+            if (!certificado) return null;
+            return { ...certificado, id_plan: plan.id_plan };
+        })
+        .filter(Boolean);
+}
+
+export async function emitir(idResultadoPlan) {
+    const response = await crearCertificado(idResultadoPlan);
+    return mapearCertificado(response.data);
 }
 
 export async function revocar(idCertificado) {
-  const response = await revocarCertificado(idCertificado);
-  return response.data;
+    const response = await editarCertificado(idCertificado, {
+        id_estado_certificado: ID_ESTADO_REVOCADO,
+    });
+    return mapearCertificado(response.data);
 }
 
-// Genera un archivo simulando la descarga del PDF del certificado.
-// Cuando el backend esté listo, esto se reemplaza por la URL real del PDF.
+// cuando el back tenga url_documento real, esto se reemplaza por abrir esa URL
 export function descargarCertificado(cert, alumnoNombre) {
-  const contenido =
-`INSTITUTO DE BOMBEROS - CERTIFICADO
+    const contenido =
+        `INSTITUTO DE BOMBEROS - CERTIFICADO
 =====================================
 Tipo: ${cert.tipo}
 Alumno: ${alumnoNombre}
-Materia/Curso: ${cert.materia}
-Comisión: ${cert.comision}
+Plan Nº: ${cert.id_plan ?? "-"}
 Código de verificación: ${cert.codigo_verificacion}
 Fecha de emisión: ${cert.fecha_emision}
-Firmado por: ${cert.firmado_por ?? "-"}
 =====================================
-Documento simulado generado por el frontend (mock).
-Cuando el módulo de Certificados esté conectado al backend,
-este botón va a descargar el PDF real emitido por el sistema.`;
+Documento simulado generado por el frontend.
+Cuando el back genere el PDF real (campo url_documento),
+este botón va a descargar ese archivo en vez de este texto.`;
 
-  const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${cert.codigo_verificacion || "certificado"}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `${cert.codigo_verificacion || "certificado"}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }

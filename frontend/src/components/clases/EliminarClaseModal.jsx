@@ -2,6 +2,7 @@
   Modal de confirmacion para eliminar una clase.
   Muestra la informacion de la clase seleccionada antes de ejecutar la eliminacion.
  */
+import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
 export default function EliminarClaseModal({
     abierto,
@@ -10,6 +11,9 @@ export default function EliminarClaseModal({
     onConfirmar,
 }) {
 
+    // El hook se llama siempre, antes de cualquier "return" condicional.
+    const modalRef = useModalAccessibility(abierto, onCerrar);
+
     if (!abierto || !clase)
         return null;
 
@@ -17,7 +21,7 @@ export default function EliminarClaseModal({
 
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
 
                 <h2 className="text-xl font-bold text-red-700 mb-4">
 

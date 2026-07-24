@@ -30,7 +30,7 @@ export async function getAsistenciaPorId(id) {
 }
 
 
-export async function actualizarAsistencia(idAsistencia, idEstado) {
+export async function actualizarAsistencia(idAsistencia, datos) {
 
     try {
 
@@ -41,9 +41,7 @@ export async function actualizarAsistencia(idAsistencia, idEstado) {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    id_estado: idEstado
-                })
+                body: JSON.stringify(datos)
             }
         );
 
@@ -91,3 +89,24 @@ export async function registrarAsistencia(datos) {
     }
     
 } 
+
+export async function eliminarAsistencia(idAsistencia) {
+    try{
+        const response = await fetch(
+            `${API_URL}/asistencias/${idAsistencia}`, 
+            {
+                method: "DELETE",
+            }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error("Error al eliminar asistencia")
+        }
+        return data; 
+    }catch (error){
+        console.error("Error al eliminar la asistencia", error);
+        throw error;
+    }
+}

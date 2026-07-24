@@ -3,6 +3,7 @@
  * Muestra la información del registro seleccionado antes
  * de ejecutar la eliminación.
  */
+import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
 export default function ModalEliminarInscripcion({
     abierto,
@@ -10,6 +11,9 @@ export default function ModalEliminarInscripcion({
     onCerrar,
     onConfirmar
 }) {
+
+    // El hook se llama siempre, antes de cualquier "return" condicional.
+    const modalRef = useModalAccessibility(abierto, onCerrar);
 
     // Si el modal está cerrado o no existe una inscripción seleccionada,
     // no se renderiza.
@@ -19,7 +23,7 @@ export default function ModalEliminarInscripcion({
     return (
 
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
                 <h2 className="text-xl font-bold text-red-700 mb-4">
                     Eliminar inscripción
                 </h2>

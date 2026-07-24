@@ -1,24 +1,26 @@
-// Modal de emisión/firma de certificado (vista Admin).
-// Regla de negocio: los certificados solo pueden emitirse/firmarse
-// por autoridades habilitadas (por eso pedimos el usuario logueado
-// y mostramos quién firma).
+// Modal de confirmación para emitir el certificado del plan completo
+// de un alumno. Ya no pide "quién firma" como campo separado: el back
+// no tiene ese campo (solo guarda id_usuario_creacion automáticamente
+// del lado del servidor), así que esto queda como una confirmación
+// simple antes de generar el certificado real.
 
 import { useState } from "react";
+import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
-export default function ModalEmitirCertificado({ abierto, certificado, usuario, onCerrar, onEmitir }) {
+export default function ModalEmitirCertificado({ abierto, fila, onCerrar, onEmitir }) {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
 
-  if (!abierto || !certificado) return null;
+  // El hook se llama siempre, antes de cualquier "return" condicional.
+  const modalRef = useModalAccessibility(abierto, onCerrar);
+
+  if (!abierto || !fila) return null;
 
   async function handleEmitir() {
     setEnviando(true);
     setError(null);
     try {
-      await onEmitir({
-        idCertificado: certificado.idCertificado,
-        firmado_por: usuario.nombre,
-      });
+      await onEmitir(fila.id_resultado_plan);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -28,17 +30,17 @@ export default function ModalEmitirCertificado({ abierto, certificado, usuario, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-1">Emitir y firmar certificado</h2>
+      <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <h2 className="text-lg font-bold text-gray-800 mb-1">Emitir certificado</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Vas a emitir este certificado con tu firma digital.
+          El tipo de certificado (Aprobación o Participación) lo determina
+          automáticamente el sistema según cómo cerró el plan.
         </p>
 
         <div className="bg-gray-50 rounded-xl p-4 space-y-1 text-sm mb-4">
-          <p><span className="text-gray-400">Alumno:</span> {certificado.alumno}</p>
-          <p><span className="text-gray-400">Tipo:</span> {certificado.tipo}</p>
-          <p><span className="text-gray-400">Materia:</span> {certificado.materia}</p>
-          <p><span className="text-gray-400">Firmará:</span> {usuario.nombre}</p>
+          <p><span className="text-gray-400">Alumno:</span> {fila.alumno}</p>
+          <p><span className="text-gray-400">Estado del plan:</span> {fila.estado_plan}</p>
+          <p><span className="text-gray-400">Avance:</span> {fila.avance}%</p>
         </div>
 
         {error && (
@@ -59,7 +61,7 @@ export default function ModalEmitirCertificado({ abierto, certificado, usuario, 
             disabled={enviando}
             className="flex-1 bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white rounded-lg py-2 text-sm font-medium"
           >
-            {enviando ? "Emitiendo..." : "Emitir y firmar"}
+            {enviando ? "Emitiendo..." : "Emitir certificado"}
           </button>
         </div>
       </div>

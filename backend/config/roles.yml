@@ -1,0 +1,134 @@
+roles:
+
+  - id: 1
+    nombre: Administrador Microservicio
+    descripcion: Acceso completo a todas las funcionalidades del microservicio.
+    acciones:
+      - micro2.inscripciones.leer
+      - micro2.inscripciones.actualizar
+      - micro2.inscripciones.eliminar
+
+      - micro2.clases.crear
+      - micro2.clases.leer
+      - micro2.clases.actualizar
+      - micro2.clases.eliminar
+
+      - micro2.asistencias.crear
+      - micro2.asistencias.leer
+      - micro2.asistencias.actualizar
+      - micro2.asistencias.eliminar
+
+      - micro2.evaluaciones.crear
+      - micro2.evaluaciones.leer
+      - micro2.evaluaciones.actualizar
+      - micro2.evaluaciones.eliminar
+
+      - micro2.calificaciones.crear
+      - micro2.calificaciones.leer
+      - micro2.calificaciones.actualizar
+      - micro2.calificaciones.eliminar
+
+      - micro2.resultado_academico.generar
+      - micro2.resultado_academico.leer
+      - micro2.resultado_academico.eliminar
+
+      - micro2.resultado_plan.leer
+      - micro2.resultado_plan.actualizar
+      - micro2.resultado_plan.eliminar
+
+      - micro2.certificados.emitir
+      - micro2.certificados.leer
+      - micro2.certificados.actualizar
+      - micro2.certificados.eliminar
+
+      - micro2.reportes.leer
+
+  - id: 2
+    nombre: Gestión de Inscripciones
+    descripcion: Administración completa del módulo de inscripciones.
+    acciones:
+      - micro2.inscripciones.leer
+      - micro2.inscripciones.actualizar
+      - micro2.inscripciones.eliminar
+
+  - id: 3
+    nombre: Gestión de Clases
+    descripcion: Administración completa del módulo de clases.
+    acciones:
+      - micro2.clases.crear
+      - micro2.clases.leer
+      - micro2.clases.actualizar
+      - micro2.clases.eliminar
+
+  - id: 4
+    nombre: Gestión de Asistencias
+    descripcion: Administración completa del módulo de asistencias.
+    acciones:
+      - micro2.asistencias.crear
+      - micro2.asistencias.leer
+      - micro2.asistencias.actualizar
+      - micro2.asistencias.eliminar
+
+  - id: 5
+    nombre: Gestión de Evaluaciones
+    descripcion: Administración de evaluaciones.
+    acciones:
+      - micro2.evaluaciones.crear
+      - micro2.evaluaciones.leer
+      - micro2.evaluaciones.actualizar
+      - micro2.evaluaciones.eliminar
+      
+  - id: 6
+    nombre: Gestión de Calificaciones
+    descripcion: Administración de calificaciones.
+    acciones:
+      - micro2.calificaciones.crear
+      - micro2.calificaciones.leer
+      - micro2.calificaciones.actualizar
+      - micro2.calificaciones.eliminar
+
+  - id: 7
+    nombre: Gestión de Certificados
+    descripcion: Emisión y administración de certificados.
+    acciones:
+      - micro2.certificados.emitir
+      - micro2.certificados.leer
+      - micro2.certificados.actualizar
+      - micro2.certificados.eliminar
+
+  - id: 8
+    nombre: Alumno
+    descripcion: Acceso de solo lectura a la información académica.
+    acciones:
+      - micro2.inscripciones.crear
+      - micro2.clases.leer
+      - micro2.asistencias.leer
+      - micro2.calificaciones.leer
+      - micro2.resultado_academico.leer
+      - micro2.resultado_plan.leer
+      - micro2.certificados.leer
+
+  - id: 9
+    nombre: Reportes
+    descripcion: Acceso a la consulta de reportes del microservicio.
+    acciones:
+      - micro2.reportes.leer
+
+  - id: 10
+    nombre: Docencia
+    descripcion: Gestión de clases, asistencias, evaluaciones y calificaciones.
+    acciones:
+      - micro2.clases.leer
+      - micro2.clases.actualizar
+
+      - micro2.asistencias.crear
+      - micro2.asistencias.leer
+      - micro2.asistencias.actualizar
+
+      - micro2.evaluaciones.crear
+      - micro2.evaluaciones.leer
+      - micro2.evaluaciones.actualizar
+
+      - micro2.calificaciones.crear
+      - micro2.calificaciones.leer
+      - micro2.calificaciones.actualizar

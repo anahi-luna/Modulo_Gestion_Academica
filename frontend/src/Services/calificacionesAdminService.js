@@ -1,10 +1,25 @@
 import * as legajosMock from "../mocks/legajosMock";
 import * as comisionesMock from "../mocks/comisionesMock";
-// TODO: cuando el back tenga listo /api/calificaciones, comento esta
-// línea y descomento la de la api real.
-// import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones } from "../api/calificacionesApi";
-import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones } from "../mocks/calificacionesMock";
+
+// Ya está conectado a la API real del back. Dos cosas importantes que
+// tuve que resolver acá (no en la UI) para que todo siga funcionando
+// igual que antes:
+//
+// 1. El back llama al campo de la nota "puntaje", no "nota". Toda la
+//    UI (CalificacionTabla, AlumnoNotaRow, etc.) sigue hablando de
+//    "nota" puertas para adentro; la traducción puntaje<->nota queda
+//    encapsulada acá.
+//
+// 2. El back NO permite volver a registrar una calificación que ya
+//    existe para esa (evaluación, inscripción): POST /calificaciones
+//    tira error "La calificación ya fue registrada" si ya hay una. Por
+//    eso "Guardar calificaciones" ya no manda todo el lote por POST
+//    como antes: separa las filas SIN nota previa (recién cargadas,
+//    van por POST en bloque) de las filas que YA tenían una
+//    calificación (van por PUT una por una, solo si cambiaron).
+import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones, eliminarCalificacion } from "../api/calificacionesApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
+import { getListaEvaluaciones } from "../api/evaluacionesApi";
 
 const NOTA_APROBACION = 6;
 
@@ -34,6 +49,9 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
 
             return {
 
+                // Guardo el id_calificacion real: lo necesito después
+                // en guardarCalificaciones para saber si esta fila hay
+                // que actualizarla (PUT) en vez de crearla (POST).
                 id: calificacion.id_calificacion,
 
                 id_legajo: legajo.numero_legajo,
@@ -50,7 +68,7 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
 
                 materia: comision?.materia ?? "-",
 
-                nota: calificacion.nota,
+                nota: calificacion.puntaje,
 
                 observacion: calificacion.observacion,
 
@@ -63,21 +81,108 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
     return resultado;
 }
 
+// Recibe { id_evaluacion, calificaciones: [{ id?, id_inscripcion, nota,
+// observacion }] }. Las filas con "id" (ya tenían una calificación
+// cargada) se actualizan con PUT; las que no tienen "id" y tienen una
+// nota puesta se crean juntas con un solo POST en bloque.
 export async function registrarCalificacionesService(datos) {
 
-    const response = await registrarCalificaciones(datos);
+    const conNotaCargada = datos.calificaciones.filter(
+        c => c.nota !== null && c.nota !== "" && c.nota !== undefined
+    );
 
-    return response.data;
+    const nuevas = conNotaCargada.filter(c => !c.id);
+
+    const existentes = conNotaCargada.filter(c => c.id);
+
+    const tareas = [];
+
+    if (nuevas.length > 0) {
+        tareas.push(
+            registrarCalificaciones({
+                id_evaluacion: datos.id_evaluacion,
+                calificaciones: nuevas.map(c => ({
+                    id_inscripcion: c.id_inscripcion,
+                    puntaje: Number(c.nota),
+                    observacion: c.observacion || undefined,
+                })),
+            })
+        );
+    }
+
+    for (const c of existentes) {
+        tareas.push(
+            actualizarCalificacion(c.id, {
+                puntaje: Number(c.nota),
+                observacion: c.observacion || undefined,
+            })
+        );
+    }
+
+    return await Promise.all(tareas);
 
 }
 
 // Actualiza la nota/observación de una calificación ya existente
 export async function modificarCalificacion(idCalificacion, nota, observacion) {
-    return await actualizarCalificacion(idCalificacion, { nota, observacion });
+    return await actualizarCalificacion(idCalificacion, { puntaje: Number(nota), observacion });
 }
 
 // Calcula estado (Aprobado/Desaprobado) para una nota puntual
 export function estadoDeNota(nota) {
     if (nota === null || nota === undefined || nota === "") return "Pendiente";
     return Number(nota) >= NOTA_APROBACION ? "Aprobado" : "Desaprobado";
+}
+
+
+export async function eliminarCalificacionService(idCalificacion) {
+    return await eliminarCalificacion(idCalificacion);
+}
+
+export async function eliminarCalificacionesPorEvaluacion(idEvaluacion) {
+
+    const calificaciones = await obtenerCalificacionesPorEvaluacion(idEvaluacion);
+
+    if (calificaciones.length === 0) {
+        return {
+            cantidadEliminada: 0,
+        };
+    }
+
+    await Promise.all(
+        calificaciones.map((calificacion) => eliminarCalificacionService(calificacion.id))
+    );
+
+    return {
+        cantidadEliminada: calificaciones.length,
+    };
+}
+
+export async function obtenerHistorialCalificacionesPorComision(idComision) {
+    const response = await getListaEvaluaciones(idComision);
+
+    const evaluaciones = response.data ?? [];
+
+    const evaluacionesConCalificaciones =
+        await Promise.all(
+            evaluaciones.map(async (evaluacion) => {
+                const calificaciones = await obtenerCalificacionesPorEvaluacion(evaluacion.id_evaluacion);
+
+                if (calificaciones.length === 0) {
+                    return null;
+                }
+
+                return {
+                    id: evaluacion.id_evaluacion,
+                    id_comision: evaluacion.id_comision,
+                    titulo: evaluacion.titulo,
+                    tipo: evaluacion.tipo_evaluacion?.nombre ?? "-",
+                    fecha: evaluacion.fecha_evaluacion,
+                    puntaje_maximo: evaluacion.puntaje_maximo,
+                    cantidad_calificaciones: calificaciones.length,
+                };
+            })
+        );
+
+    return evaluacionesConCalificaciones.filter(Boolean);
 }

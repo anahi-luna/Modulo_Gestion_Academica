@@ -1,10 +1,3 @@
-// ============================================================
-// ComisionCard.jsx
-// Tarjeta que muestra la información de una comisión.
-// Recibe la comisión y una función onSeleccionar que se
-// llama cuando el usuario elige esa comisión para inscribirse.
-// ============================================================
-
 export default function ComisionCard({ comision, onSeleccionar, seleccionada }) {
   // Calculamos el cupo restante
   const cupoLibre = comision.cupo - comision.inscriptos;
@@ -79,14 +72,14 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
         <div className="flex justify-between text-xs text-gray-500 mb-1">
           <span>Cupo</span>
           <span className={sinCupo ? "text-red-600 font-semibold" : ""}>
-            {sinCupo ? "Sin cupo" : `${cupoLibre} disponibles`}
+            {sinCupo ? "Sin cupo" : `${cupoLibre} disponibles}`}
           </span>
         </div>
         {/* Barra de progreso visual */}
         <div className="w-full bg-gray-200 rounded-full h-1.5">
           <div
             className={`h-1.5 rounded-full transition-all ${colorBarra}`}
-            style={{ width: `${Math.min(porcentaje, 100)}%` }}
+            style={{ width: `${Math.min(porcentaje, 100)}%` , }}
           />
         </div>
         <p className="text-xs text-gray-400 mt-0.5">
