@@ -4,6 +4,7 @@ export default function EvaluacionRow({
     evaluacion,
     onEditar,
     onEliminar,
+    soloLectura = false,
 }) {
 
     function formatearFecha(fecha) {
@@ -38,24 +39,26 @@ export default function EvaluacionRow({
                 {formatearFecha(evaluacion.fecha)}
             </td>
 
-            <td className="px-3 py-4">
-                <div className="flex justify-center gap-2">
-                    <button
-                        title="Editar evaluación"
-                        onClick={() => onEditar(evaluacion)}
-                        className="rounded-lg border border-gray-300 p-2 text-gray-600 transition hover:bg-gray-100 hover:text-blue-600"
-                    >
-                        <PencilSquareIcon className="h-5 w-5" />
-                    </button>
-                    <button
-                        title="Eliminar evaluación"
-                        onClick={() => onEliminar(evaluacion)}
-                        className="rounded-lg border border-red-300 p-2 text-red-600 transition hover:bg-red-50"
-                    >
-                        <TrashIcon className="h-5 w-5" />
-                    </button>
-                </div>
-            </td>
+            {!soloLectura && (
+                <td className="px-3 py-4">
+                    <div className="flex justify-center gap-2">
+                        <button
+                            title="Editar evaluación"
+                            onClick={() => onEditar(evaluacion)}
+                            className="rounded-lg border border-gray-300 p-2 text-gray-600 transition hover:bg-gray-100 hover:text-blue-600"
+                        >
+                            <PencilSquareIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                            title="Eliminar evaluación"
+                            onClick={() => onEliminar(evaluacion)}
+                            className="rounded-lg border border-red-300 p-2 text-red-600 transition hover:bg-red-50"
+                        >
+                            <TrashIcon className="h-5 w-5" />
+                        </button>
+                    </div>
+                </td>
+            )}
 
         </tr>
 
