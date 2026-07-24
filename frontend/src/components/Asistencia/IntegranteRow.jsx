@@ -42,7 +42,7 @@ export default function IntegranteRow({ asistencia, onCambiarEstado, onCambiarOb
           onChange={(e) =>
             onCambiarObservacion(asistencia.id_inscripcion, e.target.value)
           }
-          placeholder="Observacion"
+          placeholder="Observación"
           className="w-full rounded-lg border border-gray-300 px-2 py-1 text-sm disabled:opacity-50 disabled:bg-gray-100"
         />
       </td>

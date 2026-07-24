@@ -17,7 +17,7 @@ export default function HistorialCalificaciones({
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-500">
-                    Seleccioná una evaluacion para modificar su calificacion.
+                    Seleccioná una evaluación para modificar su calificación.
                 </p>
             </div>
 

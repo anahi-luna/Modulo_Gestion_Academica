@@ -257,7 +257,7 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
 
                     <p className="text-gray-500 mt-1 text-sm sm:text-base">
                         {puedeGestionar
-                            ? "Crear, editar y eliminar evaluaciones (parciales, TPs y finales)."
+                            ? "Crear, editar y eliminar evaluaciones (parciales, trabajos prácticos y finales)."
                             : "Consulta de evaluaciones de todas las comisiones."}
                     </p>
                 </div>

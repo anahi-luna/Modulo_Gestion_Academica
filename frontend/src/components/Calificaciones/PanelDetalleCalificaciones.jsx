@@ -331,16 +331,16 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
             }
             setAlerta({
                 tipo: "success",
-                titulo: "Calificacion eliminadas",
-                mensaje: `Se elimino la calificacion de ${calificacion.alumno}`,
+                titulo: "Calificación eliminadas",
+                mensaje: `Se eliminó la calificación de ${calificacion.alumno}`,
             })
 
         }catch(error){
-            console.error("Error al eliminar la calificacion" ,error);
+            console.error("Error al eliminar la calificación" ,error);
             setAlerta({
                 tipo: "error",
                 titulo: "Error",
-                mensaje: "No se pudo eliminar la evaluacion",
+                mensaje: "No se pudo eliminar la evaluación",
             })
         }
 
