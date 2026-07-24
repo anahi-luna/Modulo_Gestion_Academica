@@ -63,7 +63,7 @@ export default function ModalClase({
 
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-xl p-6">
+            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6">
 
                 <h2 className="text-2xl font-bold text-red-700 mb-6">
 

@@ -18,10 +18,6 @@ export default function Navbar({ modulo }) {
   const { usuario, hasPermission, cambiarUsuario } = usePermissions();
   const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
 
-  // Traigo la lista de usuarios de prueba que armó mi compañera en el
-  // back (admin, director, docente, alumno, etc.) para poder elegir
-  // "meterme" como cualquiera de ellos desde el dropdown de perfil.
-  // Esto reemplaza el switch fijo Admin/Alumno/Profesor que había antes.
   useEffect(() => {
     async function cargar() {
       try {
@@ -54,7 +50,7 @@ export default function Navbar({ modulo }) {
   // Esto hace que el mismo array sirva para desktop y para mobile.
   const links = [
     { to: "/inscripcionesAdmin", label: "Inscripciones", permiso: ACCIONES.INSCRIPCIONES_LEER },
-    { to: "/inscripciones", label: "Inscribirme", permiso: null, soloSiNoTieneOtroPermiso: ACCIONES.INSCRIPCIONES_LEER },
+    { to: "/inscripciones", label: "Inscribirme", permiso: ACCIONES.INSCRIPCIONES_CREAR },
     { to: "/asistencia", label: "Asistencia", permiso: ACCIONES.ASISTENCIAS_LEER },
     { to: "/GestionClases", label: "Clases", permiso: ACCIONES.CLASES_LEER},
     { to: "/GestionEvaluaciones", label: "Evaluaciones", permiso: ACCIONES.EVALUACIONES_LEER },
@@ -63,15 +59,7 @@ export default function Navbar({ modulo }) {
     { to: "/resultado-plan", label: "Resultado del plan", permiso: ACCIONES.REPORTES_LEER },
   ];
 
-  // "Inscribirme" es un caso especial: es la vista donde alguien pide
-  // ingresar a una comisión. No depende de un permiso del microservicio
-  // (cualquier usuario autenticado puede pedir inscribirse), así que la
-  // muestro salvo que el usuario YA sea alguien de gestión (tiene el
-  // permiso de leer inscripciones administradas).
   function debeMostrarse(link) {
-    if (link.soloSiNoTieneOtroPermiso) {
-      return !hasPermission(link.soloSiNoTieneOtroPermiso);
-    }
     return hasPermission(link.permiso);
   }
 

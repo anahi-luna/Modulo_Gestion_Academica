@@ -1,10 +1,6 @@
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import EvaluacionRow from "./EvaluacionRow";
 
-// Mismo criterio que ClaseTable.jsx y TablaCertificadosAdmin.jsx:
-// tarjetas apiladas en mobile, tabla completa desde tablet (md) en
-// adelante. Los filtros se sacan de la tabla y se arman en una grilla
-// aparte para que se acomoden solos según el ancho de pantalla.
 export default function EvaluacionesTable({
     evaluaciones,
 
@@ -22,6 +18,7 @@ export default function EvaluacionesTable({
 
     onEditar,
     onEliminar,
+    soloLectura = false,
 }) {
 
     const materias = [...new Set(evaluaciones.map(e => e.materia))];
@@ -33,8 +30,6 @@ export default function EvaluacionesTable({
         return new Date(fecha).toLocaleDateString("es-AR");
     }
 
-    // Un chip de color por tipo, para distinguir de un vistazo en la
-    // tarjeta mobile (en la tabla desktop ya se lee en la columna Tipo).
     const colorTipo = {
         Parcial: "bg-blue-100 text-blue-700",
         TP: "bg-purple-100 text-purple-700",
@@ -45,7 +40,6 @@ export default function EvaluacionesTable({
     return (
         <div className="space-y-4">
 
-            {/* Filtros en su propia tarjeta, en grilla responsive */}
             <div className="bg-white rounded-xl shadow border p-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 
@@ -102,7 +96,6 @@ export default function EvaluacionesTable({
                 </div>
             ) : (
                 <>
-                    {/* ---------- MOBILE (< md): tarjetas apiladas ---------- */}
                     <div className="md:hidden space-y-3">
                         {evaluaciones.map((evaluacion) => (
                             <div key={evaluacion.id} className="bg-white rounded-xl shadow border p-4">
@@ -112,20 +105,24 @@ export default function EvaluacionesTable({
                                         <p className="text-xs text-gray-400">{evaluacion.materia} · {evaluacion.codigo}</p>
                                     </div>
                                     <div className="flex gap-2 shrink-0">
-                                        <button
-                                            title="Editar evaluación"
-                                            onClick={() => onEditar(evaluacion)}
-                                            className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:bg-gray-100 hover:text-blue-600"
-                                        >
-                                            <PencilSquareIcon className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            title="Eliminar evaluación"
-                                            onClick={() => onEliminar(evaluacion)}
-                                            className="rounded-lg border border-red-300 p-2 text-red-600 hover:bg-red-50"
-                                        >
-                                            <TrashIcon className="h-4 w-4" />
-                                        </button>
+                                        {!soloLectura && (
+                                            <>
+                                                <button
+                                                    title="Editar evaluación"
+                                                    onClick={() => onEditar(evaluacion)}
+                                                    className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:bg-gray-100 hover:text-blue-600"
+                                                >
+                                                    <PencilSquareIcon className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    title="Eliminar evaluación"
+                                                    onClick={() => onEliminar(evaluacion)}
+                                                    className="rounded-lg border border-red-300 p-2 text-red-600 hover:bg-red-50"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
@@ -139,7 +136,6 @@ export default function EvaluacionesTable({
                         ))}
                     </div>
 
-                    {/* ---------- DESKTOP/TABLET (>= md): tabla completa ---------- */}
                     <div className="hidden md:block rounded-xl bg-white shadow border overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[860px]">
@@ -151,7 +147,9 @@ export default function EvaluacionesTable({
                                         <th className="text-left px-3 py-4 whitespace-nowrap">Tipo</th>
                                         <th className="text-left px-3 py-4">Título</th>
                                         <th className="text-left px-3 py-4 whitespace-nowrap">Fecha</th>
-                                        <th className="text-center px-3 py-4 whitespace-nowrap">Acciones</th>
+                                        {!soloLectura && (
+                                            <th className="text-center px-3 py-4 whitespace-nowrap">Acciones</th>
+                                        )}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -161,6 +159,7 @@ export default function EvaluacionesTable({
                                             evaluacion={evaluacion}
                                             onEditar={onEditar}
                                             onEliminar={onEliminar}
+                                            soloLectura={soloLectura}
                                         />
                                     ))}
                                 </tbody>

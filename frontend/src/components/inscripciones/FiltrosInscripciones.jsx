@@ -13,8 +13,8 @@ export default function FiltrosInscripciones({
     onLimpiar
 }) {
     return (
-        <div className="flex gap-3 mb-6">
-            <div className="relative flex-1">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="relative flex-1 min-w-0">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                     type="text"
@@ -25,36 +25,38 @@ export default function FiltrosInscripciones({
                                focus:outline-none focus:ring-2 focus:ring-red-300"
                 />
             </div>
-            <select
-                value={filtroComision}
-                onChange={(e) => setFiltroComision(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-red-300"
-            >
-                <option value="">Todas las comisiones</option>
-                {comisiones.map(c => (
-                    <option key={c.id} value={c.id}>
-                        {c.codigo} - {c.materia}
-                    </option>
-                ))}
-            </select>
-            <select
-                value={filtroEstado}
-                onChange={(e) => setFiltroEstado(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-red-300"
-            >
-                <option value="">Todos los estados</option>
-                <option value="Pendiente">Pendiente</option>
-                <option value="Aceptada">Aceptada</option>
-                <option value="Rechazada">Rechazada</option>
-            </select>
-            <button
-                onClick={onLimpiar}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
-            >
-                Limpiar filtros
-            </button>
+            <div className="flex flex-wrap gap-3">
+                <select
+                    value={filtroComision}
+                    onChange={(e) => setFiltroComision(e.target.value)}
+                    className="flex-1 sm:flex-none border border-gray-300 rounded-lg px-3 py-2 text-sm
+                               focus:outline-none focus:ring-2 focus:ring-red-300"
+                >
+                    <option value="">Todas las comisiones</option>
+                    {comisiones.map(c => (
+                        <option key={c.id} value={c.id}>
+                            {c.codigo} - {c.materia}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    value={filtroEstado}
+                    onChange={(e) => setFiltroEstado(e.target.value)}
+                    className="flex-1 sm:flex-none border border-gray-300 rounded-lg px-3 py-2 text-sm
+                               focus:outline-none focus:ring-2 focus:ring-red-300"
+                >
+                    <option value="">Todos los estados</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Aceptada">Aceptada</option>
+                    <option value="Rechazada">Rechazada</option>
+                </select>
+                <button
+                    onClick={onLimpiar}
+                    className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 whitespace-nowrap"
+                >
+                    Limpiar filtros
+                </button>
+            </div>
         </div>
     );
 }
