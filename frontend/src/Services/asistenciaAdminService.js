@@ -1,7 +1,4 @@
-// Servicio para manejar la lógica de asistencias.
-// legajosMock y comisionesMock se quedan porque son microservicios
-// del otro grupo que todavía no están integrados.
-
+// servicios relacionados con la asistencia de los alumnos a las clases, para el personal de gestión
 import * as legajosMock from "../mocks/legajosMock";
 import * as comisionesMock from "../mocks/comisionesMock";
 import { getAsistenciaPorClase, actualizarAsistencia, registrarAsistencia, eliminarAsistencia } from "../api/asistenciasApi";

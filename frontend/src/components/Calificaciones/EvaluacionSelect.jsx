@@ -1,3 +1,4 @@
+// Componente para seleccionar una evaluación de una lista desplegable.
 export default function EvaluacionSelect({
     evaluaciones,
     evaluacionSeleccionada,

@@ -6,8 +6,6 @@ import { obtenerMisInscripciones } from "./inscripcionesService";
 import { getClases } from "./clasesAdminService";
 
 export async function obtenerMisClases(idLegajo) {
-    // si no hay inscripciones, devuelvo estructura vacía
-    // no uso fallback hardcodeado porque inscripciones es mi propio back
     let inscripciones = [];
 
     try {

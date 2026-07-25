@@ -1,3 +1,4 @@
+// Componente para mostrar la información de una comisión
 export default function ComisionCard({
 
     comision,

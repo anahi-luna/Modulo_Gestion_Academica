@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
+// Componente para mostrar un modal de creación o edición de clase, con campos para seleccionar 
+// comisión, fecha, horarios, tema y estado.
 export default function ModalClase({
     abierto,
     clase,
@@ -48,8 +50,6 @@ export default function ModalClase({
 
     }, [clase]);
 
-    // El hook se llama siempre, antes de cualquier "return" condicional
-    // (regla de los hooks de React: nunca dentro de un if).
     const modalRef = useModalAccessibility(abierto, onCerrar);
 
     if (!abierto)

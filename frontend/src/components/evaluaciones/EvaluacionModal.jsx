@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
+// Componente para mostrar un modal de creación o edición de evaluación, con campos para seleccionar la comisión,
+//  tipo, título, fecha y puntaje máximo.
 export default function EvaluacionModal({
     abierto,
     evaluacion,
@@ -43,7 +45,6 @@ export default function EvaluacionModal({
 
     }, [evaluacion]);
 
-    // El hook se llama siempre, antes de cualquier "return" condicional.
     const modalRef = useModalAccessibility(abierto, onCerrar);
 
     if (!abierto)

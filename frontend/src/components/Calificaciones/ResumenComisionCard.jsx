@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
+// Componente para mostrar un resumen de las calificaciones de una comisión, 
+// con la posibilidad de expandir para ver el detalle de cada evaluación.
 export default function ResumenComisionCard({ comision }) {
   const [abierto, setAbierto] = useState(false);
 

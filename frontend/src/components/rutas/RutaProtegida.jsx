@@ -1,14 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { usePermissions } from "../../context/PermissionsContext";
-
-// Envoltorio para proteger rutas según el PERMISO del usuario (ya no
-// según su rol como antes). Le paso el/los permisos que hacen falta
-// para entrar a la ruta, y si el usuario no los tiene, lo mando de
-// vuelta al Home.
-//
-// permisoRequerido: puede ser un solo string ("micro2.asistencias.leer")
-// o un array de strings, en cuyo caso alcanza con que tenga UNO
-// cualquiera de esos permisos para poder entrar.
+// Componente de ruta protegida que verifica si el usuario tiene el permiso requerido para acceder a la ruta.
 export default function RutaProtegida({ permisoRequerido, children }) {
     const { usuario, cargando, hasPermission, hasAnyPermission } = usePermissions();
 

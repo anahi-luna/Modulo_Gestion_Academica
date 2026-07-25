@@ -7,14 +7,18 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { getEvaluaciones, registrarEvaluacion, modificarEvaluacion, borrarEvaluacion } from "../Services/evaluacionesAdminService";
 import { obtenerMisEvaluacionesPlano } from "../Services/evaluacionesAlumnoService";
 import { getComisiones } from "../mocks/comisionesMock";
-import { usePermissions } from "../context/PermissionsContext";
+import useAuth from "../auth/hooks/useAuth";
 import { ACCIONES } from "../config/modulos";
+//gestión de evaluaciones: vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión
+//  en la que está inscripto.
+//vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de
+//  todos los alumnos de una clase.
 
 const ID_LEGAJO_ALUMNO_MOCK = 1;
 
 export default function GestionEvaluaciones() {
-    const { usuario, hasPermission } = usePermissions();
-    const esAlumno = usuario?.usuario === "alumno";
+    const { user: usuario, hasPermission, hasRole } = useAuth();
+    const esAlumno = hasRole("Alumno");
 
     if (esAlumno) {
         return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;

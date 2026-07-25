@@ -3,6 +3,7 @@ import {
     TrashIcon,
 } from "@heroicons/react/24/outline";
 
+// Componente para mostrar el historial de calificaciones, con opciones para editar o eliminar cada evaluación.
 export default function HistorialCalificaciones({
     historial = [],
     onEditar,

@@ -4,6 +4,7 @@
 import EstadoCertificadoBadge from "./EstadoCertificadoBadge";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 
+// Componente para mostrar una tarjeta de certificado, con información básica y botón de descarga si está emitido.
 export default function CertificadoCard({ certificado, onDescargar }) {
   const emitido = certificado.estado === "Emitido";
 

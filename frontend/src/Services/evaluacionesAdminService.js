@@ -1,9 +1,5 @@
-// Ya está conectado a la API real del back. La única vuelta extra acá
-// es traducir entre lo que maneja la UI (tipo como texto: "Parcial",
-// "TP", "Final") y lo que espera/devuelve el back (id_tipo_evaluacion,
-// un número, con su nombre completo resuelto en tipo_evaluacion.nombre).
-// Así no tuve que tocar nada del formulario (EvaluacionModal.jsx) ni de
-// la tabla, todo el mapeo queda encapsulado acá.
+// servicios relacionados con las evaluaciones de los alumnos, para el personal de gestión 
+//  muestra las evaluaciones de cada comisión y permite crear/editar/borrar evaluaciones.
 import {
     getListaEvaluaciones,
     getEvaluacionPorId,

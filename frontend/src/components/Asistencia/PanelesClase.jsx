@@ -4,13 +4,12 @@ import { getComisiones } from "../../mocks/comisionesMock";
 import ComisionCard from "./ComisionCard";
 import Alert from "../Alert";
 
+// Componente para mostrar el panel de clases de una comisión, incluyendo la búsqueda y selección de clases.
 export default function PanelesClase({
     comisionSeleccionada,
     setComisionSeleccionada
 }) {
     const [comisiones, setComisiones] = useState([]);
-    // Antes esto solo se logueaba a consola: la lista se quedaba vacía
-    // sin explicar por qué.
     const [error, setError] = useState(null);
 
     // Carga las comisiones al montar el componente

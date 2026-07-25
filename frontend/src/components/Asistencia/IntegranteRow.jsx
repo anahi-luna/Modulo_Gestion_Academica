@@ -1,6 +1,6 @@
 // Le agrego soloLectura: si es true (el usuario no tiene permiso para
 // crear/actualizar asistencias, por ejemplo un alumno mirando la
-// planilla) deshabilito los 4 botones de estado y el input de
+// planilla) deshabilito los 4 botones de estado y el input de observación.
 
 import EstadoSelect from "./EstadoSelect";
 import { TrashIcon } from "@heroicons/react/24/outline";
@@ -30,7 +30,7 @@ export default function IntegranteRow({ asistencia, onCambiarEstado, onCambiarOb
           />
         </div>
       </td>
-      {/* Celda nueva: input controlado para la observacion de este integrante.
+      {/* input controlado para la observacion de este integrante.
           value sale siempre del estado (asistencia.observacion) y cada
           onChange llama a onCambiarObservacion para actualizar ese estado
           en el componente padre (PanelDetalleClase). */}

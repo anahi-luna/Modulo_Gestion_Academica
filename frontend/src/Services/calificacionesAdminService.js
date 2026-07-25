@@ -1,22 +1,5 @@
 import * as legajosMock from "../mocks/legajosMock";
 import * as comisionesMock from "../mocks/comisionesMock";
-
-// Ya está conectado a la API real del back. Dos cosas importantes que
-// tuve que resolver acá (no en la UI) para que todo siga funcionando
-// igual que antes:
-//
-// 1. El back llama al campo de la nota "puntaje", no "nota". Toda la
-//    UI (CalificacionTabla, AlumnoNotaRow, etc.) sigue hablando de
-//    "nota" puertas para adentro; la traducción puntaje<->nota queda
-//    encapsulada acá.
-//
-// 2. El back NO permite volver a registrar una calificación que ya
-//    existe para esa (evaluación, inscripción): POST /calificaciones
-//    tira error "La calificación ya fue registrada" si ya hay una. Por
-//    eso "Guardar calificaciones" ya no manda todo el lote por POST
-//    como antes: separa las filas SIN nota previa (recién cargadas,
-//    van por POST en bloque) de las filas que YA tenían una
-//    calificación (van por PUT una por una, solo si cambiaron).
 import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones, eliminarCalificacion } from "../api/calificacionesApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
 import { getListaEvaluaciones } from "../api/evaluacionesApi";

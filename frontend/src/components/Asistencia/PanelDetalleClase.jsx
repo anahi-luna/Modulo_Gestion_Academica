@@ -12,6 +12,8 @@ import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
 import { getComisiones } from "../../mocks/comisionesMock";
 import Alert from "../Alert";
 
+// Componente principal para mostrar el panel de detalle de una clase,
+//  incluyendo la selección de clase, estadísticas, tabla de asistencias y historial.
 export default function PanelDetalleClase({ idComision, idClaseInicial = null, }) {
     const [claseSeleccionada, setClaseSeleccionada] = useState(null);
     const [clases, setClases] = useState([]);
@@ -80,7 +82,8 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
 
 
-
+// Carga las asistencias de la clase seleccionada. Si no hay asistencias registradas,
+//  carga los inscriptos de la comisión para poder registrar la asistencia.
     async function cargarAsistencias() {
         try {
             const asistenciasObtenidas = await obtenerAsistenciasPorClase(claseSeleccionada.id);
@@ -99,6 +102,9 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
         }
     }
 
+    // Actualiza el estado de UN integrante puntual dentro del array de asistencias.
+    // Recibe el id_inscripcion (para saber a quien le cambio el estado) y el
+    // nuevo id_estado que seleccionó el usuario.
     function cambiarEstado(idInscripcion, idEstado) {
         setAsistencias(prev =>
             prev.map(a =>
@@ -368,8 +374,6 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
 
     return (
-        // Antes: "col-span-9" fijo. En mobile no hace falta col-span
-        // (ocupa toda la única columna del grid-cols-1 del padre).
         <div className="lg:col-span-9 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
 
             {alerta &&(
@@ -387,9 +391,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
             <div className="p-4 sm:p-8">
 
                 {/*
-                  Antes: "flex justify-between" ponía el título y el botón
-                  siempre en la misma fila, chocando en mobile.
-                  Ahora: en mobile van en columna (flex-col), y desde sm
+                en mobile van en columna (flex-col), y desde sm
                   vuelven a estar en fila.
                 */}
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
@@ -478,8 +480,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                         </div>
                     )}
                     {/*
-                        Antes: "grid-cols-4" fijo, 4 tarjetas apretadísimas en un celular.
-                        Ahora: 2 columnas en mobile (2 filas de 2), 4 columnas desde sm.
+                        2 columnas en mobile (2 filas de 2), 4 columnas desde sm.
                     */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6">
                         <EstadisticaCard titulo="Inscriptos" cantidad={inscriptos} />
@@ -498,7 +499,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
                     />
 
-                    {/* Antes este botón no tenía className: se veía como un link de texto plano.
+                    {/*
                         Si esta en modo edicion mostrara guardar cambios, sino guardar asistencia
                     */}
                     {(!asistenciaRegistrada || modoEdicion) && (

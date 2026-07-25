@@ -2,11 +2,11 @@
 // Mismo patrón que en Calificaciones.jsx y Asistencia.jsx: si el usuario es un alumno, ve solo su propio plan; 
 // si es personal, ve la vista de "Resultado del plan" (que es otra ruta).
 import { useEffect, useState } from "react";
-import { usePermissions } from "../context/PermissionsContext";
+import useAuth from "../auth/hooks/useAuth";
 import { obtenerMiPlan, obtenerMisMateriasDePlan } from "../Services/planesService";
 import ResumenMateriaPlanCard from "../components/planes/ResumenMateriaPlanCard";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx
+const ID_LEGAJO_ALUMNO_MOCK = 1;
 
 const ESTILOS_ESTADO = {
   Finalizado: "bg-green-100 text-green-700",
@@ -16,8 +16,8 @@ const ESTILOS_ESTADO = {
 };
 
 export default function MiPlan() {
-  const { usuario } = usePermissions();
-  const esAlumno = usuario?.usuario === "alumno";
+  const { user: usuario, hasRole } = useAuth();
+  const esAlumno = hasRole("Alumno");
 
   const [plan, setPlan] = useState(null);
   const [materias, setMaterias] = useState([]);
