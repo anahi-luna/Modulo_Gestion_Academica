@@ -16,7 +16,7 @@ export default function RutaProtegida({ permisoRequerido, children }) {
     }
 
     if (!usuario) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/homeInsc" replace />;
     }
 
     const tienePermiso = Array.isArray(permisoRequerido)
@@ -24,7 +24,7 @@ export default function RutaProtegida({ permisoRequerido, children }) {
         : hasPermission(permisoRequerido);
 
     if (!tienePermiso) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/homeInsc" replace />;
     }
 
     return children;
