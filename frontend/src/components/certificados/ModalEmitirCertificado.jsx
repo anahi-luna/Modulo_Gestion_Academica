@@ -11,7 +11,6 @@ export default function ModalEmitirCertificado({ abierto, fila, onCerrar, onEmit
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
 
-  // El hook se llama siempre, antes de cualquier "return" condicional.
   const modalRef = useModalAccessibility(abierto, onCerrar);
 
   if (!abierto || !fila) return null;

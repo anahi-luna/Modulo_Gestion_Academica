@@ -1,8 +1,8 @@
-//vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión en la que está inscripto. Es exactamente el contenido
-// que antes vivía en pages/MiAsistencia.jsx. 
-//vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de todos los alumnos de una clase.
+//vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión en la que está inscripto. 
+//vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de todos 
+// los alumnos de una clase.
 import { useEffect, useState } from "react";
-import { usePermissions } from "../context/PermissionsContext";
+import useAuth from "../auth/hooks/useAuth";
 import { ACCIONES } from "../config/modulos";
 
 import PanelesComision from "../components/Calificaciones/PanelesComision";
@@ -13,17 +13,12 @@ import { obtenerMisCalificaciones } from "../Services/calificacionesAlumnoServic
 const ID_LEGAJO_ALUMNO_MOCK = 1; // ver TODO arriba
 
 export default function Calificaciones() {
-  const { usuario, hasAnyPermission } = usePermissions();
+  const { user: usuario, hasPermission, hasRole } = useAuth();
 
-  const esAlumno = usuario?.usuario === "alumno";
-
-  // Puede cargar/editar notas si tiene permiso de crear o actualizar
-  // calificaciones (el alumno nunca los va a tener, así que para él
-  // esto siempre da false y ve todo de solo lectura).
-  const puedeEditar = hasAnyPermission([
-    ACCIONES.CALIFICACIONES_CREAR,
-    ACCIONES.CALIFICACIONES_ACTUALIZAR,
-  ]);
+  const esAlumno = hasRole("Alumno");
+// Si el usuario es un alumno, no puede editar la calificación, solo puede verla.
+// Si el usuario es un docente o administrador, puede editar la calificación si tiene los permisos correspondientes.
+  const puedeEditar = [ACCIONES.CALIFICACIONES_CREAR, ACCIONES.CALIFICACIONES_ACTUALIZAR].some(hasPermission);
 
   if (esAlumno) {
     return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;

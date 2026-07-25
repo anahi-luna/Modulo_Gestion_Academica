@@ -1,8 +1,9 @@
-// si el usuario es el alumno de prueba, delega en HomeAlumno.jsx (el
-// dashboard personal con sus inscripciones, asistencia, plan y
-// próximas clases). Para cualquier otro usuario (personal de gestión),
-// muestro la card de cada módulo solamente si tiene el permiso de
-// LECTURA de ese módulo.
+// Página de inicio del módulo de gestión académica. Muestra un dashboard con estadísticas y
+//  accesos a los distintos módulos según el rol del usuario.
+// Para el alumno, muestra su propio dashboard con inscripciones, plan de estudios, asistencia y
+//  próximas clases.  
+// Para el personal (admin, profesor, etc), muestra un dashboard con estadísticas de inscripciones
+//  y accesos a los distintos módulos según los permisos del usuario.
 
 import { useState, useEffect } from "react";
 import ModuloCard from "../components/ModuloCard";
@@ -10,18 +11,15 @@ import HomeAlumno from "../components/home/HomeAlumno";
 import Alert from "../components/Alert";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { obtenerInscripciones } from "../Services/inscripcionesAdminService";
-import { usePermissions } from "../context/PermissionsContext";
+import useAuth from "../auth/hooks/useAuth";
 import { MODULOS } from "../config/modulos";
 
 export default function Home() {
-  const { usuario, hasPermission } = usePermissions();
+  const { user: usuario, hasPermission, hasRole } = useAuth();
   const [historial, setHistorial] = useState([]);
-  // Antes esto solo se logueaba a consola: si fallaba la carga, el
-  // usuario solo veía "0 inscripciones" sin enterarse de que hubo un
-  // error real (parecía que simplemente no había datos).
   const [error, setError] = useState(null);
 
-  const esAlumno = usuario?.usuario === "alumno";
+  const esAlumno = hasRole("Alumno");
 
   // Las estadísticas de inscripciones solo tienen sentido si el usuario
   // puede leer ese módulo (si no, ni siquiera le pido el endpoint), y

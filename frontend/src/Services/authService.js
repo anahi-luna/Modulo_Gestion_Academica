@@ -1,9 +1,4 @@
-// Servicio de autenticación / permisos.
-// Por ahora no tengo login real, así que lo que hago es pedirle al back
-// el usuario "logueado" mandándole el username por query param
-// (?usuario=docente, ?usuario=admin, etc). El back me devuelve el usuario
-// con sus roles Y ya resueltos en un array de permisos tipo
-// "micro2.asistencias.crear". Con eso arma después el hasPermission.
+// Servicio para manejar la lógica de autenticación y autorización.
 
 import API_URL from "../api/api";
 

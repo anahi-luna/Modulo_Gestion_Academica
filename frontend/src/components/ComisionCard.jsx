@@ -1,3 +1,5 @@
+// Componente de tarjeta de comisión que muestra información relevante de la comisión, como código, 
+// materia, docente, horario, cupo y correlativas.
 export default function ComisionCard({ comision, onSeleccionar, seleccionada }) {
   // Calculamos el cupo restante
   const cupoLibre = comision.cupo - comision.inscriptos;

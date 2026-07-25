@@ -1,17 +1,5 @@
-// Es la misma idea que ResumenComisionCard.jsx (Mis Calificaciones):
-// una tarjeta que se puede desplegar por materia. La diferencia acá es
-// que cada materia puede estar en dos estados bien distintos:
-//
-// - FINALIZADA: ya se generó su ResultadoAcademico (el admin usó el
-//   botón "Generar resultado académico" en Certificados). Muestro el
-//   cierre real: promedio final, % de asistencia, estado académico y
-//   fecha de cierre.
-//
-// - PENDIENTE (todavía cursando): no hay ResultadoAcademico cargado
-//   todavía. Se ve exactamente como en Mis Calificaciones: la tabla de
-//   evaluaciones con las notas que ya se cargaron, para que el alumno
-//   pueda seguir su cursada mientras tanto.
-
+// Componente para mostrar un resumen de una materia dentro del plan de estudios del alumno, 
+// con la posibilidad de expandir para ver más detalles.
 import { useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 

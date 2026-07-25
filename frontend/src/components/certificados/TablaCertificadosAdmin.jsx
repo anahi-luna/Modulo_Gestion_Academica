@@ -1,9 +1,8 @@
 import EstadoPlanBadge from "../planes/EstadoPlanBadge";
 import EstadoCertificadoBadge from "./EstadoCertificadoBadge";
 
-// Cada fila ahora es un ALUMNO (su resultado de plan), no una materia
-// puntual: el certificado real certifica el plan completo, no una
-// comisión. Ver certificadosService.js para el porqué de este cambio.
+// Componente para mostrar una tabla de certificados en la vista del Administrador, 
+// con acciones según el estado del certificado y del plan.
 export default function TablaCertificadosAdmin({ filas, onEmitir, onRevocar, onDescargar }) {
   if (filas.length === 0) {
     return (
@@ -13,6 +12,7 @@ export default function TablaCertificadosAdmin({ filas, onEmitir, onRevocar, onD
     );
   }
 
+  // Componente interno para mostrar las acciones disponibles para cada fila de la tabla.
   function Acciones({ f }) {
     return (
       <div className="flex flex-wrap gap-2">

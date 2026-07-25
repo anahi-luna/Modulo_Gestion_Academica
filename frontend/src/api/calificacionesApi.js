@@ -33,6 +33,7 @@ export async function getCalificacionesPorInscripcion(idInscripcion) {
     }
 }
 
+// Calificaciones de una inscripción puntual, en todas sus evaluaciones
 export async function getCalificacionPorId(id) {
     try{
         const response = await fetch(`${API_URL}/calificaciones/${id}`);
@@ -81,7 +82,6 @@ export async function actualizarCalificacion(idCalificacion, datos) {
 }
 
 // Registra en bloque las calificaciones de una evaluación completa
-// (misma forma que registrarAsistencia: { id_evaluacion, calificaciones: [...] })
 export async function registrarCalificaciones(datos) {
 
     try{
@@ -109,6 +109,7 @@ export async function registrarCalificaciones(datos) {
 
 }
 
+// Elimina una calificación puntual
 export async function eliminarCalificacion(idCalificacion) {
     try {
         const response = await fetch(

@@ -12,6 +12,7 @@ export async function getInscripcionPorId(id) {
     return await responde.json();
 }
 
+//Obtenemos la lista de inscripciones por comision
 export async function getInscripcionesPorComision(idComision) {
     try{
         const response = await fetch(

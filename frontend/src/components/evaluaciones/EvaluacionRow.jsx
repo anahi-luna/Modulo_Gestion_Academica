@@ -1,5 +1,7 @@
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 
+// Componente para mostrar una fila de evaluación en la tabla de evaluaciones, con información básica y
+// botones de acción para editar o eliminar la evaluación.
 export default function EvaluacionRow({
     evaluacion,
     onEditar,

@@ -1,3 +1,5 @@
+// Componente de alerta que muestra un mensaje con un tipo (success, error, warning, info), un título opcional
+//  y un botón de cerrar opcional.
 export default function Alert ({
     tipo = "info",
     titulo,

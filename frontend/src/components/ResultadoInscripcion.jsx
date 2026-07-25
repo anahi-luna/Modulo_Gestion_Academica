@@ -1,8 +1,5 @@
-// ============================================================
-// ResultadoInscripcion.jsx
-// Modal que muestra el resultado de una inscripción y los
-// datos devueltos por el backend.
-// ============================================================
+// Componente de modal que muestra el resultado de una inscripción, con los datos de la 
+// comisión, materia, legajo, estado y motivo de rechazo si corresponde.
 import { useModalAccessibility } from "../hooks/useModalAccessibility";
 
 export default function ResultadoInscripcion({ resultado, onCerrar, onNueva }) {

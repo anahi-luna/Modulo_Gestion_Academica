@@ -4,14 +4,13 @@ import Alert from "../Alert";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getComisiones } from "../../mocks/comisionesMock";
 
+// Componente para mostrar el panel de comisiones, incluyendo la búsqueda y selección de comisiones.
 export default function PanelesComision({
     comisionSeleccionada,
     setComisionSeleccionada
 }) {
     const [comisiones, setComisiones] = useState([]);
     const [busqueda, setBusqueda] = useState("");
-    // Antes esto solo se logueaba a consola: la lista se quedaba vacía
-    // sin explicar por qué.
     const [error, setError] = useState(null);
 
     useEffect(() => {

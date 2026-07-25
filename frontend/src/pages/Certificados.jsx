@@ -1,21 +1,10 @@
-// Vista de certificados: si el usuario es un alumno, ve solo sus
-// propios certificados; si es personal, ve la tabla con el estado del
-// plan de cada alumno y puede emitir/revocar según sus permisos.
-//
-// Cambio importante respecto de la primera versión: el certificado
-// real certifica el PLAN completo de un alumno (no una materia
-// puntual), así que la tabla de gestión ahora tiene una fila por
-// alumno, no por materia cursada.
-//
-// Acá también agregué la sección para "Generar resultados académicos"
-// de una comisión: es una acción de comisión completa (el back calcula
-// solo promedio, asistencia y estado de cada alumno aceptado), y la
-// dejé cerca de Certificados porque generar los resultados académicos
-// de las últimas comisiones es lo que después habilita que el plan de
-// cada alumno se cierre y se pueda emitir su certificado.
-
+// Página de certificados: vista para alumnos y personal, según el rol del usuario. 
+// Si es alumno, ve solo sus certificados emitidos y puede descargarlos.
+// Si es personal, ve la tabla con el estado del plan de cada alumno y puede emitir/revocar certificados
+// según sus permisos. Además, si tiene el permiso de generar resultados académicos, puede hacerlo desde
+// un botón que abre un modal para elegir la comisión.
 import { useEffect, useState } from "react";
-import { usePermissions } from "../context/PermissionsContext";
+import useAuth from "../auth/hooks/useAuth";
 import { ACCIONES } from "../config/modulos";
 import {
   obtenerFilasCertificados,
@@ -30,11 +19,11 @@ import CertificadoCard from "../components/certificados/CertificadoCard";
 import TablaCertificadosAdmin from "../components/certificados/TablaCertificadosAdmin";
 import ModalEmitirCertificado from "../components/certificados/ModalEmitirCertificado";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; // TODO: ver Calificaciones.jsx, mismo pendiente
+const ID_LEGAJO_ALUMNO_MOCK = 1; 
 
 export default function Certificados() {
-  const { usuario, hasPermission } = usePermissions();
-  const esAlumno = usuario?.usuario === "alumno";
+  const { user: usuario, hasPermission, hasRole } = useAuth();
+  const esAlumno = hasRole("Alumno");
 
   const puedeEmitir = hasPermission(ACCIONES.CERTIFICADOS_EMITIR);
   const puedeActualizar = hasPermission(ACCIONES.CERTIFICADOS_ACTUALIZAR);
@@ -79,8 +68,6 @@ function GenerarResultadosAcademicos() {
           : "Todos los alumnos de esa comisión ya tenían resultado académico generado."
       );
     } catch (err) {
-      // El back explica bien el motivo: comisión con clases pendientes,
-      // sin alumnos aceptados, todos ya generados, etc.
       setError(err.message);
     } finally {
       setGenerando(false);

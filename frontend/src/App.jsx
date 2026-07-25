@@ -1,8 +1,7 @@
 import './App.css'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import ProtectedRoute from './auth/routes/ProtectedRoute';
-import { AuthContext, AuthProvider } from './auth/context/AuthContext';
 import { ACCIONES } from "./config/modulos";
 import MiPlan from "./pages/MiPlan";
 import ResultadoPlan from "./pages/ResultadoPlan";
@@ -15,17 +14,15 @@ import Calificaciones from "./pages/Calificaciones";
 import GestionEvaluaciones from "./pages/GestionEvaluaciones";
 import Certificados from "./pages/Certificados";
 
-//aca se define el enrutamiento de la app, y se protegen las rutas según los permisos que tenga el usuario  
-
+// La app principal, que arma el navbar y el router con todas las páginas. 
 export default function App() {
 
     return (
-        <BrowserRouter basename='/inscripciones'>
-            <AuthProvider>
-                <Navbar />
+        <>
+            <Navbar />
 
-                <main>
-                    <Routes>
+            <main>
+                <Routes>
 
                         {/* Home: uno solo para todos, arma las cards de
                             módulos según los permisos del usuario */}
@@ -111,8 +108,7 @@ export default function App() {
                         />
 
                     </Routes>
-                </main>
-            </AuthProvider>
-        </BrowserRouter>
+            </main>
+        </>
     );
 }

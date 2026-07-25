@@ -1,9 +1,7 @@
-/*
-  Modal de confirmacion para eliminar una evaluacion.
-  Muestra la informacion de la evaluacion seleccionada antes de ejecutar la eliminacion.
- */
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
+// Componente para mostrar un modal de confirmación para eliminar una evaluación, con 
+// información básica de la evaluación.
 export default function EliminarEvaluacionModal({
     abierto,
     evaluacion,
@@ -11,7 +9,6 @@ export default function EliminarEvaluacionModal({
     onConfirmar,
 }) {
 
-    // El hook se llama siempre, antes de cualquier "return" condicional.
     const modalRef = useModalAccessibility(abierto, onCerrar);
 
     if (!abierto || !evaluacion)

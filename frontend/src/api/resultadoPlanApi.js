@@ -1,13 +1,6 @@
-import API_URL from "./api";
+import API_URL from "./api"; //importamos la url de la api general
 
-// OJO: el back tiene comentada la ruta POST de resultado-plan
-// (resultado_plan_routes.py: "# resultado_plan_bp.route('/', ...)").
-// El resultado del plan se crea/actualiza SOLO automáticamente, como
-// efecto colateral de generar un resultado académico (ver
-// resultado_academico_service.py -> actualizar_resultado_plan). Por
-// eso acá del lado del front solo hay lectura y el cambio de estado
-// (por ejemplo, marcar "Abandonado").
-
+// Obtiene la lista de resultados de plan, sin filtros
 export async function getListaResultadosPlan() {
     try {
         const response = await fetch(`${API_URL}/resultados-planes/`);
@@ -24,6 +17,7 @@ export async function getListaResultadosPlan() {
     }
 }
 
+//trae resultados de plan por id
 export async function getResultadoPlanPorId(id) {
     try {
         const response = await fetch(`${API_URL}/resultados-planes/${id}`);

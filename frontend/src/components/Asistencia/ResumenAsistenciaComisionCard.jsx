@@ -1,7 +1,5 @@
-// Tarjeta desplegable de asistencia por comisión, para la vista del
-// alumno. Mismo patrón visual que ResumenComisionCard.jsx (el que ya
-// usa "Mis calificaciones"): un resumen arriba, y al hacer click se ve
-// el detalle clase por clase.
+// Tarjeta desplegable de asistencia por comisión, con resumen de porcentaje y detalle de clases. 
+// Se usa en el panel de asistencias.
 
 import { useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
