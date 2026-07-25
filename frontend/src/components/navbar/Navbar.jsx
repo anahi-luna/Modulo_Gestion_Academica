@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import user from "../../assets/user.png";
-import logo from "../../images/Logo.png";
+import logo from "../../images/logo.jpeg";
 import { hasPermission } from "../../auth/utils/permissions";
 import { obtenerUsuarios } from "../../Services/authService";
 import { ACCIONES } from "../../config/modulos";
