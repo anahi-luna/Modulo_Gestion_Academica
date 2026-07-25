@@ -6,6 +6,7 @@ from routes import *
 from seed.seed_data import cargar_datos_iniciales
 from models import *
 from auth_common import AuthCommon
+from utils.auth_registro import registrar_acciones
 
 
 #Crea y configura la aplicación Flask.
@@ -53,7 +54,8 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         cargar_datos_iniciales()
-    
+        registrar_acciones()
+
     app.run(
         host="0.0.0.0",
         port = 5000,
