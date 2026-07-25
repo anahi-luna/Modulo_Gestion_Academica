@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Ruta absoluta de la carpeta backend
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
@@ -34,3 +35,27 @@ class Config:
     DEBUG = True
     # Clave secreta (después irá en .env)
     SECRET_KEY = "microservicio-inscripciones-dev"
+
+    # Auth Common
+    AUTH_COMMON_REDIS_URL = os.getenv(
+        "AUTH_COMMON_REDIS_URL",
+        "redis://redis:6379/0"
+    )
+
+    AUTH_COMMON_SESSION_TTL = int(
+        os.getenv("AUTH_COMMON_SESSION_TTL", 900)
+    )
+
+    AUTH_COMMON_ENDPOINTS_EXCEPTUADOS = [
+        "home",      # /status
+    ]
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+
+    if not JWT_SECRET_KEY:
+        raise RuntimeError(
+            "JWT_SECRET_KEY no está definida."
+        )
+    JWT_TOKEN_LOCATION = ["headers"]
+    
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
