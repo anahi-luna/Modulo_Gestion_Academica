@@ -24,9 +24,9 @@ export default function GestionClases() {
 
     return (
         <VistaPersonal
-            puedeCrear={hasPermission(ACCIONES.CLASES_CREAR)}
-            puedeActualizar={hasPermission(ACCIONES.CLASES_ACTUALIZAR)}
-            puedeEliminar={hasPermission(ACCIONES.CLASES_ELIMINAR)}
+            puedeCrear={hasPermission(inscripcion.clases.crear)}
+            puedeActualizar={hasPermission(inscripcion.clases.actualizar)}
+            puedeEliminar={hasPermission(inscripcion.clases.eliminar)}
         />
     );
 }
