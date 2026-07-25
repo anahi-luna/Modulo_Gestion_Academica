@@ -1,15 +1,13 @@
-import os
+import logging
 from pathlib import Path
-
+import os
 import requests
 import yaml
 
+logger = logging.getLogger(__name__)
+
 
 def registrar_acciones():
-    auth_service_url = os.getenv(
-        "AUTH_SERVICE_URL",
-        "http://auth:5000"
-    )
 
     ruta = Path(__file__).parent.parent / "acciones.yml"
 
@@ -17,18 +15,24 @@ def registrar_acciones():
         with open(ruta, "r", encoding="utf-8") as archivo:
             datos = yaml.safe_load(archivo)
 
-        respuesta = requests.post(
-            f"{auth_service_url}/acciones",
-            json=datos,
-            timeout=10
-        )
+    except FileNotFoundError:
+        logger.warning(f"No se encontró {ruta}")
+        return
+
+    auth_url = os.getenv("AUTH_SERVICE_URL", "http://localhost:5000")
+
+    endpoint = f"{auth_url.rstrip('/')}/acciones"
+
+    try:
+        respuesta = requests.post(endpoint, json=datos, timeout=10)
 
         respuesta.raise_for_status()
 
-        print("Acciones registradas correctamente en Auth.")
-
-    except FileNotFoundError:
-        print(f"No se encontró el archivo: {ruta}")
+        logger.info(
+            f"Acciones registradas correctamente en Auth ({respuesta.status_code})"
+        )
 
     except requests.exceptions.RequestException as e:
-        print(f"No fue posible registrar las acciones en Auth: {e}")
+        logger.error(f"No se pudieron registrar acciones: {e}")
+    except Exception as e:
+        logger.exception(f"Error inesperado registrando acciones: {e}")

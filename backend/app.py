@@ -7,7 +7,7 @@ from seed.seed_data import cargar_datos_iniciales
 from models import *
 from auth_common import AuthCommon
 from utils.auth_registro import registrar_acciones
-
+from flask_jwt_extended import JWTManager
 
 #Crea y configura la aplicación Flask.
 def create_app():
@@ -23,6 +23,8 @@ def create_app():
     # Inicializar extensiones
     db.init_app(app)
     ma.init_app(app)
+
+    jwt_manager = JWTManager(app)
 
     # Inicializar Auth Common
     AuthCommon(app)
