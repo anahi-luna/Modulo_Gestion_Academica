@@ -15,26 +15,8 @@ import Calificaciones from "./pages/Calificaciones";
 import GestionEvaluaciones from "./pages/GestionEvaluaciones";
 import Certificados from "./pages/Certificados";
 
-// Antes esta app tenía un Home distinto por rol (HomeAdmin/HomeProfesor/
-// HomeAlumno) y un montón de rutas separadas para "la vista del admin"
-// y "la vista del alumno" de un mismo módulo (por ejemplo
-// CalificacionesAdmin vs MisCalificaciones). Ahora hay UNA sola ruta y
-// UNA sola página por módulo (Home, Asistencia, Calificaciones,
-// Certificados): la página de adentro decide qué mostrar según los
-// PERMISOS del usuario logueado, no según un rol fijo.
-//
-// El usuario ya no se guarda acá con useState: lo maneja el
-// PermissionsProvider, que le pregunta al back "quién sos y qué podés
-// hacer" (GET /api/auth/me) y se lo pasa a toda la app a través de un
-// contexto (usePermissions()). Así ni el Navbar ni las páginas
-// necesitan recibir "usuario" por props.
-//
-// Inscripciones sí sigue teniendo 2 páginas (Inscripciones.jsx para
-// pedir una inscripción e InscripcionesAdmin.jsx para gestionarlas):
-// son dos flujos de UI genuinamente distintos, no la misma tabla con
-// botones ocultos, así que no las unifiqué. Lo que sí cambié es que
-// ahora se protegen por PERMISO (micro2.inscripciones.leer/actualizar)
-// en vez de por rol hardcodeado.
+//aca se define el enrutamiento de la app, y se protegen las rutas según los permisos que tenga el usuario  
+
 export default function App() {
 
     return (
