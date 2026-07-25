@@ -5,6 +5,8 @@ from extensions import db, ma
 from routes import *
 from seed.seed_data import cargar_datos_iniciales
 from models import *
+from auth_common import AuthCommon
+
 
 #Crea y configura la aplicación Flask.
 def create_app():
@@ -20,6 +22,9 @@ def create_app():
     # Inicializar extensiones
     db.init_app(app)
     ma.init_app(app)
+
+    # Inicializar Auth Common
+    AuthCommon(app)
 
 
     app.register_blueprint(inscripcion_bp, url_prefix="/inscripciones")

@@ -34,3 +34,17 @@ class Config:
     DEBUG = True
     # Clave secreta (después irá en .env)
     SECRET_KEY = "microservicio-inscripciones-dev"
+
+    # Auth Common
+    AUTH_COMMON_REDIS_URL = os.getenv(
+        "AUTH_COMMON_REDIS_URL",
+        "redis://redis:6379/0"
+    )
+
+    AUTH_COMMON_SESSION_TTL = int(
+        os.getenv("AUTH_COMMON_SESSION_TTL", 900)
+    )
+
+    AUTH_COMMON_ENDPOINTS_EXCEPTUADOS = [
+        "home",      # /status
+    ]
