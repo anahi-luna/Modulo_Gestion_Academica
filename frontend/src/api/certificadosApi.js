@@ -1,5 +1,7 @@
+// API para certificados
 import API_URL from "./api";
 
+// Obtiene la lista de certificados emitidos, sin filtros
 export async function getListaCertificados() {
     try {
         const response = await fetch(`${API_URL}/certificados/`);
@@ -15,7 +17,7 @@ export async function getListaCertificados() {
         throw error;
     }
 }
-
+// Obtiene un certificado por su id
 export async function getCertificadoPorId(id) {
     try {
         const response = await fetch(`${API_URL}/certificados/${id}`);

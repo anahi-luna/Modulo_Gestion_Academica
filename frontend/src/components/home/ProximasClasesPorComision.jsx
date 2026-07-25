@@ -1,9 +1,5 @@
-// Lista de próximas clases agrupada por comisión, para el Home del
-// alumno. Mismo patrón desplegable que ResumenComisionCard.jsx (Mis
-// calificaciones) y ResumenAsistenciaComisionCard.jsx (Mi asistencia).
-//no muestro columna "Aula" porque clasesAdminService.js no la
-// trae todavía (el mock tiene el campo "lugar" pero el service no lo
-// mapea). En su lugar muestro Docente + Horario.
+// Componente para mostrar un listado de próximas clases por comisión, con la posibilidad 
+// de expandir cada comisión para ver sus clases.
 
 import { useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";

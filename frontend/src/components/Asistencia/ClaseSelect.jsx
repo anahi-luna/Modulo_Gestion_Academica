@@ -1,3 +1,4 @@
+// Componente para seleccionar una clase
 export default function ClaseSelect({
     clases,
     claseSeleccionada,

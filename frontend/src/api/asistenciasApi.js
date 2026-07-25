@@ -1,5 +1,6 @@
 import API_URL from "./api"; //importamos la url de la api general
 
+// Asistencias de una clase puntual (para la planilla del docente)
 export async function getAsistenciaPorClase(idClase) {
     try{
         const response = await fetch(`${API_URL}/asistencias?id_clase=${idClase}`); //Guarda la lista en la variable response
@@ -15,6 +16,7 @@ export async function getAsistenciaPorClase(idClase) {
     }
 }
 
+// Asistencias de una inscripción puntual, en todas sus clases
 export async function getAsistenciaPorId(id) {
     try{
         const response = await fetch(`${API_URL}/asistencias/${id}`);
@@ -29,7 +31,7 @@ export async function getAsistenciaPorId(id) {
     }
 }
 
-
+// Actualiza la asistencia de una clase puntual (para la planilla del docente)
 export async function actualizarAsistencia(idAsistencia, datos) {
 
     try {
@@ -62,7 +64,7 @@ export async function actualizarAsistencia(idAsistencia, datos) {
 
 }
 
-
+// Registra la asistencia de una clase puntual (para la planilla del docente)
 export async function registrarAsistencia(datos) {
 
     try{
@@ -90,6 +92,7 @@ export async function registrarAsistencia(datos) {
     
 } 
 
+// Elimina una asistencia existente
 export async function eliminarAsistencia(idAsistencia) {
     try{
         const response = await fetch(

@@ -1,10 +1,7 @@
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import ClaseRow from "./ClaseRow";
 
-// Mismo criterio que ya usamos en TablaCertificadosAdmin.jsx: en vez de
-// forzar la tabla completa  a deslizar para el costado todo el tiempo, en mobile mostramos una lista de
-// tarjetas apiladas con lo mismo que la tabla, y recién a partir de
-// tablet (md) mostramos la tabla de verdad con todas las columnas.
+// Componente para mostrar una tabla de clases, con filtros por materia, comisión, docente, fecha y tema.
 export default function ClasesTable({
     clases,
 

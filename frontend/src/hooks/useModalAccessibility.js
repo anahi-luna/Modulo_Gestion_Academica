@@ -11,10 +11,7 @@ import { useEffect, useRef } from "react";
 //   último campo vuelve al primero (y Shift+Tab desde el primero va al
 //   último), en vez de "escaparse" hacia el resto de la página que
 //   queda tapada atrás.
-//
-// Uso:
-//   const modalRef = useModalAccessibility(abierto, onCerrar);
-//   <div ref={modalRef}> ...contenido del modal... </div>
+
 export function useModalAccessibility(abierto, onCerrar) {
   const modalRef = useRef(null);
 

@@ -33,12 +33,6 @@ export const ACCIONES = {
     CERTIFICADOS_LEER: "micro2.certificados.leer",
     CERTIFICADOS_ACTUALIZAR: "micro2.certificados.actualizar",
     CERTIFICADOS_ELIMINAR: "micro2.certificados.eliminar",
-
-    // Estos ya existen del lado del back (roles.yml los tiene en el rol
-    // Administrador y en Jefatura Académica), pero acá en el front
-    // todavía no estaban declarados. Los agrego para poder usar
-    // hasPermission(ACCIONES.RESULTADO_ACADEMICO_GENERAR) en el botón
-    // nuevo de "Generar resultado académico".
     RESULTADO_ACADEMICO_GENERAR: "micro2.resultado_academico.generar",
     RESULTADO_ACADEMICO_LEER: "micro2.resultado_academico.leer",
     RESULTADO_ACADEMICO_ELIMINAR: "micro2.resultado_academico.eliminar",

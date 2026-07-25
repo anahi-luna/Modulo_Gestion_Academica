@@ -25,6 +25,7 @@ export async function generarResultadosAcademicos(idComision) {
     }
 }
 
+// Obtiene la lista de resultados académicos, sin filtros
 export async function getListaResultadosAcademicos() {
     try {
         const response = await fetch(`${API_URL}/resultados-academicos/`);
@@ -41,6 +42,7 @@ export async function getListaResultadosAcademicos() {
     }
 }
 
+// Obtiene un resultado académico por su id
 export async function getResultadoAcademicoPorId(id) {
     try {
         const response = await fetch(`${API_URL}/resultados-academicos/${id}`);

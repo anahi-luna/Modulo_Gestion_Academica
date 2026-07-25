@@ -5,7 +5,7 @@
 // Certificados con tipo "Finalización de Plan").
 
 import { useEffect, useState } from "react";
-import { usePermissions } from "../context/PermissionsContext";
+import useAuth from "../auth/hooks/useAuth";
 import EstadisticaCard from "../components/Asistencia/EstadisticaCard";
 import TablaResultadoPlan from "../components/planes/TablaResultadoPlan";
 import {
@@ -15,7 +15,7 @@ import {
 } from "../Services/planesService";
 
 export default function ResultadoPlan() {
-  const { usuario } = usePermissions();
+  const { user: usuario, hasRole } = useAuth();
   const [planes, setPlanes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);

@@ -1,34 +1,23 @@
-import { NavLink, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, BellIcon, XMarkIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline'
 import user from "../../assets/user.png";
-import logo from "../../images/Logo.png";
-import { usePermissions } from "../../context/PermissionsContext";
-import { obtenerUsuarios } from "../../Services/authService";
+import logo from "../../images/logo.jpeg";
 import { ACCIONES } from "../../config/modulos";
+import useAuth from "../../auth/hooks/useAuth";
+import { HOME_ROUTE } from "../../auth/config";
 
+// Componente de barra de navegación (navbar) que muestra el logo, el título del sistema, los links a los módulos
+// disponibles según los permisos del usuario, y un menú de usuario con opciones de notificaciones y cerrar sesión.
 export default function Navbar({ modulo }) {
+  // useAuth devuelve el usuario logueado, sus roles y funciones para verificar permisos y cerrar sesión.
+  const { user: usuario, roles, hasPermission, hasRole, logout } = useAuth();
+  const navigate = useNavigate();
 
-  // Ya no recibo "usuario"/"setUsuario" por props: los saco directo del
-  // contexto de permisos, así cualquier componente que necesite saber
-  // quién está logueado lo puede hacer sin tener que pasarlo de padre
-  // en padre (esto se llama "prop drilling" y es justo lo que el
-  // contexto evita).
-  const { usuario, hasPermission, cambiarUsuario } = usePermissions();
-  const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
-
-  useEffect(() => {
-    async function cargar() {
-      try {
-        const lista = await obtenerUsuarios();
-        setUsuariosDisponibles(lista);
-      } catch (error) {
-        console.error("No pude cargar la lista de usuarios de prueba", error);
-      }
-    }
-    cargar();
-  }, []);
+  async function handleLogout() {
+    await logout();
+    navigate(HOME_ROUTE);
+  }
 
   const linkClass = ({ isActive }) =>
     `px-3 py-2 rounded-md text-sm font-medium transition-colors
@@ -44,10 +33,7 @@ export default function Navbar({ modulo }) {
        : "text-red-100 hover:bg-red-700"
      }`;
 
-  // Antes había un link hardcodeado por rol para cada módulo. Ahora
-  // armo la lista de links en base a los permisos de LECTURA de cada
-  // módulo: si el usuario puede leer ese módulo, le muestro el link.
-  // Esto hace que el mismo array sirva para desktop y para mobile.
+// Lista de links a los módulos del sistema, con la ruta, el label y el permiso requerido para mostrarlos.
   const links = [
     { to: "/inscripcionesAdmin", label: "Inscripciones", permiso: ACCIONES.INSCRIPCIONES_LEER },
     { to: "/inscripciones", label: "Inscribirme", permiso: ACCIONES.INSCRIPCIONES_CREAR },
@@ -64,13 +50,15 @@ export default function Navbar({ modulo }) {
   }
 
   if (!usuario) {
-    // Mientras no sé quién es el usuario todavía, muestro una navbar
-    // "pelada" (sin links) para no mostrar de más ni tirar error.
+    // Mientras no sé quién es el usuario todavía (se está restaurando
+    // la sesión desde sessionStorage), muestro una navbar "pelada" (sin
+    // links) para no mostrar de más ni tirar error.
     return (
       <nav className="bg-red-800 shadow-md sticky top-0 z-40 h-16" />
     );
   }
-  const esAlumno = usuario.usuario === "alumno";
+  // Si el usuario es un alumno, le muestro el link "Mi plan" en la navbar, que lo lleva a su plan de estudios.
+  const esAlumno = hasRole("Alumno");
 
   return (
     <Disclosure as="nav" className="bg-red-800 shadow-md sticky top-0 z-40">
@@ -87,10 +75,6 @@ export default function Navbar({ modulo }) {
           </div>
 
           <div className="flex flex-1 items-center justify-center lg:items-stretch lg:justify-start">
-
-            {/* Logo + título: ahora es un Link a "/", así que clickeándolo
-                desde cualquier vista se vuelve al Home. Antes era solo
-                una imagen sin ningún link. */}
             <Link to="/" className="flex shrink-0 items-center gap-3">
               <img
                 src={logo}
@@ -152,32 +136,29 @@ export default function Navbar({ modulo }) {
                 transition
                 className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-gray-800 py-1 outline -outline-offset-1 outline-white/10 transition data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-leave:duration-75"
               >
-                {/* Info del usuario actual + sus roles, para poder ver
-                    en la defensa qué permisos está usando cada uno */}
+                {/* Info del usuario logueado + sus roles reales.
+                    "cargo" queda con optional chaining porque todavía
+                    no confirmamos si el back de Auth lo manda en el
+                    user o no -- si no aparece, sacar esta línea. */}
                 <div className="px-4 py-2 border-b border-white/10">
-                  <p className="text-sm text-white font-medium">{usuario.nombre}</p>
-                  <p className="text-xs text-gray-400">{usuario.cargo}</p>
+                  <p className="text-sm text-white font-medium">{usuario?.nombre ?? usuario?.email}</p>
+                  {usuario?.cargo && (
+                    <p className="text-xs text-gray-400">{usuario.cargo}</p>
+                  )}
                   <p className="text-xs text-gray-500 mt-1">
-                    {usuario.roles.map((r) => r.nombre).join(", ")}
+                    {roles.map((r) => r.nombre).join(", ")}
                   </p>
                 </div>
 
-                {/* Selector de usuario de prueba: reemplaza el switch
-                    fijo Admin/Alumno/Profesor. Ahora lista TODOS los
-                    usuarios mock que definió el back, para poder probar
-                    cualquier combinación de roles/permisos. */}
-                {usuariosDisponibles.map((u) => (
-                  <MenuItem key={u.id}>
-                    <button
-                      onClick={() => cambiarUsuario(u.usuario)}
-                      className={`block w-full text-left px-4 py-2 text-sm data-focus:bg-white/5 ${
-                        usuario.id === u.id ? "text-white font-semibold" : "text-gray-300"
-                      }`}
-                    >
-                      {u.nombre} — {u.cargo}
-                    </button>
-                  </MenuItem>
-                ))}
+                <MenuItem>
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 text-left px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5"
+                  >
+                    <ArrowRightStartOnRectangleIcon className="size-4" />
+                    Cerrar sesión
+                  </button>
+                </MenuItem>
               </MenuItems>
             </Menu>
           </div>

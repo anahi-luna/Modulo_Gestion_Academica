@@ -1,5 +1,7 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
 
+// Componente para mostrar una fila de calificación de un alumno, 
+// con inputs para nota y observación, y botón para eliminar la calificación.
 export default function AlumnoNotaRow({
     calificacion,
     onCambiarNota,

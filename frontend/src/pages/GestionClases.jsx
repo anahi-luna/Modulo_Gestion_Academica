@@ -9,14 +9,14 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { getClases, registrarClase, modificarClase, borrarClase } from "../Services/clasesAdminService";
 import { obtenerMisClasesPlano } from "../Services/clasesAlumnoService";
 import { getComisiones } from "../mocks/comisionesMock";
-import { usePermissions } from "../context/PermissionsContext";
+import useAuth from "../auth/hooks/useAuth";
 import { ACCIONES } from "../config/modulos";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx/Certificados.jsx
+const ID_LEGAJO_ALUMNO_MOCK = 1; 
 
 export default function GestionClases() {
-    const { usuario, hasPermission } = usePermissions();
-    const esAlumno = usuario?.usuario === "alumno";
+    const { user: usuario, hasPermission, hasRole } = useAuth();
+    const esAlumno = hasRole("Alumno");
 
     if (esAlumno) {
         return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
@@ -305,9 +305,6 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
                     >
                         Limpiar filtros
                     </button>
-
-                    {/* Antes este botón se mostraba siempre, sin
-                        importar si el usuario podía crear clases o no. */}
                     {puedeCrear && (
                         <button
                             onClick={nuevaClase}

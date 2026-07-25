@@ -1,5 +1,7 @@
 import { PencilSquareIcon, TrashIcon, } from "@heroicons/react/24/outline";
 
+// Componente para mostrar una fila de clase en la tabla de clases, con información básica y 
+// botones de acción para editar o eliminar la clase.
 export default function ClaseRow({
     clase,
     onEditar,

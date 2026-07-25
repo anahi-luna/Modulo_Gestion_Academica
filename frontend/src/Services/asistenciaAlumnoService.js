@@ -1,9 +1,5 @@
-// Arma "mi asistencia" del lado del cliente: agarro mis inscripciones,
-// para cada una traigo sus clases, y para cada clase busco mi propio
-// registro de asistencia filtrando por mi número de legajo.
-// getLegajoPorId sigue siendo del mock porque legajos es el microservicio
-// del otro grupo, no el nuestro.
-
+// servicios relacionados con la asistencia de los alumnos a las clases, para el alumno
+//  muestra su propia asistencia en cada comisión en la que está inscripto.
 import { obtenerMisInscripciones } from "./inscripcionesService";
 import { getClases } from "./clasesAdminService";
 import { obtenerAsistenciasPorClase } from "./asistenciaAdminService";

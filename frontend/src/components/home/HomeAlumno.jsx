@@ -1,6 +1,5 @@
-// Esta vista solo se muestra cuando el usuario logueado es el alumno
-// de prueba (usuario.usuario === "alumno"), decidido en Home.jsx —
-// mismo criterio que ya se usa en Calificaciones.jsx y Certificados.jsx.
+// Componente para mostrar la página de inicio del alumno, con un banner, un resumen de sus inscripciones, 
+// plan, clases y asistencia, y un listado de próximas clases por comisión.
 
 import { useEffect, useState } from "react";
 import BannerAlumno from "./BannerAlumno";
@@ -14,10 +13,7 @@ import { obtenerMisClases } from "../../Services/clasesAlumnoService";
 import { obtenerMiAsistencia } from "../../Services/asistenciaAlumnoService";
 import { obtenerMisCertificados } from "../../Services/certificadosService";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx y Certificados.jsx
-
-// Coincide con seed/seed_estado_resultado_plan.py del back (ver
-// MiPlan.jsx, que tiene esta misma corrección).
+const ID_LEGAJO_ALUMNO_MOCK = 1; 
 const ESTILOS_ESTADO_PLAN = {
   Finalizado: "bg-green-100 text-green-700",
   "En curso": "bg-blue-100 text-blue-700",
@@ -32,9 +28,6 @@ export default function HomeAlumno({ usuario }) {
   const [porcentajeAsistencia, setPorcentajeAsistencia] = useState(null);
   const [certificadosObtenidos, setCertificadosObtenidos] = useState(0);
   const [cargando, setCargando] = useState(true);
-  // Antes esto solo se logueaba a consola: el alumno se quedaba
-  // viendo "Todavía no tenés..." en todos lados sin saber que en
-  // realidad hubo un error cargando sus datos.
   const [error, setError] = useState(null);
 
   useEffect(() => {
