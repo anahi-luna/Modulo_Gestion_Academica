@@ -4,9 +4,10 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import user from "../../assets/user.png";
 import logo from "../../images/Logo.png";
-import { usePermissions } from "../../context/PermissionsContext";
+import { hasPermission } from "../../auth/utils/permissions";
 import { obtenerUsuarios } from "../../Services/authService";
 import { ACCIONES } from "../../config/modulos";
+import useAuth from "../../auth/hooks/useAuth";
 
 export default function Navbar({ modulo }) {
 
@@ -15,8 +16,9 @@ export default function Navbar({ modulo }) {
   // quién está logueado lo puede hacer sin tener que pasarlo de padre
   // en padre (esto se llama "prop drilling" y es justo lo que el
   // contexto evita).
-  const { usuario, hasPermission, cambiarUsuario } = usePermissions();
+  //const { usuario, hasPermission, cambiarUsuario } = usePermissions();
   const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
+  const {hasPermission} = useAuth
 
   useEffect(() => {
     async function cargar() {

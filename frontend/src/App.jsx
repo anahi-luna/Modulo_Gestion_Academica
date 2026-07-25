@@ -1,8 +1,8 @@
 import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
-import RutaProtegida from "./components/rutas/RutaProtegida";
-import { PermissionsProvider } from "./context/PermissionsContext";
+import ProtectedRoute from './auth/routes/ProtectedRoute';
+import { AuthContext, AuthProvider } from './auth/context/AuthContext';
 import { ACCIONES } from "./config/modulos";
 import MiPlan from "./pages/MiPlan";
 import ResultadoPlan from "./pages/ResultadoPlan";
@@ -39,7 +39,7 @@ export default function App() {
 
     return (
         <BrowserRouter basename='/inscripciones'>
-            <PermissionsProvider>
+            <AuthProvider>
                 <Navbar />
 
                 <main>
@@ -59,9 +59,9 @@ export default function App() {
                         <Route
                             path="/inscripcionesAdmin"
                             element={
-                                <RutaProtegida permisoRequerido={ACCIONES.INSCRIPCIONES_LEER}>
+                                <ProtectedRoute permissions={[ACCIONES.INSCRIPCIONES_LEER]}>
                                     <InscripcionesAdmin />
-                                </RutaProtegida>
+                                </ProtectedRoute>
                             }
                         />
 
@@ -70,9 +70,9 @@ export default function App() {
                         <Route
                             path="/asistencia"
                             element={
-                                <RutaProtegida permisoRequerido={ACCIONES.ASISTENCIAS_LEER}>
+                                <ProtectedRoute permissions={[ACCIONES.ASISTENCIAS_LEER]}>
                                     <Asistencia />
-                                </RutaProtegida>
+                                </ProtectedRoute>
                             }
                         />
 
@@ -81,9 +81,9 @@ export default function App() {
                         <Route
                             path="/GestionClases"
                             element={
-                                <RutaProtegida permisoRequerido={ACCIONES.CLASES_LEER}>
+                                <ProtectedRoute permissions={[ACCIONES.CLASES_LEER]}>
                                     <GestionClases />
-                                </RutaProtegida>
+                                </ProtectedRoute>
                             }
                         />
 
@@ -92,9 +92,9 @@ export default function App() {
                         <Route
                             path="/calificaciones"
                             element={
-                                <RutaProtegida permisoRequerido={ACCIONES.CALIFICACIONES_LEER}>
+                                <ProtectedRoute permissions={[ACCIONES.CALIFICACIONES_LEER]}>
                                     <Calificaciones />
-                                </RutaProtegida>
+                                </ProtectedRoute>
                             }
                         />
 
@@ -102,9 +102,9 @@ export default function App() {
                         <Route
                             path="/GestionEvaluaciones"
                             element={
-                                <RutaProtegida permisoRequerido={ACCIONES.EVALUACIONES_LEER}>
+                                <ProtectedRoute permissions={[ACCIONES.EVALUACIONES_LEER]}>
                                     <GestionEvaluaciones />
-                                </RutaProtegida>
+                                </ProtectedRoute>
                             }
                         />
 
@@ -113,24 +113,24 @@ export default function App() {
                         <Route
                             path="/certificados"
                             element={
-                                <RutaProtegida permisoRequerido={ACCIONES.CERTIFICADOS_LEER}>
+                                <ProtectedRoute permissions={[ACCIONES.CERTIFICADOS_LEER]}>
                                     <Certificados />
-                                </RutaProtegida>
+                                </ProtectedRoute>
                             }
                         />
                         <Route path="/mi-plan" element={<MiPlan />} />
                         <Route
                             path="/resultado-plan"
                             element={
-                                <RutaProtegida permisoRequerido={ACCIONES.REPORTES_LEER}>
+                                <ProtectedRoute permissions={[ACCIONES.REPORTES_LEER]}>
                                     <ResultadoPlan />
-                                </RutaProtegida>
+                                </ProtectedRoute>
                             }
                         />
 
                     </Routes>
                 </main>
-            </PermissionsProvider>
+            </AuthProvider>
         </BrowserRouter>
     );
 }
