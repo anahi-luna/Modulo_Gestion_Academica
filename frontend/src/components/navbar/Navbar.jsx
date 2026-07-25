@@ -75,7 +75,7 @@ export default function Navbar({ modulo }) {
           </div>
 
           <div className="flex flex-1 items-center justify-center lg:items-stretch lg:justify-start">
-            <Link to="/" className="flex shrink-0 items-center gap-3">
+            <Link to="/homeInsc" className="flex shrink-0 items-center gap-3">
               <img
                 src={logo}
                 alt="Logo Bomberos"
@@ -89,7 +89,7 @@ export default function Navbar({ modulo }) {
 
             <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <div className="flex space-x-1 xl:space-x-2">
-                <NavLink to="/" className={linkClass} end>Home</NavLink>
+                <NavLink to="/homeInsc" className={linkClass} end>Home</NavLink>
 
                 {esAlumno && (
                   <NavLink to="/mi-plan" className={linkClass} end>Mi plan</NavLink>
@@ -168,7 +168,7 @@ export default function Navbar({ modulo }) {
 
       <DisclosurePanel className="lg:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
-          <NavLink to="/" className={linkClassMobile} end>Home</NavLink>
+          <NavLink to="/homeInsc" className={linkClassMobile} end>Home</NavLink>
 
           {esAlumno && (
             <NavLink to="/mi-plan" className={linkClassMobile} end>Mi plan</NavLink>
