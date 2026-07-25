@@ -1,30 +1,30 @@
 from flask import Blueprint
 from auth_common.decorador import requires_permission
-from controllers.clase_controllers import *
+from controllers.evaluacion_controller import *
 
-clase_bp = Blueprint("clase_bp", __name__)
+evaluacion_bp = Blueprint("evaluacion_bp", __name__)
 
-# Crear clase
-clase_bp.route("/", methods=["POST"])(
-    requires_permission("inscripcion.clases.crear")(agregar_clase)
+# Crear evaluación
+evaluacion_bp.route("/", methods=["POST"])(
+    requires_permission("inscripcion.evaluaciones.crear")(agregar_evaluacion)
 )
 
-# Obtener todas las clases
-clase_bp.route("/", methods=["GET"])(
-    requires_permission("inscripcion.clases.leer")(get_lista_de_clases)
+# Obtener todas las evaluaciones
+evaluacion_bp.route("/", methods=["GET"])(
+    requires_permission("inscripcion.evaluaciones.leer")(get_lista_de_evaluaciones)
 )
 
-# Obtener una clase
-clase_bp.route("/<int:id_clase>", methods=["GET"])(
-    requires_permission("inscripcion.clases.leer")(get_clase)
+# Obtener una evaluación
+evaluacion_bp.route("/<int:id_evaluacion>", methods=["GET"])(
+    requires_permission("inscripcion.evaluaciones.leer")(get_evaluacion)
 )
 
-# Modificar una clase
-clase_bp.route("/<int:id_clase>", methods=["PUT"])(
-    requires_permission("inscripcion.clases.actualizar")(actualizar_clase)
+# Modificar una evaluación
+evaluacion_bp.route("/<int:id_evaluacion>", methods=["PUT"])(
+    requires_permission("inscripcion.evaluaciones.actualizar")(actualizar_evaluacion)
 )
 
-# Eliminar una clase
-clase_bp.route("/<int:id_clase>", methods=["DELETE"])(
-    requires_permission("inscripcion.clases.eliminar")(eliminar_clase_controller)
+# Eliminar una evaluación
+evaluacion_bp.route("/<int:id_evaluacion>", methods=["DELETE"])(
+    requires_permission("inscripcion.evaluaciones.eliminar")(eliminar_evaluacion_controller)
 )
