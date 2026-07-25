@@ -25,7 +25,7 @@ export default function Home() {
   // puede leer ese módulo (si no, ni siquiera le pido el endpoint), y
   // no aplican al alumno (que tiene su propio dashboard en HomeAlumno).
   useEffect(() => {
-    if (!esAlumno && hasPermission("micro2.inscripciones.leer")) {
+    if (!esAlumno && hasPermission("inscripcion.inscripciones.leer")) {
       cargarDatos();
     }
   }, [usuario]);

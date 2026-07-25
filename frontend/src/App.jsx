@@ -26,7 +26,7 @@ export default function App() {
 
                         {/* Home: uno solo para todos, arma las cards de
                             módulos según los permisos del usuario */}
-                        <Route path="/" element={<Home />} />
+                        <Route path="/homeInsc" element={<Home />} />
 
                         {/* Pedir una inscripción: no depende de un permiso
                             del microservicio, cualquiera autenticado
@@ -38,7 +38,7 @@ export default function App() {
                         <Route
                             path="/inscripcionesAdmin"
                             element={
-                                <ProtectedRoute permissions={[ACCIONES.INSCRIPCIONES_LEER]}>
+                                <ProtectedRoute permissions={[inscripcion.inscripciones.leer]}>
                                     <InscripcionesAdmin />
                                 </ProtectedRoute>
                             }
@@ -49,7 +49,7 @@ export default function App() {
                         <Route
                             path="/asistencia"
                             element={
-                                <ProtectedRoute permissions={[ACCIONES.ASISTENCIAS_LEER]}>
+                                <ProtectedRoute permissions={[inscripcion.asistencias.leer]}>
                                     <Asistencia />
                                 </ProtectedRoute>
                             }
@@ -60,7 +60,7 @@ export default function App() {
                         <Route
                             path="/GestionClases"
                             element={
-                                <ProtectedRoute permissions={[ACCIONES.CLASES_LEER]}>
+                                <ProtectedRoute permissions={[inscripcion.clases.leer]}>
                                     <GestionClases />
                                 </ProtectedRoute>
                             }
@@ -71,7 +71,7 @@ export default function App() {
                         <Route
                             path="/calificaciones"
                             element={
-                                <ProtectedRoute permissions={[ACCIONES.CALIFICACIONES_LEER]}>
+                                <ProtectedRoute permissions={[inscripcion.calificaciones.leer]}>
                                     <Calificaciones />
                                 </ProtectedRoute>
                             }
@@ -81,7 +81,7 @@ export default function App() {
                         <Route
                             path="/GestionEvaluaciones"
                             element={
-                                <ProtectedRoute permissions={[ACCIONES.EVALUACIONES_LEER]}>
+                                <ProtectedRoute permissions={[inscripcion.evaluaciones.leer]}>
                                     <GestionEvaluaciones />
                                 </ProtectedRoute>
                             }
@@ -92,7 +92,7 @@ export default function App() {
                         <Route
                             path="/certificados"
                             element={
-                                <ProtectedRoute permissions={[ACCIONES.CERTIFICADOS_LEER]}>
+                                <ProtectedRoute permissions={[inscripcion.certificados.leer]}>
                                     <Certificados />
                                 </ProtectedRoute>
                             }
@@ -101,7 +101,7 @@ export default function App() {
                         <Route
                             path="/resultado-plan"
                             element={
-                                <ProtectedRoute permissions={[ACCIONES.REPORTES_LEER]}>
+                                <ProtectedRoute permissions={[inscripcion.resultado_plan.leer]}>
                                     <ResultadoPlan />
                                 </ProtectedRoute>
                             }
