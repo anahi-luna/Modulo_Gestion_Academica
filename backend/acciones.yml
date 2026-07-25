@@ -1,0 +1,196 @@
+servicio: inscripcion
+
+acciones:
+
+  # INSCRIPCIONES
+  - nombre: inscripciones.crear
+    descripcion: Registrar una inscripción a una comisión.
+    activo: true
+  - nombre: inscripciones.leer
+    descripcion: Consultar inscripciones.
+    activo: true
+  - nombre: inscripciones.actualizar
+    descripcion: Modificar una inscripción.
+    activo: true
+  - nombre: inscripciones.eliminar
+    descripcion: Eliminar una inscripción.
+    activo: true
+
+  # CLASES
+  - nombre: clases.crear
+    descripcion: Crear clases.
+    activo: true
+  - nombre: clases.leer
+    descripcion: Consultar clases.
+    activo: true
+  - nombre: clases.actualizar
+    descripcion: Modificar clases.
+    activo: true
+  - nombre: clases.eliminar
+    descripcion: Eliminar clases.
+    activo: true
+
+  # ASISTENCIAS
+  - nombre: asistencias.crear
+    descripcion: Registrar asistencias.
+    activo: true
+  - nombre: asistencias.leer
+    descripcion: Consultar asistencias.
+    activo: true
+  - nombre: asistencias.actualizar
+    descripcion: Modificar asistencias.
+    activo: true
+  - nombre: asistencias.eliminar
+    descripcion: Eliminar asistencias.
+    activo: true
+
+  # EVALUACIONES
+  - nombre: evaluaciones.crear
+    descripcion: Crear evaluaciones.
+    activo: true
+  - nombre: evaluaciones.leer
+    descripcion: Consultar evaluaciones.
+    activo: true
+  - nombre: evaluaciones.actualizar
+    descripcion: Modificar evaluaciones.
+    activo: true
+  - nombre: evaluaciones.eliminar
+    descripcion: Eliminar evaluaciones.
+    activo: true
+
+  # CALIFICACIONES
+  - nombre: calificaciones.crear
+    descripcion: Registrar calificaciones.
+    activo: true
+  - nombre: calificaciones.leer
+    descripcion: Consultar calificaciones.
+    activo: true
+  - nombre: calificaciones.actualizar
+    descripcion: Modificar calificaciones.
+    activo: true
+  - nombre: calificaciones.eliminar
+    descripcion: Eliminar calificaciones.
+    activo: true
+
+  # RESULTADO ACADÉMICO
+  - nombre: resultado_academico.generar
+    descripcion: Generar resultados académicos.
+    activo: true
+  - nombre: resultado_academico.leer
+    descripcion: Consultar resultados académicos.
+    activo: true
+  - nombre: resultado_academico.eliminar
+    descripcion: Eliminar resultados académicos.
+    activo: true
+
+  # RESULTADO DE PLAN
+  - nombre: resultado_plan.leer
+    descripcion: Consultar resultados de plan.
+    activo: true
+  - nombre: resultado_plan.actualizar
+    descripcion: Actualizar el estado del resultado de un plan.
+    activo: true
+  - nombre: resultado_plan.eliminar
+    descripcion: Eliminar resultados de plan.
+    activo: true
+
+  # CERTIFICADOS
+  - nombre: certificados.emitir
+    descripcion: Emitir certificados.
+    activo: true
+  - nombre: certificados.leer
+    descripcion: Consultar certificados.
+    activo: true
+  - nombre: certificados.actualizar
+    descripcion: Revocar o actualizar certificados.
+    activo: true
+  - nombre: certificados.eliminar
+    descripcion: Eliminar certificados.
+    activo: true
+
+roles:
+
+  - nombre: Administrador Microservicio
+    descripcion: Acceso completo al microservicio de Inscripción.
+
+  - nombre: Docencia
+    descripcion: Gestión de clases, asistencias, evaluaciones y calificaciones.
+
+  - nombre: Alumno
+    descripcion: Acceso a sus inscripciones e información académica.
+
+rol_accion:
+
+  - rol: Administrador Microservicio
+    acciones:
+      - inscripciones.crear
+      - inscripciones.leer
+      - inscripciones.actualizar
+      - inscripciones.eliminar
+
+      - clases.crear
+      - clases.leer
+      - clases.actualizar
+      - clases.eliminar
+
+      - asistencias.crear
+      - asistencias.leer
+      - asistencias.actualizar
+      - asistencias.eliminar
+
+      - evaluaciones.crear
+      - evaluaciones.leer
+      - evaluaciones.actualizar
+      - evaluaciones.eliminar
+
+      - calificaciones.crear
+      - calificaciones.leer
+      - calificaciones.actualizar
+      - calificaciones.eliminar
+
+      - resultado_academico.generar
+      - resultado_academico.leer
+      - resultado_academico.eliminar
+
+      - resultado_plan.leer
+      - resultado_plan.actualizar
+      - resultado_plan.eliminar
+
+      - certificados.emitir
+      - certificados.leer
+      - certificados.actualizar
+      - certificados.eliminar
+
+  - rol: Docencia
+    acciones:
+      - clases.leer
+      - clases.actualizar
+
+      - asistencias.crear
+      - asistencias.leer
+      - asistencias.actualizar
+
+      - evaluaciones.crear
+      - evaluaciones.leer
+      - evaluaciones.actualizar
+
+      - calificaciones.crear
+      - calificaciones.leer
+      - calificaciones.actualizar
+
+  - rol: Alumno
+    acciones:
+      - inscripciones.crear
+      - inscripciones.leer
+
+      - clases.leer
+
+      - asistencias.leer
+
+      - calificaciones.leer
+
+      - resultado_academico.leer
+
+      - resultado_plan.leer
+
+      - certificados.leer
