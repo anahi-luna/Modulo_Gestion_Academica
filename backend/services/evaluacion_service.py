@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
-
+from flask import g
 from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
@@ -10,10 +10,7 @@ from models.modelo_evaluacion import Evaluacion
 from models.modelo_calificacion import Calificacion
 
 from services.comision_cliente import obtener_comision
-from services.usuario_cliente import obtener_usuario
 from services.tipo_evaluacion_service import obtener_tipo_evaluacion_por_id
-
-ID_USUARIO_SIMULADO = 100
 
 
 # Obtiene el listado de evaluaciones.
@@ -42,7 +39,7 @@ def obtener_evaluacion_por_id(id_evaluacion):
 
 
 # Prepara los datos necesarios para crear una evaluación.
-def preparar_datos_evaluacion(datos):
+def preparar_datos_evaluacion(datos,id_usuario_autenticado):
     ahora = datetime.now()
     return {
         "id_comision": datos["id_comision"],
@@ -51,7 +48,7 @@ def preparar_datos_evaluacion(datos):
         "fecha_evaluacion": datos["fecha_evaluacion"],
         "puntaje_maximo": datos["puntaje_maximo"],
         "id_evaluacion_origen": datos.get("id_evaluacion_origen"),
-        "id_usuario_creacion": ID_USUARIO_SIMULADO,
+        "id_usuario_creacion": id_usuario_autenticado,
         "id_usuario_modificacion": None,
         "ts_creacion": ahora,
         "ts_modificacion": None,
@@ -97,24 +94,19 @@ def validar_evaluacion(datos):
 
 # Crea una nueva evaluación.
 def crear_evaluacion(datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} " "inició el registro de una evaluación."
+        f"Usuario {id_usuario_autenticado} " "inició el registro de una evaluación."
     )
 
     try:
-        # Valida que exista el usuario.
-        usuario = obtener_usuario(ID_USUARIO_SIMULADO)
-
-        if not usuario:
-            logger.warning("El usuario no existe.")
-            raise BusinessError("El usuario no existe.", 404)
-
         # Valida la información recibida.
         validar_evaluacion(datos)
 
         # Prepara los datos.
-        datos_evaluacion = preparar_datos_evaluacion(datos)
+        datos_evaluacion = preparar_datos_evaluacion(datos,id_usuario_autenticado)
 
         nueva_evaluacion = Evaluacion(**datos_evaluacion)
 
@@ -149,10 +141,12 @@ def crear_evaluacion(datos):
 
 # Modifica una evaluación existente.
 def modificar_evaluacion(id_evaluacion, datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     try:
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} " f"modificando la evaluación {id_evaluacion}."
+            f"Usuario {id_usuario_autenticado} " f"modificando la evaluación {id_evaluacion}."
         )
 
         # Busca la evaluación.
@@ -161,11 +155,6 @@ def modificar_evaluacion(id_evaluacion, datos):
         if not evaluacion:
             logger.warning(f"La evaluación {id_evaluacion} no existe.")
             return None
-
-        # Verifica que exista el usuario.
-        if not obtener_usuario(ID_USUARIO_SIMULADO):
-            logger.warning("El usuario no existe.")
-            raise BusinessError("El usuario no existe.", 404)
 
         # Indica si realmente hubo modificaciones.
         hubo_cambios = False
@@ -253,7 +242,7 @@ def modificar_evaluacion(id_evaluacion, datos):
             return evaluacion
 
         # Auditoría.
-        evaluacion.id_usuario_modificacion = ID_USUARIO_SIMULADO
+        evaluacion.id_usuario_modificacion = id_usuario_autenticado
         evaluacion.ts_modificacion = datetime.now()
 
         db.session.commit()
@@ -286,10 +275,12 @@ def modificar_evaluacion(id_evaluacion, datos):
 
 # Elimina una evaluación.
 def eliminar_evaluacion(id_evaluacion):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     try:
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} " f"eliminando la evaluación {id_evaluacion}."
+            f"Usuario {id_usuario_autenticado} " f"eliminando la evaluación {id_evaluacion}."
         )
 
         evaluacion = obtener_evaluacion_por_id(id_evaluacion)

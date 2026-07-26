@@ -3,15 +3,13 @@ from sqlalchemy.exc import IntegrityError
 from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
+from flask import g
 
 from models.modelo_asistencia import Asistencia, TipoRegistro
 from models.modelo_clase import EstadoClase
 from services.clase_service import obtener_clase_por_id
 from services.estado_asistencia_services import obtener_estado_asistencia_por_id
-from services.usuario_cliente import obtener_usuario
 from services.inscripcion_service import obtener_inscripcion_por_id
-
-ID_USUARIO_SIMULADO = 100
 
 
 # Obtiene el listado de asistencias.
@@ -93,7 +91,7 @@ def validar_item_asistencia(item, clase, id_clase):
 
 
 # Prepara los datos necesarios para crear una asistencia.
-def preparar_datos_asistencia(item, id_clase, fecha):
+def preparar_datos_asistencia(item, id_clase, fecha,id_usuario_autenticado):
 
     return {
         "id_inscripcion": item["id_inscripcion"],
@@ -101,7 +99,7 @@ def preparar_datos_asistencia(item, id_clase, fecha):
         "id_estado": item["id_estado"],
         "tipo_registro": TipoRegistro.MANUAL,
         "observacion": item.get("observacion"),
-        "id_usuario_creacion": ID_USUARIO_SIMULADO,
+        "id_usuario_creacion": id_usuario_autenticado,
         "id_usuario_modificacion": None,
         "ts_creacion": fecha,
         "ts_modificacion": None,
@@ -110,9 +108,10 @@ def preparar_datos_asistencia(item, id_clase, fecha):
 
 # Registra las asistencias de una clase.
 def crear_asistencias(datos):
-
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} inició el registro "
+        f"Usuario {id_usuario_autenticado} inició el registro "
         f"de asistencias para la clase {datos['id_clase']}."
     )
 
@@ -139,13 +138,6 @@ def crear_asistencias(datos):
                 "Solo es posible registrar asistencia en clases dictadas.", 400
             )
 
-        # Verifica que exista el usuario.
-        usuario = obtener_usuario(ID_USUARIO_SIMULADO)
-
-        if not usuario:
-            logger.warning("El usuario no existe.")
-            raise BusinessError("El usuario no existe.", 404)
-
         ahora = datetime.now()
 
         # Recorre todas las asistencias enviadas.
@@ -154,7 +146,7 @@ def crear_asistencias(datos):
             validar_item_asistencia(item, clase, datos["id_clase"])
 
             # Prepara los datos de la asistencia.
-            nueva_asistencia = preparar_datos_asistencia(item, datos["id_clase"], ahora)
+            nueva_asistencia = preparar_datos_asistencia(item, datos["id_clase"], ahora,id_usuario_autenticado)
 
             # Agrega la asistencia a la lista.
             lista_asistencias.append(Asistencia(**nueva_asistencia))
@@ -196,9 +188,10 @@ def crear_asistencias(datos):
 
 # Modifica una asistencia existente.
 def modificar_asistencia(id_asistencia, datos):
-
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} " f"modificando la asistencia {id_asistencia}."
+        f"Usuario {id_usuario_autenticado} " f"modificando la asistencia {id_asistencia}."
     )
 
     # Busca la asistencia.
@@ -207,11 +200,6 @@ def modificar_asistencia(id_asistencia, datos):
     if not asistencia:
         logger.warning(f"La asistencia {id_asistencia} no existe.")
         return None
-
-    # Verifica que exista el usuario.
-    if not obtener_usuario(ID_USUARIO_SIMULADO):
-        logger.warning("El usuario no existe.")
-        raise BusinessError("El usuario no existe.", 404)
 
     # Verifica que exista la clase.
     clase = obtener_clase_por_id(asistencia.id_clase)
@@ -266,7 +254,7 @@ def modificar_asistencia(id_asistencia, datos):
         return asistencia
 
     # Actualiza los datos de auditoría.
-    asistencia.id_usuario_modificacion = ID_USUARIO_SIMULADO
+    asistencia.id_usuario_modificacion = id_usuario_autenticado
     asistencia.ts_modificacion = datetime.now()
 
     try:
@@ -291,11 +279,13 @@ def modificar_asistencia(id_asistencia, datos):
 # Elimina una asistencia.
 # SOLO PARA DESARROLLO.
 def eliminar_asistencia(id_asistencia):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     try:
 
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} "
+            f"Usuario {id_usuario_autenticado} "
             f"eliminando la asistencia {id_asistencia}."
         )
 

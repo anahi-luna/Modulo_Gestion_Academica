@@ -3,10 +3,10 @@ from extensions import db
 from exceptions import BusinessError
 from sqlalchemy.exc import IntegrityError
 from utils.logger import logger
+from flask import g
 
 from services.legajo_cliente import obtener_legajo
 from services.comision_cliente import obtener_comision
-from services.usuario_cliente import obtener_usuario
 from services.estado_inscripcion_service import obtener_estado_por_nombre
 from services.resultado_plan_service import actualizar_resultado_plan
 from services.plan_asignatura_cliente import obtener_plan_asignatura
@@ -16,9 +16,7 @@ from models.modelo_estado_inscripcion import EstadoInscripcion
 from models.modelo_asistencia import Asistencia
 from models.modelo_calificacion import Calificacion
 
-ID_USUARIO_SIMULADO = 100
-
-
+# Verifica si ya existe una inscripción para el mismo alumno y comisión.
 def existe_inscripcion(id_legajo, id_comision):
     return (
         Inscripcion.query.filter_by(
@@ -27,8 +25,8 @@ def existe_inscripcion(id_legajo, id_comision):
         is not None
     )
 
-
-def preparar_datos_inscripcion(inscripcion_data, id_estado):
+# Prepara los datos para crear una nueva inscripción
+def preparar_datos_inscripcion(inscripcion_data, id_estado, id_usuario_autenticado):
     ahora = datetime.now()
 
     return {
@@ -36,7 +34,7 @@ def preparar_datos_inscripcion(inscripcion_data, id_estado):
         "id_comision": inscripcion_data["id_comision"],
         "id_estado": id_estado,
         "fecha_inscripcion": ahora,
-        "id_usuario_creacion": ID_USUARIO_SIMULADO,
+        "id_usuario_creacion": id_usuario_autenticado,
         "id_usuario_modificacion": None,
         "ts_creacion": ahora,
         "ts_modificacion": None,
@@ -56,7 +54,7 @@ def existe_calificacion_inscripcion(id_inscripcion):
         Calificacion.query.filter_by(id_inscripcion=id_inscripcion).first() is not None
     )
 
-
+# Obtiene el listado de inscripciones con filtros opcionales.
 def obtener_lista_de_inscripciones(id_estado=None, id_legajo=None, id_comision=None):
     logger.info("Consultando listado de inscripciones.")
 
@@ -72,18 +70,21 @@ def obtener_lista_de_inscripciones(id_estado=None, id_legajo=None, id_comision=N
 
     return query.all()
 
-
+# Obtiene una inscripción por su ID.
 def obtener_inscripcion_por_id(id_inscripcion):
 
     logger.info(f"Consultando inscripción {id_inscripcion}.")
 
     return db.session.get(Inscripcion, id_inscripcion)
 
-
+# Registra una nueva inscripción.
 def crear_inscripcion(datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
+
     try:
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} inició el registro de una inscripción."
+            f"Usuario {id_usuario_autenticado} inició el registro de una inscripción."
         )
 
         # Obtener el estado Pendiente desde la BD
@@ -114,12 +115,6 @@ def crear_inscripcion(datos):
             logger.warning(f"La comisión {datos['id_comision']} no posee cupo.")
             raise BusinessError("La comision no posee cupo disponible.", 400)
 
-        # Validamos si existe usuario
-        usuario = obtener_usuario(ID_USUARIO_SIMULADO)
-        if not usuario:
-            logger.warning("El usuario no existe.")
-            raise BusinessError("El usuario no existe.", 404)
-
         # Validamos si el alumno ya está inscripto en ESTA comisión
         if existe_inscripcion(datos["id_legajo"], datos["id_comision"]):
             logger.warning(
@@ -129,8 +124,11 @@ def crear_inscripcion(datos):
             raise BusinessError(
                 "El alumno ya se encuentra inscripto en esta comisión.", 400
             )
-
-        datos_inscripcion = preparar_datos_inscripcion(datos, estado.id_estado)
+        
+        # Prepara los datos de la inscripción.
+        datos_inscripcion = preparar_datos_inscripcion(
+            datos, estado.id_estado, id_usuario_autenticado
+        )
 
         # Crear inscripción
         inscripcion = Inscripcion(**datos_inscripcion)
@@ -163,14 +161,16 @@ def crear_inscripcion(datos):
 
         raise BusinessError("Ocurrió un error interno del servidor.", 500)
 
-
+# Modifica una inscripción existente.
 def modificar_inscripcion(id_inscripcion, datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     try:
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} modificando la inscripción {id_inscripcion}."
+            f"Usuario {id_usuario_autenticado} modificando la inscripción {id_inscripcion}."
         )
-
+        # Cambia el estado de la inscripción.
         inscripcion = obtener_inscripcion_por_id(id_inscripcion)
 
         if not inscripcion:
@@ -224,7 +224,8 @@ def modificar_inscripcion(id_inscripcion, datos):
             inscripcion.id_comision = datos["id_comision"]
             # Pendiente:Actualizar cupos cuando el microservicio de comisiones exponga su API.
 
-        inscripcion.id_usuario_modificacion = ID_USUARIO_SIMULADO
+        # Registra el usuario y fecha de modificación.
+        inscripcion.id_usuario_modificacion = id_usuario_autenticado
         inscripcion.ts_modificacion = datetime.now()
 
         db.session.commit()
@@ -255,10 +256,10 @@ def modificar_inscripcion(id_inscripcion, datos):
 
 
 def eliminar_inscripcion(id_inscripcion):
-
+    id_usuario_autenticado = g.id_usuario
     try:
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} eliminando la inscripción {id_inscripcion}."
+            f"Usuario {id_usuario_autenticado} eliminando la inscripción {id_inscripcion}."
         )
 
         inscripcion = obtener_inscripcion_por_id(id_inscripcion)

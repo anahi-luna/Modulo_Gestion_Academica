@@ -3,12 +3,10 @@ from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from exceptions import BusinessError
 from utils.logger import logger
+from flask import g
 from models.modelo_clase import Clase, EstadoClase
 from models.modelo_asistencia import Asistencia
 from services.comision_cliente import obtener_comision
-from services.usuario_cliente import obtener_usuario
-
-ID_USUARIO_SIMULADO = 100
 
 
 def obtener_lista_de_clases(id_comision=None, estado=None):
@@ -35,10 +33,13 @@ def obtener_clase_por_id(id_clase):
 
 
 def crear_clase(datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
+
     try:
 
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} " "inició el registro de una clase."
+            f"Usuario {id_usuario_autenticado} " "inició el registro de una clase."
         )
 
         # Valida la comisión.
@@ -71,16 +72,7 @@ def crear_clase(datos):
                 "La hora de fin debe ser mayor que la hora de inicio.", 400
             )
 
-        # Valida usuario.
-        usuario = obtener_usuario(ID_USUARIO_SIMULADO)
-
-        if not usuario:
-
-            logger.warning("El usuario no existe.")
-
-            raise BusinessError("El usuario no existe.", 404)
-
-        datos_clase = preparar_datos_clase(datos)
+        datos_clase = preparar_datos_clase(datos,id_usuario_autenticado)
 
         nueva_clase = Clase(**datos_clase)
 
@@ -118,10 +110,13 @@ def crear_clase(datos):
 # Modifica una clase existente.
 # Solo actualiza los campos enviados.
 def modificar_clase(id_clase, datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
+
     try:
 
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} " f"modificando la clase {id_clase}."
+            f"Usuario {id_usuario_autenticado} " f"modificando la clase {id_clase}."
         )
 
         clase = obtener_clase_por_id(id_clase)
@@ -174,7 +169,7 @@ def modificar_clase(id_clase, datos):
                 "La hora de fin debe ser mayor que la hora de inicio.", 400
             )
 
-        clase.id_usuario_modificacion = ID_USUARIO_SIMULADO
+        clase.id_usuario_modificacion = id_usuario_autenticado
         clase.ts_modificacion = datetime.now()
 
         db.session.commit()
@@ -207,10 +202,13 @@ def modificar_clase(id_clase, datos):
 
 
 def eliminar_clase(id_clase):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
+
     try:
 
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} " f"eliminando la clase {id_clase}."
+            f"Usuario {id_usuario_autenticado} " f"eliminando la clase {id_clase}."
         )
 
         clase = obtener_clase_por_id(id_clase)
@@ -274,7 +272,7 @@ def existe_numero_clase(id_comision, numero_clase):
 
 # Completa automáticamente los datos necesarios
 # para crear una nueva clase.
-def preparar_datos_clase(datos):
+def preparar_datos_clase(datos,id_usuario_autenticado):
     ahora = datetime.now()  # Obtiene la fecha y hora actual.
 
     # Devuelve un diccionario con toda la información
@@ -288,7 +286,7 @@ def preparar_datos_clase(datos):
         "tema": datos["tema"],
         "estado": EstadoClase.PROGRAMADA,  # Toda clase nueva comienza con estado PROGRAMADA.
         # Datos de auditoría.
-        "id_usuario_creacion": ID_USUARIO_SIMULADO,
+        "id_usuario_creacion": id_usuario_autenticado,
         "id_usuario_modificacion": None,
         "ts_creacion": ahora,
         "ts_modificacion": None,

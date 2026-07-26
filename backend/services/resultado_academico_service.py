@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
-
+from flask import g
 from models.modelo_resultado_academico import ResultadoAcademico
 from models.modelo_asistencia import Asistencia
 from models.modelo_calificacion import Calificacion
@@ -14,14 +14,12 @@ from models.modelo_inscripcion import Inscripcion
 from services.estado_academico_service import (
     obtener_estado_academico_por_nombre,
 )
-from services.usuario_cliente import obtener_usuario
 from services.comision_cliente import obtener_comision
 from services.plan_asignatura_cliente import obtener_plan_asignatura
 from services.inscripcion_service import obtener_inscripcion_por_id
 from services.resultado_plan_service import actualizar_resultado_plan
 from services.estado_inscripcion_service import obtener_estado_por_nombre
 
-ID_USUARIO_SIMULADO = 100
 
 # -------------------CONSULTAS-------------------#
 
@@ -101,6 +99,8 @@ def obtener_calificaciones(id_inscripcion):
 
 #Cambia el estado a finalizado de una inscripcion
 def finalizar_inscripcion(inscripcion):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     estado = obtener_estado_por_nombre(
         "Finalizada"
@@ -109,7 +109,7 @@ def finalizar_inscripcion(inscripcion):
     if inscripcion.id_estado != estado.id_estado:
 
         inscripcion.id_estado = estado.id_estado
-        inscripcion.id_usuario_modificacion = ID_USUARIO_SIMULADO
+        inscripcion.id_usuario_modificacion = id_usuario_autenticado
         inscripcion.ts_modificacion = datetime.now()
 
 # -------------------CÁLCULOS-------------------#
@@ -207,7 +207,7 @@ def validar_inscripcion_activa(inscripcion):
 
 # Prepara los datos necesarios para crear un resultado académico.
 def preparar_datos_resultado(
-    id_inscripcion, porcentaje_asistencia, promedio_final, estado
+    id_inscripcion, porcentaje_asistencia, promedio_final, estado,id_usuario_autenticado
 ):
 
     ahora = datetime.now()
@@ -218,7 +218,7 @@ def preparar_datos_resultado(
         "promedio_final": promedio_final,
         "id_estado_academico": estado.id_estado_academico,
         "fecha_resultado": ahora.date(),
-        "id_usuario_creacion": ID_USUARIO_SIMULADO,
+        "id_usuario_creacion": id_usuario_autenticado,
         "ts_creacion": ahora,
     }
 
@@ -228,18 +228,15 @@ def preparar_datos_resultado(
 
 # Genera los resultados académicos de todos los alumnos aceptados de una comisión finalizada.
 def crear_resultado_academico(datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} "
+        f"Usuario {id_usuario_autenticado} "
         "inició la generación de resultados académicos."
     )
 
     try:
-
-        # Verifica que exista el usuario.
-        if not obtener_usuario(ID_USUARIO_SIMULADO):
-
-            raise BusinessError("El usuario no existe.", 404)
 
         # Verifica que la comisión haya finalizado.
         validar_comision_finalizada(datos["id_comision"])
@@ -290,6 +287,7 @@ def crear_resultado_academico(datos):
                 porcentaje_asistencia,
                 promedio_final,
                 estado,
+                id_usuario_autenticado
             )
 
             resultados.append(ResultadoAcademico(**datos_resultado))
@@ -349,9 +347,11 @@ def crear_resultado_academico(datos):
 
 # Elimina un resultado académico. Solo para desarrollo
 def eliminar_resultado_academico(id_resultado_academico):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} "
+        f"Usuario {id_usuario_autenticado} "
         f"eliminando el resultado académico "
         f"{id_resultado_academico}."
     )
