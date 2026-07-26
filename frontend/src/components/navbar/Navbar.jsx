@@ -34,14 +34,14 @@ export default function Navbar({ modulo }) {
 
 // Lista de links a los módulos del sistema, con la ruta, el label y el permiso requerido para mostrarlos.
   const links = [
-    { to: "/inscripcionesAdmin", label: "Inscripciones", permiso: inscripcion.inscripciones.leer },
-    { to: "/inscripciones", label: "Inscribirme", permiso: inscripcion.inscripciones.crear },
-    { to: "/asistencia", label: "Asistencia", permiso: inscripcion.asistencias.leer },
-    { to: "/GestionClases", label: "Clases", permiso: inscripcion.clases.leer},
-    { to: "/GestionEvaluaciones", label: "Evaluaciones", permiso: inscripcion.evaluaciones.leer },
-    { to: "/calificaciones", label: "Calificaciones", permiso: inscripcion.calificaciones.leer },
-    { to: "/certificados", label: "Certificados", permiso: inscripcion.certificados.leer },
-    { to: "/resultado-plan", label: "Resultado del plan", permiso: inscripcion.resultado_plan.leer },
+    { to: "/inscripcionesAdmin", label: "Inscripciones", permiso: "inscripcion.inscripciones.leer" },
+    { to: "/inscripciones", label: "Inscribirme", permiso: "inscripcion.inscripciones.crear" },
+    { to: "/asistencia", label: "Asistencia", permiso: "inscripcion.asistencias.leer" },
+    { to: "/GestionClases", label: "Clases", permiso: "inscripcion.clases.leer"},
+    { to: "/GestionEvaluaciones", label: "Evaluaciones", permiso: "inscripcion.evaluaciones.leer" },
+    { to: "/calificaciones", label: "Calificaciones", permiso: "inscripcion.calificaciones.leer" },
+    { to: "/certificados", label: "Certificados", permiso: "inscripcion.certificados.leer" },
+    { to: "/resultado-plan", label: "Resultado del plan", permiso: "inscripcion.resultado_plan.leer" },
   ];
 
   function debeMostrarse(link) {

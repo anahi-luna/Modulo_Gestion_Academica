@@ -17,7 +17,7 @@ export default function Asistencia() {
 
 // Si el usuario es un alumno, no puede editar la asistencia, solo puede verla.
 // Si el usuario es un docente o administrador, puede editar la asistencia si tiene los permisos correspondientes.
-  const puedeEditar = [inscripcion.asistencias.crear, inscripcion.asistencias.actualizar].some(hasPermission);
+  const puedeEditar = ["inscripcion.asistencias.crear", "inscripcion.asistencias.actualizar"].some(hasPermission);
 
   if (esAlumno) {
     return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;

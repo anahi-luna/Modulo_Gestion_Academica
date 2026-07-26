@@ -37,7 +37,7 @@ export default function App() {
                         <Route
                             path="/inscripcionesAdmin"
                             element={
-                                <ProtectedRoute permissions={[inscripcion.inscripciones.leer]}>
+                                <ProtectedRoute permissions={["inscripcion.inscripciones.leer"]}>
                                     <InscripcionesAdmin />
                                 </ProtectedRoute>
                             }
@@ -48,7 +48,7 @@ export default function App() {
                         <Route
                             path="/asistencia"
                             element={
-                                <ProtectedRoute permissions={[inscripcion.asistencias.leer]}>
+                                <ProtectedRoute permissions={["inscripcion.asistencias.leer"]}>
                                     <Asistencia />
                                 </ProtectedRoute>
                             }
@@ -59,7 +59,7 @@ export default function App() {
                         <Route
                             path="/GestionClases"
                             element={
-                                <ProtectedRoute permissions={[inscripcion.clases.leer]}>
+                                <ProtectedRoute permissions={["inscripcion.clases.leer"]}>
                                     <GestionClases />
                                 </ProtectedRoute>
                             }
@@ -70,7 +70,7 @@ export default function App() {
                         <Route
                             path="/calificaciones"
                             element={
-                                <ProtectedRoute permissions={[inscripcion.calificaciones.leer]}>
+                                <ProtectedRoute permissions={["inscripcion.calificaciones.leer"]}>
                                     <Calificaciones />
                                 </ProtectedRoute>
                             }
@@ -80,7 +80,7 @@ export default function App() {
                         <Route
                             path="/GestionEvaluaciones"
                             element={
-                                <ProtectedRoute permissions={[inscripcion.evaluaciones.leer]}>
+                                <ProtectedRoute permissions={["inscripcion.evaluaciones.leer"]}>
                                     <GestionEvaluaciones />
                                 </ProtectedRoute>
                             }
@@ -91,7 +91,7 @@ export default function App() {
                         <Route
                             path="/certificados"
                             element={
-                                <ProtectedRoute permissions={[inscripcion.certificados.leer]}>
+                                <ProtectedRoute permissions={["inscripcion.certificados.leer"]}>
                                     <Certificados />
                                 </ProtectedRoute>
                             }
@@ -100,7 +100,7 @@ export default function App() {
                         <Route
                             path="/resultado-plan"
                             element={
-                                <ProtectedRoute permissions={[inscripcion.resultado_plan.leer]}>
+                                <ProtectedRoute permissions={["inscripcion.resultado_plan.leer"]}>
                                     <ResultadoPlan />
                                 </ProtectedRoute>
                             }
