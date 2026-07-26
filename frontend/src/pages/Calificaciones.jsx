@@ -17,7 +17,7 @@ export default function Calificaciones() {
   const esAlumno = hasRole("Alumno");
 // Si el usuario es un alumno, no puede editar la calificación, solo puede verla.
 // Si el usuario es un docente o administrador, puede editar la calificación si tiene los permisos correspondientes.
-  const puedeEditar = [inscripcion.calificaciones.crear, inscripcion.calificaciones.actualizar].some(hasPermission);
+  const puedeEditar = ["inscripcion.calificaciones.crear", "inscripcion.calificaciones.actualizar"].some(hasPermission);
 
   if (esAlumno) {
     return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;

@@ -25,9 +25,9 @@ export default function GestionEvaluaciones() {
 
     return (
         <VistaPersonal
-            puedeCrear={hasPermission(inscripcion.evaluaciones.crear)}
-            puedeActualizar={hasPermission(inscripcion.evaluaciones.actualizar)}
-            puedeEliminar={hasPermission(inscripcion.evaluaciones.eliminar)}
+            puedeCrear={hasPermission("inscripcion.evaluaciones.crear")}
+            puedeActualizar={hasPermission("inscripcion.evaluaciones.actualizar")}
+            puedeEliminar={hasPermission("inscripcion.evaluaciones.eliminar")}
         />
     );
 }

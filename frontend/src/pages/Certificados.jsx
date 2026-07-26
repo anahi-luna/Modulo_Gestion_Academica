@@ -24,9 +24,9 @@ export default function Certificados() {
   const { user: usuario, hasPermission, hasRole } = useAuth();
   const esAlumno = hasRole("Alumno");
 
-  const puedeEmitir = hasPermission(inscripcion.certificados.emitir);
-  const puedeActualizar = hasPermission(inscripcion.certificados.actualizar);
-  const puedeGenerarResultado = hasPermission(inscripcion.resultado_academico.generar);
+  const puedeEmitir = hasPermission("inscripcion.certificados.emitir");
+  const puedeActualizar = hasPermission("inscripcion.certificados.actualizar");
+  const puedeGenerarResultado = hasPermission("inscripcion.resultado_academico.generar");
 
   if (esAlumno) {
     return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} usuario={usuario} />;

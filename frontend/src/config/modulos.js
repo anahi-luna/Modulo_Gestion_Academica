@@ -8,7 +8,7 @@ export const MODULOS = [
         titulo: "Inscripciones",
         descripcion: "Alta, baja y modificación de inscripciones.",
         ruta: "/inscripcionesAdmin",
-        permisoLeer: inscripcion.inscripciones.leer,
+        permisoLeer: "inscripcion.inscripciones.leer",
         color: "red",
     },
     {
@@ -16,7 +16,7 @@ export const MODULOS = [
         titulo: "Gestión de clases",
         descripcion: "Programación de clases por comisión.",
         ruta: "/GestionClases",
-        permisoLeer: inscripcion.clases.leer,
+        permisoLeer: "inscripcion.clases.leer",
         color: "blue",
     },
     {
@@ -24,7 +24,7 @@ export const MODULOS = [
         titulo: "Asistencia",
         descripcion: "Registro y seguimiento de asistencia.",
         ruta: "/asistencia",
-        permisoLeer: inscripcion.asistencias.leer,
+        permisoLeer: "inscripcion.asistencias.leer",
         color: "blue",
     },
     {
@@ -32,7 +32,7 @@ export const MODULOS = [
         titulo: "Gestión de evaluaciones",
         descripcion: "Parciales, recuperatorios y trabajos prácticos.",
         ruta: "/GestionEvaluaciones",
-        permisoLeer: inscripcion.evaluaciones.leer,
+        permisoLeer: "inscripcion.evaluaciones.leer",
         color: "green",
     },
     {
@@ -40,7 +40,7 @@ export const MODULOS = [
         titulo: "Calificaciones",
         descripcion: "Carga y consulta de notas por evaluación.",
         ruta: "/calificaciones",
-        permisoLeer: inscripcion.calificaciones.leer,
+        permisoLeer: "inscripcion.calificaciones.leer",
         color: "green",
     },
     {
@@ -48,7 +48,7 @@ export const MODULOS = [
         titulo: "Certificados",
         descripcion: "Emisión, consulta y descarga de certificados.",
         ruta: "/certificados",
-        permisoLeer: inscripcion.certificados.leer,
+        permisoLeer: "inscripcion.certificados.leer",
         color: "yellow",
     },
     {
@@ -57,7 +57,7 @@ export const MODULOS = [
         descripcion: "Avance académico del alumno respecto de su plan de estudios.",
         ruta: "/resultado-plan",
 
-        permisoLeer: inscripcion.resultado_plan.leer,
+        permisoLeer: "inscripcion.resultado_plan.leer",
         color: "red",
     },
 ];
