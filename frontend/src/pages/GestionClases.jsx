@@ -10,7 +10,6 @@ import { getClases, registrarClase, modificarClase, borrarClase } from "../Servi
 import { obtenerMisClasesPlano } from "../Services/clasesAlumnoService";
 import { getComisiones } from "../mocks/comisionesMock";
 import useAuth from "../auth/hooks/useAuth";
-import { ACCIONES } from "../config/modulos";
 
 const ID_LEGAJO_ALUMNO_MOCK = 1; 
 

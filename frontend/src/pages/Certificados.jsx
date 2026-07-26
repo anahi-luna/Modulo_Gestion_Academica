@@ -5,7 +5,6 @@
 // un botón que abre un modal para elegir la comisión.
 import { useEffect, useState } from "react";
 import useAuth from "../auth/hooks/useAuth";
-import { ACCIONES } from "../config/modulos";
 import {
   obtenerFilasCertificados,
   obtenerMisCertificados,

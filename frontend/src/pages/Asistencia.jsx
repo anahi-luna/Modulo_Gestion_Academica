@@ -5,7 +5,6 @@ import EstadisticaCard from "../components/Asistencia/EstadisticaCard";
 import ResumenAsistenciaComisionCard from "../components/Asistencia/ResumenAsistenciaComisionCard";
 import { useState, useEffect } from "react";
 import useAuth from "../auth/hooks/useAuth";
-import { ACCIONES } from "../config/modulos";
 import { obtenerMiAsistencia } from "../Services/asistenciaAlumnoService";
 
 const ID_LEGAJO_ALUMNO_MOCK = 1; 

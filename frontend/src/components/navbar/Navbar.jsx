@@ -3,7 +3,6 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline'
 import user from "../../assets/user.png";
 import logo from "../../images/logo.jpeg";
-import { ACCIONES } from "../../config/modulos";
 import useAuth from "../../auth/hooks/useAuth";
 import { HOME_ROUTE } from "../../auth/config";
 

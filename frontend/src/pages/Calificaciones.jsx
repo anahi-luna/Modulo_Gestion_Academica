@@ -3,7 +3,6 @@
 // los alumnos de una clase.
 import { useEffect, useState } from "react";
 import useAuth from "../auth/hooks/useAuth";
-import { ACCIONES } from "../config/modulos";
 
 import PanelesComision from "../components/Calificaciones/PanelesComision";
 import PanelDetalleCalificaciones from "../components/Calificaciones/PanelDetalleCalificaciones";
