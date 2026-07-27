@@ -13,7 +13,7 @@ import {
   descargarCertificado,
 } from "../Services/certificadosService";
 import { generarResultadosAcademicos } from "../Services/resultadoAcademicoService";
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 import CertificadoCard from "../components/certificados/CertificadoCard";
 import TablaCertificadosAdmin from "../components/certificados/TablaCertificadosAdmin";
 import ModalEmitirCertificado from "../components/certificados/ModalEmitirCertificado";
@@ -91,7 +91,7 @@ function GenerarResultadosAcademicos() {
         >
           <option value="">Seleccioná una comisión</option>
           {comisiones.map((c) => (
-            <option key={c.id} value={c.id}>{c.codigo} - {c.materia}</option>
+            <option key={c.id_comision_asignatura} value={c.id_comision_asignatura}>{c.comision.descripcion} - {c.nombre}</option>
           ))}
         </select>
         <button
@@ -284,7 +284,7 @@ function VistaAlumno({ idLegajo, usuario }) {
 
         <div className="space-y-3">
           {certificados.map((c) => (
-            <CertificadoCard key={c.id} certificado={c} onDescargar={handleDescargar} />
+            <CertificadoCard key={c.id_comision_asignatura} certificado={c} onDescargar={handleDescargar} />
           ))}
         </div>
       </main>

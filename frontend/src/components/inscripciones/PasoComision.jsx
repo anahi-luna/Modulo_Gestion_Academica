@@ -78,9 +78,9 @@ export default function PasoComision({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                     {comisiones.map((com) => (
                         <ComisionCard
-                            key={com.id}
+                            key={com.id_comision_asignatura}
                             comision={com}
-                            seleccionada={comisionElegida?.id === com.id}
+                            seleccionada={comisionElegida?.id_comision_asignatura === com.id_comision_asignatura}
                             onSeleccionar={onSeleccionarComision}
                         />
                     ))}
@@ -92,7 +92,7 @@ export default function PasoComision({
                     </div>
                 )}
 
-                {/* Panel de confirmación */}
+                {/* Panel de confirmación IMPORTANTE CHEQUEAR SI FUNCIONA, SINO CAMBIAR DAtOS */}
                 {comisionElegida && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-4
                                     flex flex-col sm:flex-row items-start sm:items-center

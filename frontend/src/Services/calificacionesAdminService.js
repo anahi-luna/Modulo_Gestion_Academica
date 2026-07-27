@@ -1,5 +1,5 @@
 import * as legajosMock from "../mocks/legajosMock";
-import * as comisionesMock from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones, eliminarCalificacion } from "../api/calificacionesApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
 import { getListaEvaluaciones } from "../api/evaluacionesApi";
@@ -13,8 +13,8 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
     const response =
         await getCalificacionesPorEvaluacion(idEvaluacion);
 
-    const comisiones =
-        (await comisionesMock.getComisiones()).data;
+    const comisiones = (await getComisiones()).data;
+
 
     const resultado = await Promise.all(
 
@@ -27,7 +27,7 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
             ).data;
 
             const comision = comisiones.find(
-                c => c.id === inscripcion.id_comision
+                c => c.id_comision_asignatura === inscripcion.id_comision
             );
 
             return {
@@ -47,9 +47,9 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
 
                 id_comision: inscripcion.id_comision,
 
-                codigo_comision: comision?.codigo ?? "-",
+                codigo_comision: comision?.comision.descripcion ?? "-",
 
-                materia: comision?.materia ?? "-",
+                materia: comision?.nombre ?? "-",
 
                 nota: calificacion.puntaje,
 

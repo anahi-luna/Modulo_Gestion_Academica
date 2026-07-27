@@ -11,7 +11,7 @@ import {
 } from "../api/inscripcionesApi";
 
 import { getLegajoPorId } from "../mocks/legajosMock";
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 
 // Obtiene todas las inscripciones
 export async function obtenerInscripciones() {
@@ -27,7 +27,7 @@ export async function obtenerInscripciones() {
             ).data;
 
             const comision = comisiones.find(
-                c => c.id === inscripcion.id_comision
+                c => c.id_comision_asignatura === inscripcion.id_comision
             );
 
             return {
@@ -40,9 +40,9 @@ export async function obtenerInscripciones() {
 
                 id_comision: inscripcion.id_comision,
 
-                comision: comision?.codigo ?? "-",
+                comision: comision?.comision.descripcion ?? "-",
 
-                materia: comision?.materia ?? "-",
+                materia: comision?.nombre ?? "-",
 
                 estado: inscripcion.estado.nombre,
 
@@ -81,7 +81,7 @@ export async function obtenerInscripcionesPorComision(idComision) {
             ).data;
 
             const comision = comisiones.find(
-                c => c.id === inscripcion.id_comision
+                c => c.id_comision_asignatura === inscripcion.id_comision
             );
 
             return {
@@ -98,7 +98,7 @@ export async function obtenerInscripcionesPorComision(idComision) {
 
                 id_comision: inscripcion.id_comision,
 
-                materia: comision?.materia ?? "-",
+                materia: comision?.nombre ?? "-",
 
                 estado: inscripcion.estado.nombre,
 

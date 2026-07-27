@@ -1,6 +1,6 @@
 // servicios relacionados con la asistencia de los alumnos a las clases, para el personal de gestión
 import * as legajosMock from "../mocks/legajosMock";
-import * as comisionesMock from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 import { getAsistenciaPorClase, actualizarAsistencia, registrarAsistencia, eliminarAsistencia } from "../api/asistenciasApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
 import { modificarClase, getClases } from "./clasesAdminService";
@@ -8,13 +8,13 @@ import { modificarClase, getClases } from "./clasesAdminService";
 // obtiene todas las asistencias de una clase con los datos del alumno resueltos
 export async function obtenerAsistenciasPorClase(idClase) {
     const response   = await getAsistenciaPorClase(idClase);
-    const comisiones = (await comisionesMock.getComisiones()).data;
+    const comisiones = (await getComisiones()).data
 
     const resultado = await Promise.all(
         response.data.map(async (asistencia) => {
             const inscripcion = (await getInscripcionPorId(asistencia.id_inscripcion)).data;
             const legajo      = (await legajosMock.getLegajoPorId(inscripcion.id_legajo)).data;
-            const comision    = comisiones.find(c => c.id === inscripcion.id_comision);
+            const comision    = comisiones.find(c => c.id_comision_asignatura === inscripcion.id_comision);
 
             return {
                 id:              asistencia.id_asistencia,
@@ -23,9 +23,11 @@ export async function obtenerAsistenciasPorClase(idClase) {
                 rango:           legajo.rango,
                 id_inscripcion:  inscripcion.id_inscripcion,
                 id_comision:     inscripcion.id_comision,
-                codigo_comision: comision?.codigo   ?? "-",
-                materia:         comision?.materia  ?? "-",
+                codigo_comision: comision?.comision.descripcion   ?? "-",
+                materia:         comision?.nombre  ?? "-",
+                //modificar docente cuadno este agregado el dato
                 docente:         comision?.docente  ?? "-",
+                //modificar horario cuadno este agregado el dato
                 horario:         comision?.horario  ?? "-",
                 id_estado:       asistencia.id_estado,
                 observacion:     asistencia.observacion,

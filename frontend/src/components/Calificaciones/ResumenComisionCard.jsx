@@ -6,6 +6,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 export default function ResumenComisionCard({ comision }) {
   const [abierto, setAbierto] = useState(false);
 
+  //CHREQUEAR ESTADO COMISION
   const colorEstado = {
     Aprobado: "bg-green-100 text-green-700",
     Desaprobado: "bg-red-100 text-red-700",

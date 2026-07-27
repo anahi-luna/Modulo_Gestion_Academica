@@ -100,10 +100,10 @@ export default function ModalValidarInscripcion({
                         >
                             {comisiones.map((com) => (
                                 <option
-                                    key={com.id}
-                                    value={com.id}
+                                    key={com.id_comision_asignatura}
+                                    value={com.id_comision_asignatura}
                                 >
-                                    {com.codigo} - {com.materia}
+                                    {com.comision.descripcion} - {com.nombre}
                                 </option>
                             ))}
                         </select>

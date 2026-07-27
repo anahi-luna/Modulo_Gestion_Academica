@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { getComisiones } from "../../mocks/comisionesMock";
+import { getComisiones } from "../../api/comisiones";
 import ComisionCard from "./ComisionCard";
 import Alert from "../Alert";
 
@@ -60,9 +60,9 @@ export default function PanelesClase({
             <div className="space-y-3 overflow-y-auto max-h-72 lg:max-h-[600px] pr-1">
                 {comisiones.map((comision) => (
                     <ComisionCard
-                        key={comision.id}
+                        key={comision.id_comision_asignatura}
                         comision={comision}
-                        seleccionada={comision.id === comisionSeleccionada?.id}
+                        seleccionada={comision.id_comision_asignatura === comisionSeleccionada?.id_comision_asignatura}
                         onClick={() => setComisionSeleccionada(comision)}
                     />
                 ))}
