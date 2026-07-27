@@ -8,7 +8,7 @@ import {
     eliminarEvaluacion,
 } from "../api/evaluacionesApi";
 
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 
 // Coincide con seed/seed_tipo_evaluacion.py del back.
 const TIPOS_EVALUACION = {
@@ -43,7 +43,7 @@ export async function getEvaluaciones(idComision) {
     const resultado = response.data.map((evaluacion) => {
 
         const comision = comisiones.find(
-            c => c.id === evaluacion.id_comision
+            c => c.id_comision_asignatura === evaluacion.id_comision
         );
 
         return {
@@ -52,10 +52,10 @@ export async function getEvaluaciones(idComision) {
 
             id_comision: evaluacion.id_comision,
 
-            codigo: comision?.codigo ?? "-",
+            codigo: comision?.comision.descripcion ?? "-",
 
-            materia: comision?.materia ?? "-",
-
+            materia: comision?.nombre ?? "-",
+            //modificar docente cuando este agregado el dato
             docente: comision?.docente ?? "-",
 
             titulo: evaluacion.titulo,
@@ -81,7 +81,7 @@ export async function getEvaluacion(id) {
     const comisiones = (await getComisiones()).data;
 
     const comision = comisiones.find(
-        c => c.id === response.data.id_comision
+        c => c.id_comision_asignatura === response.data.id_comision
     );
 
     return {

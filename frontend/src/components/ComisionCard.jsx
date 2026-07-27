@@ -1,5 +1,8 @@
 // Componente de tarjeta de comisión que muestra información relevante de la comisión, como código, 
 // materia, docente, horario, cupo y correlativas.
+
+//LEER IMPORTANTE!!!!!!
+//CUANDO SE TERMINE DE HACER EL CUPO SE MODIFICA TODO EL CUPO, MISMO CON HORARIO Y DOCENTE
 export default function ComisionCard({ comision, onSeleccionar, seleccionada }) {
   // Calculamos el cupo restante
   const cupoLibre = comision.cupo - comision.inscriptos;
@@ -32,9 +35,9 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
       {/* Encabezado: código y materia */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div>
-          <p className="text-xs font-mono text-gray-400">{comision.codigo}</p>
+          <p className="text-xs font-mono text-gray-400">{comision.comision.descripcion}</p>
           <h3 className="font-bold text-gray-800 text-sm sm:text-base leading-tight">
-            {comision.materia}
+            {comision.nombre}
           </h3>
         </div>
         {/* Indicador de selección */}
@@ -56,13 +59,7 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
         <p className="text-xs text-gray-500 flex items-center gap-1">
           <span></span> {comision.horario}
         </p>
-        {/* Correlativas y rango mínimo si existen */}
-        {comision.rango_minimo && (
-          <p className="text-xs text-orange-600 flex items-center gap-1">
-            <span></span> Rango mínimo: {comision.rango_minimo}
-          </p>
-        )}
-        {comision.correlativas.length > 0 && (
+        {comision.plan_asignaturas.correlativas.length > 0 && (
           <p className="text-xs text-blue-600 flex items-center gap-1">
             <span></span> Requiere correlativas
           </p>

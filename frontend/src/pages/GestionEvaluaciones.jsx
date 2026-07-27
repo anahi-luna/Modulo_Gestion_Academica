@@ -6,7 +6,7 @@ import Alert from "../components/Alert";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getEvaluaciones, registrarEvaluacion, modificarEvaluacion, borrarEvaluacion } from "../Services/evaluacionesAdminService";
 import { obtenerMisEvaluacionesPlano } from "../Services/evaluacionesAlumnoService";
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 import useAuth from "../auth/hooks/useAuth";
 //gestión de evaluaciones: vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión
 //  en la que está inscripto.

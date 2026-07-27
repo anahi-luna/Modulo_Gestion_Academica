@@ -8,7 +8,7 @@ import Alert from "../components/Alert";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getClases, registrarClase, modificarClase, borrarClase } from "../Services/clasesAdminService";
 import { obtenerMisClasesPlano } from "../Services/clasesAlumnoService";
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 import useAuth from "../auth/hooks/useAuth";
 
 const ID_LEGAJO_ALUMNO_MOCK = 1; 

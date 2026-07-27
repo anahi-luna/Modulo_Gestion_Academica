@@ -56,7 +56,7 @@ export default function ModalClase({
         return null;
 
     const comisionSeleccionada = comisiones.find(
-        c => c.id === Number(formulario.id_comision)
+        c => c.id_comision_asignatura === Number(formulario.id_comision)
     );
 
     return (
@@ -102,10 +102,10 @@ export default function ModalClase({
                             {comisiones.map((comision) => (
 
                                 <option
-                                    key={comision.id}
-                                    value={comision.id}
+                                    key={comision.id_comision_asignatura}
+                                    value={comision.id_comision_asignatura}
                                 >
-                                    {comision.codigo} - {comision.materia}
+                                    {comision.comision.descripcion} - {comision.nombre}
                                 </option>
 
                             ))}
@@ -124,12 +124,12 @@ export default function ModalClase({
 
                                 <strong>Materia:</strong>{" "}
 
-                                {comisionSeleccionada.materia}
+                                {comisionSeleccionada.nombre}
 
                             </p>
 
                             <p>
-
+                                {/*Cambiar docente */}
                                 <strong>Docente:</strong>{" "}
 
                                 {comisionSeleccionada.docente}

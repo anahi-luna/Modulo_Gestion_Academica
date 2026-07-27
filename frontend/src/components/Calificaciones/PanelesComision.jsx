@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ComisionCard from "../Asistencia/ComisionCard";
 import Alert from "../Alert";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { getComisiones } from "../../mocks/comisionesMock";
+import { getComisiones } from "../../api/comisiones";
 
 // Componente para mostrar el panel de comisiones, incluyendo la búsqueda y selección de comisiones.
 export default function PanelesComision({
@@ -28,9 +28,9 @@ export default function PanelesComision({
         }
         cargarComisiones();
     }, []);
-
+    //Modificar docente cuando este
     const comisionesFiltradas = comisiones.filter((c) =>
-        `${c.materia} ${c.codigo} ${c.docente}`
+        `${c.nombre} ${c.comision.descripcion} ${c.docente}`
             .toLowerCase()
             .includes(busqueda.toLowerCase())
     );
@@ -62,9 +62,9 @@ export default function PanelesComision({
             <div className="space-y-3 overflow-y-auto max-h-72 lg:max-h-[600px] pr-1">
                 {comisionesFiltradas.map((comision) => (
                     <ComisionCard
-                        key={comision.id}
+                        key={comision.id_comision_asignatura}
                         comision={comision}
-                        seleccionada={comision.id === comisionSeleccionada?.id}
+                        seleccionada={comision.id_comision_asignatura === comisionSeleccionada?.id_comision_asignatura}
                         onClick={() => setComisionSeleccionada(comision)}
                     />
                 ))}

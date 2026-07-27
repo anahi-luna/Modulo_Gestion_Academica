@@ -9,7 +9,7 @@ import { getClase, getClases } from "../../Services/clasesAdminService";
 import { obtenerAsistenciasPorClase, modificarAsistencia, registrarAsistenciaService, actualizarEstadoAutomaticamente, eliminarAsistenciasPorClase, obtenerHistorialPorComision, eliminarAsistenciaService } from "../../Services/asistenciaAdminService";
 import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
 import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
-import { getComisiones } from "../../mocks/comisionesMock";
+import { getComisiones } from "../../api/comisiones";
 import Alert from "../Alert";
 
 // Componente principal para mostrar el panel de detalle de una clase,

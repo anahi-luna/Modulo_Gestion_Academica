@@ -2,18 +2,10 @@
 // Cuando los microservicios reales estén disponibles,
 // solamente será necesario modificar este archivo.
 import { getLegajo } from "../mocks/legajosMock";
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 import { crearInscripcion } from "../api/inscripcionesApi";
 import { getListaDeInscripciones } from "../api/inscripcionesApi";
 
-// Orden jerárquico de rangos
-
-const RANGOS = [
-    "Bombero",
-    "Cabo",
-    "Sargento",
-    "Suboficial Mayor"
-];
 
 // Buscar un legajo
 export async function buscarLegajo(numeroLegajo) {
@@ -40,25 +32,15 @@ export async function obtenerComisionesDisponibles(numeroLegajo) {
 
     const legajo = await buscarLegajo(numeroLegajo);
     const comisiones = await obtenerComisiones();
-    const indiceAlumno = RANGOS.indexOf(legajo.rango);
 
     return comisiones.filter((comision) => {
 
-        // 1. Validar rango mínimo
-        if (comision.rango_minimo !== null) {
 
-            const indiceRequerido = RANGOS.indexOf(comision.rango_minimo);
-
-            if (indiceAlumno < indiceRequerido) {
-                return false;
-            }
-        }
-
-        // 2. Validar correlativas
-        if (comision.correlativas.length > 0) {
+        // 1. Validar correlativas (Chequear que sea necesario)
+        if (comision.plan_asignaturas.correlativas.length > 0) {
 
             const cumpleCorrelativas =
-                comision.correlativas.every(idMateria =>
+                comision.plan_asignaturas.correlativas.every(idMateria =>
                     legajo.materias_aprobadas.includes(idMateria)
                 );
 
@@ -68,7 +50,7 @@ export async function obtenerComisionesDisponibles(numeroLegajo) {
 
         }
 
-        // 3. Validar cupo disponible
+        // 2. Validar cupo disponible (Cuando rebe haga calculo modificar)
         if (comision.inscriptos >= comision.cupo) {
             return false;
         }
@@ -105,7 +87,7 @@ export async function crearSolicitudInscripcion(
 
     const comisiones = await obtenerComisiones();
     const comision = comisiones.find(
-        c => c.id === idComision
+        c => c.id_comision_asignatura === idComision
     )
 
     // Enviamos la solicitud al backend por POST
@@ -138,9 +120,9 @@ export async function crearSolicitudInscripcion(
 
             alumno: `${legajo.nombre} ${legajo.apellido}`,
 
-            comision: comision?.codigo ?? "-",
+            comision: comision?.comision.descripcion ?? "-",
 
-            materia: comision?.materia ?? "-",
+            materia: comision?.nombre ?? "-",
 
             estado: data.estado.nombre,
 
@@ -164,14 +146,14 @@ export async function obtenerMisInscripciones(idLegajo) {
     const mias = response.data.filter(
         ins => ins.id_legajo === idLegajo
     );
-
+    //(Modificar horario cuando este)
     return mias.map(ins => {
-        const com = comisiones.find(c => c.id === ins.id_comision);
+        const com = comisiones.find(c => c.id_plan_asignatura === ins.id_comision);
         return {
             id: ins.id_inscripcion,
             id_comision: ins.id_comision,
-            materia: com?.materia ?? "-",
-            comision: com?.codigo ?? "-",
+            materia: com?.nombre ?? "-",
+            comision: com?.comision.descripcion ?? "-",
             horario: com?.horario ?? "-",
             estado: ins.estado.nombre,
             fecha_inscripcion: ins.fecha_inscripcion

@@ -1,6 +1,6 @@
 import { getListaClases, getClasePorId, crearClase, editarClase, eliminarClase } from "../api/clasesApi";
 
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 
 
 export async function getClases(idComision) {
@@ -12,7 +12,7 @@ export async function getClases(idComision) {
     const resultado = response.data.map((clase) => {
 
         const comision = comisiones.find(
-            c => c.id === clase.id_comision
+            c => c.id_comision_asignatura === clase.id_comision
         );
 
         return {
@@ -23,10 +23,10 @@ export async function getClases(idComision) {
 
             numero_clase: clase.numero_clase,
 
-            codigo: comision?.codigo ?? "-",
+            codigo: comision?.comision.descripcion ?? "-",
 
-            materia: comision?.materia ?? "-",
-
+            materia: comision?.nombre ?? "-",
+            //modificar docente cuadno este agregado el dato
             docente: comision?.docente ?? "-",
 
             tema: clase.tema,
@@ -56,7 +56,7 @@ export async function getClase(id) {
     const comisiones = (await getComisiones()).data;
 
     const comision = comisiones.find(
-        c => c.id === response.data.id_comision
+        c => c.id_comision_asignatura === response.data.id_comision
     );
 
     return {
@@ -67,10 +67,10 @@ export async function getClase(id) {
 
         numero_clase: response.data.numero_clase,
 
-        codigo: comision?.codigo ?? "-",
+        codigo: comision?.comision.descripcion ?? "-",
 
-        materia: comision?.materia ?? "-",
-
+        materia: comision?.nombre ?? "-",
+        //modificar docente cuadno este agregado el dato
         docente: comision?.docente ?? "-",
 
         tema: response.data.tema,

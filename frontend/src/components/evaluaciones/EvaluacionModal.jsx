@@ -84,8 +84,8 @@ export default function EvaluacionModal({
                         >
                             <option value="">Seleccione una comisión</option>
                             {comisiones.map((comision) => (
-                                <option key={comision.id} value={comision.id}>
-                                    {comision.codigo} - {comision.materia}
+                                <option key={comision.id_comsion_asignatura} value={comision.id_comsion_asignatura}>
+                                    {comision.comision.descripcion} - {comision.nombre}
                                 </option>
                             ))}
                         </select>
@@ -95,8 +95,9 @@ export default function EvaluacionModal({
                     {comisionSeleccionada && (
                         <div className="rounded-lg bg-gray-100 p-4 space-y-2">
                             <p>
-                                <strong>Materia:</strong> {comisionSeleccionada.materia}
+                                <strong>Materia:</strong> {comisionSeleccionada.nombre}
                             </p>
+                            {/*Cambiar docente */}
                             <p>
                                 <strong>Docente:</strong> {comisionSeleccionada.docente}
                             </p>
