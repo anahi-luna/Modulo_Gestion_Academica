@@ -8,19 +8,20 @@ import { getEvaluaciones, registrarEvaluacion, modificarEvaluacion, borrarEvalua
 import { obtenerMisEvaluacionesPlano } from "../Services/evaluacionesAlumnoService";
 import { getComisiones } from "../api/comisiones";
 import useAuth from "../auth/hooks/useAuth";
+import { obtenerIdLegajo } from "../config/legajo";
 //gestión de evaluaciones: vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión
 //  en la que está inscripto.
 //vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de
 //  todos los alumnos de una clase.
 
-const ID_LEGAJO_ALUMNO_MOCK = 1;
 
 export default function GestionEvaluaciones() {
     const { user: usuario, hasPermission, hasRole } = useAuth();
     const esAlumno = hasRole("Alumno");
+    const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {
-        return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
+        return <VistaAlumno idLegajo={idLegajo} />;
     }
 
     return (
@@ -43,6 +44,11 @@ function VistaAlumno({ idLegajo }) {
     const [filtroTipo, setFiltroTipo] = useState("");
 
     useEffect(() => {
+        if (!idLegajo) {
+            setCargando(false);
+            setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+            return;
+        }
         async function cargar() {
             setCargando(true);
             setError(null);

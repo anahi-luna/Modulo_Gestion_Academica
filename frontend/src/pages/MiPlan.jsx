@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import useAuth from "../auth/hooks/useAuth";
 import { obtenerMiPlan, obtenerMisMateriasDePlan } from "../Services/planesService";
 import ResumenMateriaPlanCard from "../components/planes/ResumenMateriaPlanCard";
+import { obtenerIdLegajo } from "../config/legajo";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1;
 
 const ESTILOS_ESTADO = {
   Finalizado: "bg-green-100 text-green-700",
@@ -18,6 +18,7 @@ const ESTILOS_ESTADO = {
 export default function MiPlan() {
   const { user: usuario, hasRole } = useAuth();
   const esAlumno = hasRole("Alumno");
+  const idLegajo = obtenerIdLegajo(usuario);
 
   const [plan, setPlan] = useState(null);
   const [materias, setMaterias] = useState([]);
@@ -29,6 +30,11 @@ export default function MiPlan() {
       setCargando(false);
       return;
     }
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);
@@ -37,8 +43,8 @@ export default function MiPlan() {
         // totales/aprobadas/finalizadas) y el detalle materia por
         // materia (finalizada o pendiente) que se despliega más abajo.
         const [planData, materiasData] = await Promise.all([
-          obtenerMiPlan(ID_LEGAJO_ALUMNO_MOCK),
-          obtenerMisMateriasDePlan(ID_LEGAJO_ALUMNO_MOCK),
+          obtenerMiPlan(idLegajo),
+          obtenerMisMateriasDePlan(idLegajo),
         ]);
         setPlan(planData);
         setMaterias(materiasData);
@@ -49,7 +55,7 @@ export default function MiPlan() {
       }
     }
     cargar();
-  }, [esAlumno]);
+  }, [esAlumno, idLegajo]);
 
   if (!esAlumno) {
     return (

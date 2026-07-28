@@ -8,8 +8,9 @@ import PanelesComision from "../components/Calificaciones/PanelesComision";
 import PanelDetalleCalificaciones from "../components/Calificaciones/PanelDetalleCalificaciones";
 import ResumenComisionCard from "../components/Calificaciones/ResumenComisionCard";
 import { obtenerMisCalificaciones } from "../Services/calificacionesAlumnoService";
+import { obtenerIdLegajo } from "../config/legajo";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; // ver TODO arriba
+
 
 export default function Calificaciones() {
   const { user: usuario, hasPermission, hasRole } = useAuth();
@@ -18,9 +19,10 @@ export default function Calificaciones() {
 // Si el usuario es un alumno, no puede editar la calificación, solo puede verla.
 // Si el usuario es un docente o administrador, puede editar la calificación si tiene los permisos correspondientes.
   const puedeEditar = ["inscripcion.calificaciones.crear", "inscripcion.calificaciones.actualizar"].some(hasPermission);
+  const idLegajo = obtenerIdLegajo(usuario)
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
+    return <VistaAlumno idLegajo={idLegajo} />;
   }
 
   return <VistaComisiones puedeEditar={puedeEditar} />;
@@ -73,6 +75,11 @@ function VistaAlumno({ idLegajo }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);

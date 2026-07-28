@@ -17,19 +17,20 @@ import { getComisiones } from "../api/comisiones";
 import CertificadoCard from "../components/certificados/CertificadoCard";
 import TablaCertificadosAdmin from "../components/certificados/TablaCertificadosAdmin";
 import ModalEmitirCertificado from "../components/certificados/ModalEmitirCertificado";
+import { obtenerIdLegajo } from "../config/legajo";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; 
 
 export default function Certificados() {
   const { user: usuario, hasPermission, hasRole } = useAuth();
   const esAlumno = hasRole("Alumno");
+  const idLegajo = obtenerIdLegajo(usuairo);
 
   const puedeEmitir = hasPermission("inscripcion.certificados.emitir");
   const puedeActualizar = hasPermission("inscripcion.certificados.actualizar");
   const puedeGenerarResultado = hasPermission("inscripcion.resultado_academico.generar");
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} usuario={usuario} />;
+    return <VistaAlumno idLegajo={idLegajo} usuario={usuario} />;
   }
 
   return (
@@ -241,6 +242,11 @@ function VistaAlumno({ idLegajo, usuario }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);
