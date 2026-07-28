@@ -31,8 +31,11 @@ class ResultadoAcademicoSchema(ma.SQLAlchemyAutoSchema):
 # Valida la creación de un resultado académico.
 class ResultadoAcademicoRequestSchema(ma.Schema):
 
-    id_comision = fields.Integer(
-        required=True
+    id_comision_asignatura = fields.Integer(
+        required=True,
+        error_messages={
+            "required": "La comisión asignatura es obligatoria."
+        }
     )
 
 
