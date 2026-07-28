@@ -21,7 +21,7 @@ def registrar_acciones():
 
     auth_url = os.getenv("AUTH_SERVICE_URL", "http://localhost:5000")
 
-    endpoint = f"{auth_url.rstrip('/')}/acciones"
+    endpoint = f"{auth_url.rstrip('/')}/auth/acciones"
 
     try:
         respuesta = requests.post(endpoint, json=datos, timeout=10)
