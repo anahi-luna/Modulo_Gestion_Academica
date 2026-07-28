@@ -1,4 +1,4 @@
-from mocks.mock_comisiones_asignaturas import COMISIONES
+from mocks.mock_comisiones import COMISIONES
 
 def obtener_comision(id_comision):
 
