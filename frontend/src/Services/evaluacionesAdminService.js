@@ -8,7 +8,7 @@ import {
     eliminarEvaluacion,
 } from "../api/evaluacionesApi";
 
-import { getComisiones } from "../api/comisiones";
+import { getComisiones, obtenerDocenteTitular } from "../api/comisiones";
 
 // Coincide con seed/seed_tipo_evaluacion.py del back.
 const TIPOS_EVALUACION = {
@@ -18,9 +18,7 @@ const TIPOS_EVALUACION = {
     4: "TP", // "Trabajo Práctico" en el back, lo dejo corto para la UI
 };
 
-// El formulario solo ofrece Parcial/TP/Final (ver EvaluacionModal.jsx),
-// así que el mapeo inverso cubre esos 3 + Recuperatorio por si se
-// necesita más adelante.
+// Coincide con seed/seed_tipo_evaluacion.py del back.
 const ID_POR_TIPO = {
     Parcial: 1,
     Recuperatorio: 2,
@@ -55,8 +53,8 @@ export async function getEvaluaciones(idComision) {
             codigo: comision?.comision.descripcion ?? "-",
 
             materia: comision?.nombre ?? "-",
-            //modificar docente cuando este agregado el dato
-            docente: comision?.docente ?? "-",
+
+            docente: obtenerDocenteTitular(comision),
 
             titulo: evaluacion.titulo,
 
@@ -90,11 +88,11 @@ export async function getEvaluacion(id) {
 
         id_comision: response.data.id_comision,
 
-        codigo: comision?.codigo ?? "-",
+        codigo: comision?.comision.descripcion ?? "-",
 
-        materia: comision?.materia ?? "-",
+        materia: comision?.nombre ?? "-",
 
-        docente: comision?.docente ?? "-",
+        docente: obtenerDocenteTitular(comision),
 
         titulo: response.data.titulo,
 

@@ -17,3 +17,21 @@ export async function getComisiones(){
         console.error(error)
     }
 }
+
+export function obtenerDocenteTitular(comisionAsignatura) {
+    const autoridades = comisionAsignatura?.autoridades ?? [];
+
+    if (autoridades.length === 0) return "-";
+
+    const titular = autoridades.find(a =>
+        a.tipo_autoridad?.descripcion?.toLowerCase().includes("titular")
+    );
+
+    const elegido = titular ?? autoridades[0];
+
+    const persona = elegido?.legajo?.persona;
+
+    if (!persona) return "-";
+
+    return `${persona.nombre} ${persona.apellido}`.trim() || "-";
+}

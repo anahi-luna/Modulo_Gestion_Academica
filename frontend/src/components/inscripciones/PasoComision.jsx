@@ -30,7 +30,7 @@ export default function PasoComision({
                     <p className="font-bold text-gray-800">
                         {legajoData.nombre} {legajoData.apellido}
                     </p>
-                    <p className="text-sm text-gray-500">{legajoData.rango}</p>
+                    {/*<p className="text-sm text-gray-500">{legajoData.rango}</p>*/}
                 </div>
                 <button
                     onClick={onCambiarLegajo}
@@ -102,7 +102,7 @@ export default function PasoComision({
                                 Seleccionaste: {comisionElegida.materia}
                             </p>
                             <p className="text-xs text-red-600">
-                                {comisionElegida.codigo} · {comisionElegida.horario}
+                                {comisionElegida.codigo} · {comisionElegida.modalidad}
                             </p>
                         </div>
                         <button
