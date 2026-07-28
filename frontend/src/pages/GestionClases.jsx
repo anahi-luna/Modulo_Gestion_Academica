@@ -10,15 +10,15 @@ import { getClases, registrarClase, modificarClase, borrarClase } from "../Servi
 import { obtenerMisClasesPlano } from "../Services/clasesAlumnoService";
 import { getComisiones } from "../api/comisiones";
 import useAuth from "../auth/hooks/useAuth";
-
-const ID_LEGAJO_ALUMNO_MOCK = 1; 
+import { obtenerIdLegajo } from "../config/legajo";
 
 export default function GestionClases() {
     const { user: usuario, hasPermission, hasRole } = useAuth();
     const esAlumno = hasRole("Alumno");
+    const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {
-        return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
+        return <VistaAlumno idLegajo={idLegajo} />;
     }
 
     return (
@@ -44,6 +44,11 @@ function VistaAlumno({ idLegajo }) {
     const [filtroTema, setFiltroTema] = useState("");
 
     useEffect(() => {
+        if (!idLegajo) {
+            setCargando(false);
+            setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+            return;
+        }
         async function cargar() {
             setCargando(true);
             setError(null);

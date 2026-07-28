@@ -12,8 +12,8 @@ import { obtenerMiPlan } from "../../Services/planesService";
 import { obtenerMisClases } from "../../Services/clasesAlumnoService";
 import { obtenerMiAsistencia } from "../../Services/asistenciaAlumnoService";
 import { obtenerMisCertificados } from "../../Services/certificadosService";
-
-const ID_LEGAJO_ALUMNO_MOCK = 1; 
+import { obtenerIdLegajo } from "../../config/legajo";
+ 
 const ESTILOS_ESTADO_PLAN = {
   Finalizado: "bg-green-100 text-green-700",
   "En curso": "bg-blue-100 text-blue-700",
@@ -22,6 +22,7 @@ const ESTILOS_ESTADO_PLAN = {
 };
 
 export default function HomeAlumno({ usuario }) {
+  const idLegajo = obtenerIdLegajo(usuario);
   const [inscripciones, setInscripciones] = useState([]);
   const [plan, setPlan] = useState(null);
   const [clasesInfo, setClasesInfo] = useState({ porComision: [], proximaClase: null });
@@ -31,17 +32,22 @@ export default function HomeAlumno({ usuario }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);
       try {
         const [misInscripciones, miPlan, misClases, miAsistencia, misCertificados] =
           await Promise.all([
-            obtenerMisInscripciones(ID_LEGAJO_ALUMNO_MOCK),
-            obtenerMiPlan(ID_LEGAJO_ALUMNO_MOCK),
-            obtenerMisClases(ID_LEGAJO_ALUMNO_MOCK),
-            obtenerMiAsistencia(ID_LEGAJO_ALUMNO_MOCK),
-            obtenerMisCertificados(ID_LEGAJO_ALUMNO_MOCK),
+            obtenerMisInscripciones(idLegajo),
+            obtenerMiPlan(idLegajo),
+            obtenerMisClases(idLegajo),
+            obtenerMiAsistencia(idLegajo),
+            obtenerMisCertificados(idLegajo),
           ]);
         setInscripciones(misInscripciones);
         setPlan(miPlan);
@@ -58,7 +64,7 @@ export default function HomeAlumno({ usuario }) {
       }
     }
     cargar();
-  }, []);
+  }, [idLegajo]);
 
   const tieneInscripciones = inscripciones.length > 0;
 

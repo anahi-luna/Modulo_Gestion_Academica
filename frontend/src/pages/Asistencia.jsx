@@ -6,21 +6,22 @@ import ResumenAsistenciaComisionCard from "../components/Asistencia/ResumenAsist
 import { useState, useEffect } from "react";
 import useAuth from "../auth/hooks/useAuth";
 import { obtenerMiAsistencia } from "../Services/asistenciaAlumnoService";
+import { obtenerIdLegajo } from "../config/legajo";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; 
 
 export default function Asistencia() {
   const [comisionSeleccionada, setComisionSeleccionada] = useState(null);
   const { user: usuario, hasPermission, hasRole } = useAuth();
 
   const esAlumno = hasRole("Alumno");
+  const idLegajo = obtenerIdLegajo(usuario);
 
 // Si el usuario es un alumno, no puede editar la asistencia, solo puede verla.
 // Si el usuario es un docente o administrador, puede editar la asistencia si tiene los permisos correspondientes.
   const puedeEditar = ["inscripcion.asistencias.crear", "inscripcion.asistencias.actualizar"].some(hasPermission);
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
+    return <VistaAlumno idLegajo={idLegajo} />;
   }
 
   return (
@@ -65,6 +66,11 @@ function VistaAlumno({ idLegajo }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);
