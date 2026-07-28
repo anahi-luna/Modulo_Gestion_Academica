@@ -31,7 +31,7 @@ class ClaseResumenSchema(ma.Schema):
 # Este schema valida todos los datos para la creacióm de una clase
 # Todos los campos son obligatorios.
 class ClaseRequestSchema(ma.Schema):
-    id_comision = fields.Integer(
+    id_comision_asignatura  = fields.Integer(
         required=True
     )
 
@@ -75,7 +75,7 @@ class ClaseRequestSchema(ma.Schema):
 # pueden enviarse de forma opcional.
 class ModificarClaseSchema(ma.Schema):
     # Comisión a la que pertenece la clase.
-    id_comision = fields.Integer(required=True)
+    id_comision_asignatura  = fields.Integer(required=True)
     #Después se valida todos los datos nuevos de la clase
     numero_clase = fields.Integer(required=False)
 
@@ -89,10 +89,7 @@ class ModificarClaseSchema(ma.Schema):
 
     estado = fields.String(required=False)
 
-# ============================================================
 # Instancias de los schemas utilizadas por los controladores.
-# ============================================================
-
 clase_schema = ClaseSchema() # Schema para una única clase.
 clases_schema = ClaseSchema(many=True) # Schema para una lista de clases.
 

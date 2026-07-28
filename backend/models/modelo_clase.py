@@ -4,7 +4,7 @@ from extensions import db
 class EstadoClase(Enum):
     PROGRAMADA = "Programada"
     DICTADA = "Dictada"
-    SUSPENDIDA = "Supendida"
+    SUSPENDIDA = "Suspendida"
     REPROGRAMADA = "Reprogramada"
 
 class Clase(db.Model):
@@ -15,9 +15,9 @@ class Clase(db.Model):
         primary_key = True
     )
 
-    id_comision = db.Column(
+    id_comision_asignatura = db.Column(
         db.Integer,
-        nullable = False
+        nullable=False
     )
 
     numero_clase = db.Column(
@@ -74,6 +74,6 @@ class Clase(db.Model):
     def __repr__(self):
         return (
             f"<Clase {self.numero_clase} - "
-            f"Comisión {self.id_comision}>"
+            f"Comisión Asignatura  {self.id_comision_asignatura}>"
         )
 

@@ -6,17 +6,17 @@ from utils.logger import logger
 from flask import g
 from models.modelo_clase import Clase, EstadoClase
 from models.modelo_asistencia import Asistencia
-from services.comision_cliente import obtener_comision
+from clients.planes_cliente import obtener_comision_asignatura_por_id
 
 
-def obtener_lista_de_clases(id_comision=None, estado=None):
+def obtener_lista_de_clases(id_comision_asignatura=None, estado=None):
     logger.info("Consultando listado de clases.")
     # Inicia la consulta sobre la tabla Clase.
     query = Clase.query
 
     # Si se recibe una comisión, filtra únicamente sus clases.
-    if id_comision is not None:
-        query = query.filter_by(id_comision=id_comision)
+    if id_comision_asignatura is not None:
+        query = query.filter_by(id_comision_asignatura=id_comision_asignatura)
 
     # Si se recibe un estado, filtra únicamente las clases con ese estado.
     if estado is not None:
@@ -43,25 +43,25 @@ def crear_clase(datos):
         )
 
         # Valida la comisión.
-        comision = obtener_comision(datos["id_comision"])
+        comision = obtener_comision_asignatura_por_id(datos["id_comision_asignatura"])
 
         if not comision:
 
-            logger.warning(f"La comisión {datos['id_comision']} no existe.")
+            logger.warning(f"La comisión asignatura {datos['id_comision_asignatura']} no existe.")
 
-            raise BusinessError("La comisión no existe.", 404)
+            raise BusinessError("La comisión asignatura no existe.", 404)
 
         # Verifica número de clase.
-        if existe_numero_clase(datos["id_comision"], datos["numero_clase"]):
+        if existe_numero_clase(datos["id_comision_asignatura"], datos["numero_clase"]):
 
             logger.warning(
                 f"Ya existe la clase "
                 f"{datos['numero_clase']} "
                 f"para la comisión "
-                f"{datos['id_comision']}."
+                f"{datos['id_comision_asignatura']}."
             )
 
-            raise BusinessError("Ya existe ese número de clase para la comisión.", 400)
+            raise BusinessError("Ya existe ese número de clase para la comisión asignatura.", 400)
 
         # Valida horario.
         if datos["hora_fin"] <= datos["hora_inicio"]:
@@ -145,18 +145,18 @@ def modificar_clase(id_clase, datos):
         if "numero_clase" in datos:
 
             if datos["numero_clase"] != clase.numero_clase and existe_numero_clase(
-                clase.id_comision, datos["numero_clase"]
+                clase.id_comision_asignatura, datos["numero_clase"]
             ):
 
                 logger.warning(
                     f"Ya existe la clase "
                     f"{datos['numero_clase']} "
                     f"para la comisión "
-                    f"{clase.id_comision}."
+                    f"{clase.id_comision_asignatura}."
                 )
 
                 raise BusinessError(
-                    "Ya existe ese número de clase para la comisión.", 400
+                    "Ya existe ese número de clase para la comisión asignatura.", 400
                 )
 
             clase.numero_clase = datos["numero_clase"]
@@ -261,10 +261,10 @@ def eliminar_clase(id_clase):
 
 # Verifica si ya existe un número de clase
 # dentro de una determinada comisión.
-def existe_numero_clase(id_comision, numero_clase):
+def existe_numero_clase(id_comision_asignatura, numero_clase):
     return (
         Clase.query.filter_by(
-            id_comision=id_comision, numero_clase=numero_clase
+            id_comision_asignatura=id_comision_asignatura, numero_clase=numero_clase
         ).first()
         is not None
     )
@@ -278,7 +278,7 @@ def preparar_datos_clase(datos,id_usuario_autenticado):
     # Devuelve un diccionario con toda la información
     # necesaria para crear el registro.
     return {
-        "id_comision": datos["id_comision"],
+        "id_comision_asignatura": datos["id_comision_asignatura"],
         "numero_clase": datos["numero_clase"],
         "fecha": datos["fecha"],
         "hora_inicio": datos["hora_inicio"],
