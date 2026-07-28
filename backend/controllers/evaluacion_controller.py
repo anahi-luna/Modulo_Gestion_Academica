@@ -10,12 +10,12 @@ from utils.response import success_response, error_response
 # Permite filtrar por comisión o tipo de evaluación.
 def get_lista_de_evaluaciones():
 
-    id_comision = request.args.get("id_comision", type=int)
+    id_comision_asignatura = request.args.get("id_comision_asignatura", type=int)
 
     id_tipo_evaluacion = request.args.get("id_tipo_evaluacion", type=int)
 
     evaluaciones = obtener_lista_de_evaluaciones(
-        id_comision=id_comision, id_tipo_evaluacion=id_tipo_evaluacion
+        id_comision_asignatura=id_comision_asignatura, id_tipo_evaluacion=id_tipo_evaluacion
     )
 
     resultado = evaluaciones_schema.dump(evaluaciones)

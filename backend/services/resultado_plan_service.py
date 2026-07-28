@@ -13,11 +13,12 @@ from services.estado_resultado_plan_service import (
     obtener_estado_resultado_plan_por_nombre,
     obtener_estado_resultado_plan_por_id,
 )
-from services.planes_cliente import obtener_plan
 from services.estado_inscripcion_service import obtener_estado_por_nombre
-from services.plan_asignatura_cliente import (obtener_planes_asignatura_por_plan)
-from services.legajo_cliente import obtener_legajo
-from services.comision_cliente import obtener_comisiones_por_plan_asignatura
+from clients.planes_cliente import (
+    obtener_legajo,
+    obtener_plan,
+    obtener_comisiones_asignaturas_por_plan
+)
 
 
 # -------------------CONSULTAS-------------------#
@@ -56,11 +57,11 @@ def obtener_inscripciones_plan(id_legajo, id_plan):
 
     inscripciones = []
 
-    comisiones = obtener_comisiones_plan(id_plan)
+    comisiones_asignaturas = obtener_comisiones_plan(id_plan)
 
-    for comision in comisiones:
+    for comision_asignatura in comisiones_asignaturas:
         resultado = Inscripcion.query.filter_by(
-            id_legajo=id_legajo, id_comision=comision["id_comision"]
+            id_legajo=id_legajo, id_comision_asignatura=comision_asignatura["id_comision_asignatura"]
         ).first()
 
         if resultado:
@@ -69,21 +70,11 @@ def obtener_inscripciones_plan(id_legajo, id_plan):
     return inscripciones
 
 
-# Obtiene todas las comisiones
+# Obtiene todas las comisiones asignaturas
 # correspondientes a un plan.
 def obtener_comisiones_plan(id_plan):
 
-    comisiones = []
-
-    planes = obtener_planes_asignatura_por_plan(id_plan)
-
-    for plan in planes:
-
-        comisiones.extend(
-            obtener_comisiones_por_plan_asignatura(plan["id_plan_asignatura"])
-        )
-
-    return comisiones
+    return obtener_comisiones_asignaturas_por_plan(id_plan)
 
 
 # Obtiene los resultados académicos correspondientes a un plan.
@@ -115,12 +106,12 @@ def obtener_resultado_plan(id_legajo, id_plan):
 # -------------------CÁLCULOS-------------------#
 
 
-# Calcula la cantidad total de materias del plan.
+# Calcula la cantidad total de comisiones asignaturas del plan.
 def calcular_materias_totales(id_plan):
 
-    planes = obtener_planes_asignatura_por_plan(id_plan)
+    comisiones_asignaturas = obtener_comisiones_plan(id_plan)
 
-    return len(planes)
+    return len(comisiones_asignaturas)
 
 
 # Calcula la cantidad de materias aprobadas.

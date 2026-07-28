@@ -121,3 +121,44 @@ def obtener_id_plan_por_comision_asignatura(
         return None
 
     return plan_asignatura.get("plan_id")
+
+
+# Obtiene todas las comisiones asignaturas pertenecientes a un plan.
+def obtener_comisiones_asignaturas_por_plan(id_plan, id_legajo=None, headers=None):
+
+    comisiones = obtener_comisiones_disponibles(
+        id_legajo=id_legajo,
+        headers=headers
+    )
+
+    if not comisiones:
+        return []
+
+    resultado = []
+
+    for comision in comisiones:
+
+        plan_asignatura = comision.get("plan_asignaturas")
+
+        if not plan_asignatura:
+            continue
+
+        if plan_asignatura.get("plan_id") == id_plan:
+            resultado.append(comision)
+
+    return resultado
+
+
+# Obtiene el Plan de Estudio por su identificador.
+def obtener_plan(id_plan, id_legajo=None, headers=None):
+
+    comisiones = obtener_comisiones_asignaturas_por_plan(
+        id_plan,
+        id_legajo=id_legajo,
+        headers=headers
+    )
+
+    if not comisiones:
+        return None
+
+    return comisiones[0]["plan_asignaturas"]["plan"]
