@@ -1,4 +1,4 @@
-import * as legajosMock from "../mocks/legajosMock";
+import * as legajosApi from "../api/legajosApi";
 import { getComisiones } from "../api/comisiones";
 import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones, eliminarCalificacion } from "../api/calificacionesApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
@@ -23,7 +23,7 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
             const inscripcion = (await getInscripcionPorId(calificacion.id_inscripcion)).data;
 
             const legajo = (
-                await (legajosMock.getLegajoPorId(inscripcion.id_legajo))
+            await (legajosApi.getLegajoPorId(inscripcion.id_legajo))
             ).data;
 
             const comision = comisiones.find(
@@ -41,7 +41,7 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
 
                 alumno: `${legajo.nombre} ${legajo.apellido}`,
 
-                rango: legajo.rango,
+                //rango: legajo.rango,
 
                 id_inscripcion: inscripcion.id_inscripcion,
 

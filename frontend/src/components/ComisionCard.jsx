@@ -1,7 +1,7 @@
 // Componente de tarjeta de comisión que muestra información relevante de la comisión, como código, 
 // materia, docente, horario, cupo y correlativas.
+import { obtenerDocenteTitular } from "../api/comisiones";
 
-//LEER IMPORTANTE!!!!!!
 //CUANDO SE TERMINE DE HACER EL CUPO SE MODIFICA TODO EL CUPO, MISMO CON HORARIO Y DOCENTE
 export default function ComisionCard({ comision, onSeleccionar, seleccionada }) {
   // Calculamos el cupo restante
@@ -54,10 +54,10 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
       {/* Docente y horario */}
       <div className="space-y-1 mb-3">
         <p className="text-xs text-gray-500 flex items-center gap-1">
-          <span></span> {comision.docente}
+          <span></span> {obtenerDocenteTitular(comision)}
         </p>
         <p className="text-xs text-gray-500 flex items-center gap-1">
-          <span></span> {comision.horario}
+          <span></span> {comision.modalidad}
         </p>
         {comision.plan_asignaturas.correlativas.length > 0 && (
           <p className="text-xs text-blue-600 flex items-center gap-1">

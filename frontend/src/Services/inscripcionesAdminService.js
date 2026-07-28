@@ -10,7 +10,7 @@ import {
     getInscripcionesPorComision
 } from "../api/inscripcionesApi";
 
-import { getLegajoPorId } from "../mocks/legajosMock";
+import { getLegajoPorId } from "../api/legajosApi";
 import { getComisiones } from "../api/comisiones";
 
 // Obtiene todas las inscripciones
@@ -94,7 +94,7 @@ export async function obtenerInscripcionesPorComision(idComision) {
 
                 dni: legajo.dni,
 
-                rango: legajo.rango,
+                //rango: legajo.rango,
 
                 id_comision: inscripcion.id_comision,
 

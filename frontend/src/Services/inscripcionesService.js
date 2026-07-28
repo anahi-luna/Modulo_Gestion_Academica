@@ -1,15 +1,14 @@
 // Servicio de Inscripciones
-// Cuando los microservicios reales estén disponibles,
-// solamente será necesario modificar este archivo.
-import { getLegajo } from "../mocks/legajosMock";
+import { getLegajoPorNumero } from "../api/legajosApi";
 import { getComisiones } from "../api/comisiones";
 import { crearInscripcion } from "../api/inscripcionesApi";
 import { getListaDeInscripciones } from "../api/inscripcionesApi";
+import { obtenerResultadosAcademicos } from "./resultadoAcademicoService";
 
 
 // Buscar un legajo
 export async function buscarLegajo(numeroLegajo) {
-    const response = await getLegajo(numeroLegajo);
+    const response = await getLegajoPorNumero(numeroLegajo);
     const legajo = response.data;
     // Validación local para evitar continuar
     // con el flujo si el legajo está inactivo.
@@ -27,11 +26,22 @@ export async function obtenerComisiones() {
     return response.data;
 }
 
+async function obtenerMateriasAprobadas(idLegajo) {
+    const resultados = await obtenerResultadosAcademicos(idLegajo);
+    const comisiones = await obtenerComisiones();
+
+    return resultados
+        .filter(r => r.estado_academico === "Aprobado")
+        .map(r => comisiones.find(c => c.id_comision_asignatura === r.id_comision)?.plan_asignaturas?.asignatura_id)
+        .filter(Boolean);
+}
+
 // Obtener únicamente las comisiones que el alumno puede cursar
 export async function obtenerComisionesDisponibles(numeroLegajo) {
 
     const legajo = await buscarLegajo(numeroLegajo);
     const comisiones = await obtenerComisiones();
+    const materiasAprobadas = await obtenerMateriasAprobadas(legajo.id_legajo);
 
     return comisiones.filter((comision) => {
 
@@ -40,8 +50,8 @@ export async function obtenerComisionesDisponibles(numeroLegajo) {
         if (comision.plan_asignaturas.correlativas.length > 0) {
 
             const cumpleCorrelativas =
-                comision.plan_asignaturas.correlativas.every(idMateria =>
-                    legajo.materias_aprobadas.includes(idMateria)
+                comision.plan_asignaturas.correlativas.every(correlativa =>
+                    materiasAprobadas.includes(correlativa.asignatura_id)
                 );
 
             if (!cumpleCorrelativas) {
@@ -137,7 +147,6 @@ export async function crearSolicitudInscripcion(
 }
 
 // Obtiene las inscripciones del legajo del alumno logueado.
-// Filtra del listado completo ya que todavía no existe un endpoint por legajo.
 export async function obtenerMisInscripciones(idLegajo) {
 
     const response = await getListaDeInscripciones();
@@ -148,13 +157,13 @@ export async function obtenerMisInscripciones(idLegajo) {
     );
     //(Modificar horario cuando este)
     return mias.map(ins => {
-        const com = comisiones.find(c => c.id_plan_asignatura === ins.id_comision);
+        const com = comisiones.find(c => c.id_comision_asignatura === ins.id_comision);
         return {
             id: ins.id_inscripcion,
             id_comision: ins.id_comision,
             materia: com?.nombre ?? "-",
             comision: com?.comision.descripcion ?? "-",
-            horario: com?.horario ?? "-",
+            horario: com?.modalidad ?? "-",
             estado: ins.estado.nombre,
             fecha_inscripcion: ins.fecha_inscripcion
         };

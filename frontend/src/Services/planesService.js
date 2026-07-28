@@ -2,7 +2,7 @@
 //  para el alumno, muestra su propio plan de estudios y materias cursadas; para el personal de gestión,
 //  muestra todos los planes de todos los alumnos.
 import { getListaResultadosPlan, actualizarEstadoResultadoPlan } from "../api/resultadoPlanApi";
-import { getLegajoPorId } from "../mocks/legajosMock";
+import { getLegajoPorId } from "../api/legajosApi";
 import { emitir } from "./certificadosService";
 import { obtenerMisCalificaciones } from "./calificacionesAlumnoService";
 import { obtenerResultadosAcademicos } from "./resultadoAcademicoService";

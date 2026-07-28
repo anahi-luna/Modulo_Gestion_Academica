@@ -1,6 +1,6 @@
 // servicios relacionados con la asistencia de los alumnos a las clases, para el personal de gestión
-import * as legajosMock from "../mocks/legajosMock";
-import { getComisiones } from "../api/comisiones";
+import * as legajosApi from "../api/legajosApi";
+import { getComisiones, obtenerDocenteTitular } from "../api/comisiones";
 import { getAsistenciaPorClase, actualizarAsistencia, registrarAsistencia, eliminarAsistencia } from "../api/asistenciasApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
 import { modificarClase, getClases } from "./clasesAdminService";
@@ -13,22 +13,21 @@ export async function obtenerAsistenciasPorClase(idClase) {
     const resultado = await Promise.all(
         response.data.map(async (asistencia) => {
             const inscripcion = (await getInscripcionPorId(asistencia.id_inscripcion)).data;
-            const legajo      = (await legajosMock.getLegajoPorId(inscripcion.id_legajo)).data;
+            const legajo      = (await legajosApi.getLegajoPorId(inscripcion.id_legajo)).data;
             const comision    = comisiones.find(c => c.id_comision_asignatura === inscripcion.id_comision);
 
             return {
                 id:              asistencia.id_asistencia,
                 id_legajo:       legajo.numero_legajo,
                 alumno:          `${legajo.nombre} ${legajo.apellido}`,
-                rango:           legajo.rango,
+               // rango:           legajo.rango,
                 id_inscripcion:  inscripcion.id_inscripcion,
                 id_comision:     inscripcion.id_comision,
                 codigo_comision: comision?.comision.descripcion   ?? "-",
                 materia:         comision?.nombre  ?? "-",
-                //modificar docente cuadno este agregado el dato
-                docente:         comision?.docente  ?? "-",
-                //modificar horario cuadno este agregado el dato
-                horario:         comision?.horario  ?? "-",
+
+                docente:         obtenerDocenteTitular(comision),
+                 horario:         comision?.modalidad  ?? "-",
                 id_estado:       asistencia.id_estado,
                 observacion:     asistencia.observacion,
             };
