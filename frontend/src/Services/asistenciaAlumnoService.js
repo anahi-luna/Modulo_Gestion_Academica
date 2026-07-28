@@ -3,7 +3,7 @@
 import { obtenerMisInscripciones } from "./inscripcionesService";
 import { getClases } from "./clasesAdminService";
 import { obtenerAsistenciasPorClase } from "./asistenciaAdminService";
-import { getLegajoPorId } from "../mocks/legajosMock";
+import { getLegajoPorId } from "../api/legajosApi";
 
 // mismo mapeo que usa EstadoSelect.jsx en la vista de gestión
 const ESTADOS = {

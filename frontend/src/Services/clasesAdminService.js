@@ -1,8 +1,8 @@
 import { getListaClases, getClasePorId, crearClase, editarClase, eliminarClase } from "../api/clasesApi";
 
-import { getComisiones } from "../api/comisiones";
+import { getComisiones, obtenerDocenteTitular } from "../api/comisiones";
 
-
+// Obtiene todas las clases de una comisión
 export async function getClases(idComision) {
 
     const response = await getListaClases(idComision);
@@ -26,8 +26,8 @@ export async function getClases(idComision) {
             codigo: comision?.comision.descripcion ?? "-",
 
             materia: comision?.nombre ?? "-",
-            //modificar docente cuadno este agregado el dato
-            docente: comision?.docente ?? "-",
+
+            docente: obtenerDocenteTitular(comision),
 
             tema: clase.tema,
 
@@ -70,8 +70,8 @@ export async function getClase(id) {
         codigo: comision?.comision.descripcion ?? "-",
 
         materia: comision?.nombre ?? "-",
-        //modificar docente cuadno este agregado el dato
-        docente: comision?.docente ?? "-",
+
+        docente: obtenerDocenteTitular(comision),
 
         tema: response.data.tema,
 

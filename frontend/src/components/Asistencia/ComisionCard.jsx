@@ -1,4 +1,6 @@
 // Componente para mostrar la información de una comisión
+import { obtenerDocenteTitular } from "../../api/comisiones";
+
 export default function ComisionCard({
 
     comision,
@@ -30,7 +32,7 @@ export default function ComisionCard({
             </p>
 
             <p className="text-sm text-gray-500">
-                {comision.docente}
+                {obtenerDocenteTitular(comision)}
             </p>
 
         </div>

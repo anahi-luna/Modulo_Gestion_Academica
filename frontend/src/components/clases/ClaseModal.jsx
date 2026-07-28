@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
+import { obtenerDocenteTitular } from "../../api/comisiones";
 // Componente para mostrar un modal de creación o edición de clase, con campos para seleccionar 
 // comisión, fecha, horarios, tema y estado.
 export default function ModalClase({
@@ -132,8 +133,7 @@ export default function ModalClase({
                                 {/*Cambiar docente */}
                                 <strong>Docente:</strong>{" "}
 
-                                {comisionSeleccionada.docente}
-
+                                {obtenerDocenteTitular(comisionSeleccionada)}
                             </p>
 
                         </div>

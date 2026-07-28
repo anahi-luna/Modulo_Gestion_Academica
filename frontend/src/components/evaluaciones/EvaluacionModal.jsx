@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
+import { obtenerDocenteTitular } from "../../api/comisiones";
 
 // Componente para mostrar un modal de creación o edición de evaluación, con campos para seleccionar la comisión,
 //  tipo, título, fecha y puntaje máximo.
@@ -84,7 +85,7 @@ export default function EvaluacionModal({
                         >
                             <option value="">Seleccione una comisión</option>
                             {comisiones.map((comision) => (
-                                <option key={comision.id_comsion_asignatura} value={comision.id_comsion_asignatura}>
+                                <option key={comision.id_comsion_asignatura} value={comision.id_comision_asignatura}>
                                     {comision.comision.descripcion} - {comision.nombre}
                                 </option>
                             ))}
@@ -99,7 +100,7 @@ export default function EvaluacionModal({
                             </p>
                             {/*Cambiar docente */}
                             <p>
-                                <strong>Docente:</strong> {comisionSeleccionada.docente}
+                                <strong>Docente:</strong> {obtenerDocenteTitular(comisionSeleccionada)}
                             </p>
                         </div>
                     )}
