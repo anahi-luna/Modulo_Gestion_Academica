@@ -1,7 +1,9 @@
 from extensions import ma
 from marshmallow import fields
+
 from models.modelo_evaluacion import Evaluacion
 from schemas.tipo_evaluacion_schema import TipoEvaluacionSchema
+
 
 # Convierte los objetos del modelo Evaluacion en formato JSON.
 # También incluye la información del tipo de evaluación.
@@ -18,6 +20,7 @@ class EvaluacionSchema(ma.SQLAlchemyAutoSchema):
         dump_only=True
     )
 
+
 # Schema resumido de una evaluación.
 # Se utiliza como objeto anidado en Calificación.
 class EvaluacionResumenSchema(ma.Schema):
@@ -32,13 +35,14 @@ class EvaluacionResumenSchema(ma.Schema):
 
     id_tipo_evaluacion = fields.Integer()
 
+
 # Valida los datos enviados para crear una evaluación.
 class EvaluacionRequestSchema(ma.Schema):
 
-    id_comision = fields.Integer(
+    id_comision_asignatura = fields.Integer(
         required=True,
         error_messages={
-            "required": "La comisión es obligatoria."
+            "required": "La comisión asignatura es obligatoria."
         }
     )
 
@@ -77,10 +81,11 @@ class EvaluacionRequestSchema(ma.Schema):
 
 
 # Valida los datos enviados para modificar una evaluación.
-# Todos los campos son opcionales.
+# Solo el id de la comisión asignatura es obligatorio;
+# el resto de los campos pueden enviarse opcionalmente.
 class ModificarEvaluacionSchema(ma.Schema):
 
-    id_comision = fields.Integer(
+    id_comision_asignatura = fields.Integer(
         required=True
     )
 
@@ -107,9 +112,10 @@ class ModificarEvaluacionSchema(ma.Schema):
 
 
 # Instancias de los schemas utilizadas por los controladores.
-
 evaluacion_schema = EvaluacionSchema()
+
 evaluaciones_schema = EvaluacionSchema(many=True)
 
 evaluacion_request_schema = EvaluacionRequestSchema()
+
 modificar_evaluacion_schema = ModificarEvaluacionSchema()

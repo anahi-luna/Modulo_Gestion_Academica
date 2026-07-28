@@ -1,5 +1,6 @@
 from extensions import db
 
+
 class Evaluacion(db.Model):
     __tablename__ = "evaluacion"
 
@@ -8,7 +9,8 @@ class Evaluacion(db.Model):
         primary_key=True
     )
 
-    id_comision = db.Column(
+    # Comisión asignatura a la que pertenece la evaluación.
+    id_comision_asignatura = db.Column(
         db.Integer,
         nullable=False
     )
@@ -29,6 +31,8 @@ class Evaluacion(db.Model):
         nullable=False
     )
 
+    # Si la evaluación es un recuperatorio,
+    # referencia la evaluación original.
     id_evaluacion_origen = db.Column(
         db.Integer,
         db.ForeignKey("evaluacion.id_evaluacion"),
@@ -77,4 +81,4 @@ class Evaluacion(db.Model):
             f"<Evaluacion "
             f"{self.id_evaluacion} - "
             f"{self.titulo}>"
-        ) 
+        )

@@ -9,20 +9,20 @@ from utils.logger import logger
 from models.modelo_evaluacion import Evaluacion
 from models.modelo_calificacion import Calificacion
 
-from services.comision_cliente import obtener_comision
+from clients.planes_cliente import obtener_comision_asignatura_por_id
 from services.tipo_evaluacion_service import obtener_tipo_evaluacion_por_id
 
 
 # Obtiene el listado de evaluaciones.
 # Permite filtrar por comisión o tipo de evaluación.
-def obtener_lista_de_evaluaciones(id_comision=None, id_tipo_evaluacion=None):
+def obtener_lista_de_evaluaciones(id_comision_asignatura=None, id_tipo_evaluacion=None):
 
     logger.info("Consultando listado de evaluaciones.")
 
     query = Evaluacion.query
 
-    if id_comision is not None:
-        query = query.filter_by(id_comision=id_comision)
+    if id_comision_asignatura is not None:
+        query = query.filter_by(id_comision_asignatura=id_comision_asignatura)
 
     if id_tipo_evaluacion is not None:
         query = query.filter_by(id_tipo_evaluacion=id_tipo_evaluacion)
@@ -42,7 +42,7 @@ def obtener_evaluacion_por_id(id_evaluacion):
 def preparar_datos_evaluacion(datos,id_usuario_autenticado):
     ahora = datetime.now()
     return {
-        "id_comision": datos["id_comision"],
+        "id_comision_asignatura": datos["id_comision_asignatura"],
         "id_tipo_evaluacion": datos["id_tipo_evaluacion"],
         "titulo": datos["titulo"],
         "fecha_evaluacion": datos["fecha_evaluacion"],
@@ -59,11 +59,11 @@ def preparar_datos_evaluacion(datos,id_usuario_autenticado):
 def validar_evaluacion(datos):
 
     # Verifica que exista la comisión.
-    comision = obtener_comision(datos["id_comision"])
+    comision = obtener_comision_asignatura_por_id(datos["id_comision_asignatura"])
 
     if not comision:
-        logger.warning(f"La comisión {datos['id_comision']} no existe.")
-        raise BusinessError("La comisión no existe.", 404)
+        logger.warning(f"La comisión asignatura {datos['id_comision_asignatura']} no existe.")
+        raise BusinessError("La comisión asignatura  no existe.", 404)
 
     # Verifica que exista el tipo de evaluación.
     tipo = obtener_tipo_evaluacion_por_id(datos["id_tipo_evaluacion"])
@@ -160,14 +160,14 @@ def modificar_evaluacion(id_evaluacion, datos):
         hubo_cambios = False
 
         # Comisión
-        if "id_comision" in datos:
+        if "id_comision_asignatura" in datos:
 
-            if not obtener_comision(datos["id_comision"]):
-                logger.warning(f"La comisión {datos['id_comision']} no existe.")
-                raise BusinessError("La comisión no existe.", 404)
+            if not obtener_comision_asignatura_por_id(datos["id_comision_asignatura"]):
+                logger.warning(f"La comisión asignatura {datos['id_comision_asignatura']} no existe.")
+                raise BusinessError("La comisión asignatura no existe.", 404)
 
-            if evaluacion.id_comision != datos["id_comision"]:
-                evaluacion.id_comision = datos["id_comision"]
+            if evaluacion.id_comision_asignatura != datos["id_comision_asignatura"]:
+                evaluacion.id_comision_asignatura = datos["id_comision_asignatura"]
                 hubo_cambios = True
 
         # Tipo de evaluación
