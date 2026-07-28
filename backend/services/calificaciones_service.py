@@ -61,17 +61,17 @@ def validar_item_calificacion(item, evaluacion):
 
     # Verifica que la inscripción pertenezca
     # a la comisión de la evaluación.
-    if inscripcion.id_comision != evaluacion.id_comision:
+    if inscripcion.id_comision_asignatura != evaluacion.id_comision_asignatura:
 
         logger.warning(
             f"La inscripción "
             f"{inscripcion.id_inscripcion} "
-            f"no pertenece a la comisión "
-            f"{evaluacion.id_comision}."
+            f"no pertenece a la comisión asignatura "
+            f"{evaluacion.id_comision_asignatura}."
         )
 
         raise BusinessError(
-            "La inscripción no pertenece a la comisión de la evaluación.", 400
+            "La inscripción no pertenece a la comisión asignatura de la evaluación.", 400
         )
 
     # Verifica que no exista una calificación previa.
