@@ -58,17 +58,17 @@ def validar_item_asistencia(item, clase, id_clase):
         )
 
     # Verifica que la inscripción pertenezca
-    # a la comisión de la clase.
-    if inscripcion.id_comision != clase.id_comision:
+    # a la comisión asignatura de la clase.
+    if inscripcion.id_comision_asignatura != clase.id_comision_asignatura:
         logger.warning(
             f"La inscripción "
             f"{inscripcion.id_inscripcion} "
-            f"no pertenece a la comisión "
-            f"{clase.id_comision}."
+            f"no pertenece a la comisión asignatura"
+            f"{clase.id_comision_asignatura}."
         )
 
         raise BusinessError(
-            "La inscripción no pertenece a la comisión de la clase.", 400
+            "La inscripción no pertenece a la comisión asignatura de la clase.", 400
         )
 
     # Verifica que exista el estado.
