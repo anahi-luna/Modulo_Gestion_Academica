@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import ComisionCard from "../Asistencia/ComisionCard";
 import Alert from "../Alert";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { getComisiones } from "../../api/comisiones";
 import { getComisiones, obtenerDocenteTitular } from "../../api/comisiones";
 
 // Componente para mostrar el panel de comisiones, incluyendo la búsqueda y selección de comisiones.
