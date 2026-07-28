@@ -5,11 +5,12 @@ from sqlalchemy.exc import IntegrityError
 from utils.logger import logger
 from flask import g
 
-from services.legajo_cliente import obtener_legajo
-from services.comision_cliente import obtener_comision
+from clients.planes_cliente import (
+    obtener_comision_asignatura_por_id,
+    obtener_legajo
+)
 from services.estado_inscripcion_service import obtener_estado_por_nombre
 from services.resultado_plan_service import actualizar_resultado_plan
-from services.plan_asignatura_cliente import obtener_plan_asignatura
 
 from models.modelo_inscripcion import Inscripcion
 from models.modelo_estado_inscripcion import EstadoInscripcion
@@ -17,10 +18,10 @@ from models.modelo_asistencia import Asistencia
 from models.modelo_calificacion import Calificacion
 
 # Verifica si ya existe una inscripción para el mismo alumno y comisión.
-def existe_inscripcion(id_legajo, id_comision):
+def existe_inscripcion(id_legajo, id_comision_asignatura):
     return (
         Inscripcion.query.filter_by(
-            id_legajo=id_legajo, id_comision=id_comision
+            id_legajo=id_legajo, id_comision_asignatura=id_comision_asignatura
         ).first()
         is not None
     )
@@ -31,7 +32,7 @@ def preparar_datos_inscripcion(inscripcion_data, id_estado, id_usuario_autentica
 
     return {
         "id_legajo": inscripcion_data["id_legajo"],
-        "id_comision": inscripcion_data["id_comision"],
+        "id_comision_asignatura": inscripcion_data["id_comision_asignatura"],
         "id_estado": id_estado,
         "fecha_inscripcion": ahora,
         "id_usuario_creacion": id_usuario_autenticado,
@@ -55,7 +56,7 @@ def existe_calificacion_inscripcion(id_inscripcion):
     )
 
 # Obtiene el listado de inscripciones con filtros opcionales.
-def obtener_lista_de_inscripciones(id_estado=None, id_legajo=None, id_comision=None):
+def obtener_lista_de_inscripciones(id_estado=None, id_legajo=None, id_comision_asignatura=None):
     logger.info("Consultando listado de inscripciones.")
 
     query = Inscripcion.query
@@ -65,8 +66,8 @@ def obtener_lista_de_inscripciones(id_estado=None, id_legajo=None, id_comision=N
     if id_legajo is not None:
         query = query.filter_by(id_legajo=id_legajo)
 
-    if id_comision is not None:
-        query = query.filter_by(id_comision=id_comision)
+    if id_comision_asignatura is not None:
+        query = query.filter_by(id_comision_asignatura=id_comision_asignatura)
 
     return query.all()
 
@@ -76,6 +77,22 @@ def obtener_inscripcion_por_id(id_inscripcion):
     logger.info(f"Consultando inscripción {id_inscripcion}.")
 
     return db.session.get(Inscripcion, id_inscripcion)
+
+#Calcula el número de inscriptos en una comision asignatura
+def contar_inscriptos(id_comision_asignatura):
+
+    estado_aceptada = obtener_estado_por_nombre("Aceptada")
+    estado_finalizada = obtener_estado_por_nombre("Finalizada")
+
+    return (
+        Inscripcion.query.filter(
+            Inscripcion.id_comision_asignatura == id_comision_asignatura,
+            Inscripcion.id_estado.in_([
+                estado_aceptada.id_estado,
+                estado_finalizada.id_estado
+            ])
+        ).count()
+    )
 
 # Registra una nueva inscripción.
 def crear_inscripcion(datos):
@@ -94,7 +111,7 @@ def crear_inscripcion(datos):
             logger.warning("No existe el estado Pendiente.")
             raise BusinessError("No existe el estado Pendiente.", 500)
 
-            # Validamos si existe legajo
+        # Validamos si existe legajo
         legajo = obtener_legajo(datos["id_legajo"])
         if not legajo:
             logger.warning(f"El legajo {datos['id_legajo']} no existe.")
@@ -105,21 +122,21 @@ def crear_inscripcion(datos):
             raise BusinessError("El legajo se encuentra inactivo.", 400)
 
         # Validamos si existe la comision
-        comision = obtener_comision(datos["id_comision"])
+        comision = obtener_comision(datos["id_comision_asignatura"])
         if not comision:
-            logger.warning(f"La comisión {datos['id_comision']} no existe.")
+            logger.warning(f"La comisión {datos['id_comision_asignatura']} no existe.")
             raise BusinessError("La comisión no existe.", 404)
 
         # Validamos cupo de comision
         if comision["inscriptos"] >= comision["cupo"]:
-            logger.warning(f"La comisión {datos['id_comision']} no posee cupo.")
+            logger.warning(f"La comisión {datos['id_comision_asignatura']} no posee cupo.")
             raise BusinessError("La comision no posee cupo disponible.", 400)
 
         # Validamos si el alumno ya está inscripto en ESTA comisión
-        if existe_inscripcion(datos["id_legajo"], datos["id_comision"]):
+        if existe_inscripcion(datos["id_legajo"], datos["id_comision_asignatura"]):
             logger.warning(
                 f"El legajo {datos['id_legajo']} ya está inscripto "
-                f"en la comisión {datos['id_comision']}."
+                f"en la comisión {datos['id_comision_asignatura']}."
             )
             raise BusinessError(
                 "El alumno ya se encuentra inscripto en esta comisión.", 400
@@ -199,7 +216,7 @@ def modificar_inscripcion(id_inscripcion, datos):
                 and nuevo_estado.nombre == "Aceptada"
             ):
 
-                comision = obtener_comision(inscripcion.id_comision)
+                comision = obtener_comision(inscripcion.id_comision_asignatura)
 
                 plan_asignatura = obtener_plan_asignatura(
                     comision["id_plan_asignatura"]
@@ -210,18 +227,18 @@ def modificar_inscripcion(id_inscripcion, datos):
                 )
 
         # cambiar comision
-        if "id_comision" in datos:
-            nueva_comision = obtener_comision(datos["id_comision"])
+        if "id_comision_asignatura" in datos:
+            nueva_comision = obtener_comision(datos["id_comision_asignatura"])
 
             if not nueva_comision:
-                logger.warning(f"La comisión {datos['id_comision']} no existe.")
+                logger.warning(f"La comisión {datos['id_comision_asignatura']} no existe.")
                 raise BusinessError("La comisión no existe.", 404)
 
             if nueva_comision["inscriptos"] >= nueva_comision["cupo"]:
-                logger.warning(f"La comisión {datos['id_comision']} no posee cupo.")
+                logger.warning(f"La comisión {datos['id_comision_asignatura']} no posee cupo.")
                 raise BusinessError("La comisión no posee cupo disponible.", 400)
 
-            inscripcion.id_comision = datos["id_comision"]
+            inscripcion.id_comision_asignatura = datos["id_comision_asignatura"]
             # Pendiente:Actualizar cupos cuando el microservicio de comisiones exponga su API.
 
         # Registra el usuario y fecha de modificación.

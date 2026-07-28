@@ -9,12 +9,12 @@ def get_lista_de_inscripciones():
 
     id_estado = request.args.get("id_estado", type=int)
     id_legajo = request.args.get("id_legajo", type=int)
-    id_comision = request.args.get("id_comision", type=int)
+    id_comision_asignatura = request.args.get("id_comision_asignatura", type=int)
 
     inscripciones = obtener_lista_de_inscripciones(
         id_estado= id_estado,
         id_legajo=id_legajo,
-        id_comision = id_comision
+        id_comision_asignatura = id_comision_asignatura
     )
 
     resultado = inscripciones_schema.dump(inscripciones)

@@ -14,7 +14,7 @@ class Inscripcion(db.Model):
         nullable=False
     )
 
-    id_comision = db.Column(
+    id_comision_asignatura = db.Column(
         db.Integer,
         nullable=False
     )
