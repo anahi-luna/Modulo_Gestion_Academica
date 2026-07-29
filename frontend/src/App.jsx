@@ -25,7 +25,7 @@ export default function App() {
 
                         {/* Home: uno solo para todos, arma las cards de
                             módulos según los permisos del usuario */}
-                        <Route path="/homeInsc" element={<Home />} />
+                        <Route path="/" element={<Home />} />
 
                         {/* Pedir una inscripción: no depende de un permiso
                             del microservicio, cualquiera autenticado

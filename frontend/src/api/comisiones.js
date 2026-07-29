@@ -1,9 +1,11 @@
+const API_URL_PLANES = 
+    import.meta.env.VITE_API_URL_PLANES || "http://localhost:5000";
 
 //Obtener comisiones
 export async function getComisiones(){
     try{
         //console.log("ID que envío:", idLegajo);
-        const response = await fetch(`/api/planes/comisiones-asignaturas/GetDetalleFromLegajoID`);
+        const response = await fetch(`${API_URL_PLANES}/comisiones-asignaturas/GetDetalleFromLegajoID`);
 
         const data = await response.json();
 
@@ -20,7 +22,7 @@ export async function getComisiones(){
 export async function getComisionesPorIdLegajo(idLegajo){
     try{
         //console.log("ID que envío:", idLegajo);
-        const response = await fetch(`/api/planes/comisiones-asignaturas/GetDetalleFromLegajoID?id=${idLegajo}`);
+        const response = await fetch(`${API_URL_PLANES}/comisiones-asignaturas/GetDetalleFromLegajoID?id=${idLegajo}`);
 
         const data = await response.json();
 

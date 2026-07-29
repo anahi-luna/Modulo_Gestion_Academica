@@ -36,7 +36,7 @@ export async function getInscripcionPorId(id) {
 export async function getInscripcionesPorComision(idComision) {
     try{
         const response = await fetch(
-            `${API_URL}/inscripciones?id_comision=${idComision}`
+            `${API_URL}/inscripciones?id_comision_asignatura=${idComision}`
         );
 
         const data = await response.json();

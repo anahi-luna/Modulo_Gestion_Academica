@@ -1,10 +1,10 @@
 // Servicio de Legajos
-import API_URL from "./api";
-
+const API_URL_PLANES = 
+    import.meta.env.VITE_API_URL_PLANES || "http://localhost:5000";
 // Obtener un legajo por su número
 export async function getLegajoPorNumero(numeroLegajo) {
     const response = await fetch(
-        `${API_URL}/legajos/GetPersonaFromLegajoNum?numero=${numeroLegajo}`
+        `${API_URL_PLANES}/legajos/GetPersonaFromLegajoNum?numero=${numeroLegajo}`
     );
     const data = await response.json();
 
@@ -29,7 +29,7 @@ export async function getLegajoPorNumero(numeroLegajo) {
 // Obtener un legajo por su ID
 export async function getLegajoPorId(idLegajo) {
     const response = await fetch(
-        `${API_URL}/legajos/GetPersonaFromLegajoId?id=${idLegajo}`
+        `${API_URL_PLANES}/legajos/GetPersonaFromLegajoId?id=${idLegajo}`
     );
     const data = await response.json();
 
