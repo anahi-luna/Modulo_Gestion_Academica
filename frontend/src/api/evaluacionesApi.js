@@ -7,7 +7,7 @@ export async function getListaEvaluaciones(idComision) {
     try{
 
         const url = idComision
-            ? `${API_URL}/evaluaciones?id_comision=${idComision}`
+            ? `${API_URL}/evaluaciones?id_comision_asignatura=${idComision}`
             : `${API_URL}/evaluaciones/`
 
         const response = await fetch(url);

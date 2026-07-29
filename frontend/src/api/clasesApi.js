@@ -6,7 +6,7 @@ export async function getListaClases(idComision) {
     try{   
 
         const url = idComision //Cambia entre obtener las clases por comision o todas segun lo que se ejecute
-            ? `${API_URL}/clases?id_comision=${idComision}`
+            ? `${API_URL}/clases?id_comision_asignatura=${idComision}`
             :`${API_URL}/clases/`
         
 
