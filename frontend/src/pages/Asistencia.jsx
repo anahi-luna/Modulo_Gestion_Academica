@@ -21,7 +21,7 @@ export default function Asistencia() {
   const puedeEditar = ["inscripcion.asistencias.crear", "inscripcion.asistencias.actualizar"].some(hasPermission);
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={idLegajo} />;
+    return <VistaAlumno idLegajo={usuario?.id_legajo} />;
   }
 
   return (

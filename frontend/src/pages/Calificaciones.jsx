@@ -3,7 +3,6 @@
 // los alumnos de una clase.
 import { useEffect, useState } from "react";
 import useAuth from "../auth/hooks/useAuth";
-
 import PanelesComision from "../components/Calificaciones/PanelesComision";
 import PanelDetalleCalificaciones from "../components/Calificaciones/PanelDetalleCalificaciones";
 import ResumenComisionCard from "../components/Calificaciones/ResumenComisionCard";
@@ -22,9 +21,9 @@ export default function Calificaciones() {
   const idLegajo = obtenerIdLegajo(usuario)
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={idLegajo} />;
+    return <VistaAlumno idLegajo={usuario?.id_legajo} />;
   }
-
+  
   return <VistaComisiones puedeEditar={puedeEditar} />;
 }
 

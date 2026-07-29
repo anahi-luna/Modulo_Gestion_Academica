@@ -10,10 +10,7 @@ export function obtenerIdLegajo(user) {
   if (idLegajo == null) {
     if (import.meta.env.DEV) {
       console.warn(
-        "[legajo] El usuario logueado no tiene id_legajo. Si es un " +
-          "alumno, revisá con el equipo de Auth qué campo trae " +
-          "data.user en la respuesta de POST /auth/login, y " +
-          "actualizá src/config/legajo.js."
+        "[legajo] El usuario logueado no tiene id_legajo."
       );
     }
     return null;
