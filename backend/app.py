@@ -38,7 +38,6 @@ def create_app():
     app.register_blueprint(resultado_academico_bp,url_prefix ="/resultados-academicos")
     app.register_blueprint(resultado_plan_bp, url_prefix ="/resultados-planes")
     app.register_blueprint(certificado_bp, url_prefix ="/certificados")
-    app.register_blueprint(auth_bp)
     
     # Ruta de prueba
     @app.route("/status")
