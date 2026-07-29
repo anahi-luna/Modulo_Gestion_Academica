@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
-from flask import g
+from flask import g, request
 from models.modelo_resultado_plan import ResultadoPlan
 from models.modelo_resultado_academico import ResultadoAcademico
 from models.modelo_inscripcion import Inscripcion
@@ -74,7 +74,7 @@ def obtener_inscripciones_plan(id_legajo, id_plan):
 # correspondientes a un plan.
 def obtener_comisiones_plan(id_plan):
 
-    return obtener_comisiones_asignaturas_por_plan(id_plan)
+    return obtener_comisiones_asignaturas_por_plan(id_plan,headers=request.headers)
 
 
 # Obtiene los resultados académicos correspondientes a un plan.
@@ -174,14 +174,14 @@ def plan_finalizado(id_legajo, id_plan):
 def validar_resultado_plan(id_legajo, id_plan):
 
     # Verifica el legajo.
-    legajo = obtener_legajo(id_legajo)
+    legajo = obtener_legajo(id_legajo,headers=request.headers)
 
     if not legajo:
 
         raise BusinessError("El legajo no existe.", 404)
 
     # Verifica el plan.
-    plan = obtener_plan(id_plan)
+    plan = obtener_plan(id_plan,headers=request.headers)
 
     if not plan:
 

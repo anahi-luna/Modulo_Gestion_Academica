@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from exceptions import BusinessError
 from utils.logger import logger
-from flask import g
+from flask import g, request
 from models.modelo_clase import Clase, EstadoClase
 from models.modelo_asistencia import Asistencia
 from clients.planes_cliente import obtener_comision_asignatura_por_id
@@ -43,7 +43,10 @@ def crear_clase(datos):
         )
 
         # Valida la comisión.
-        comision = obtener_comision_asignatura_por_id(datos["id_comision_asignatura"])
+        comision = obtener_comision_asignatura_por_id(
+            datos["id_comision_asignatura"],
+            headers=request.headers
+        )
 
         if not comision:
 

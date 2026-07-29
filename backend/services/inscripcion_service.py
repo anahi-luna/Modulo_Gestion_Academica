@@ -3,7 +3,7 @@ from extensions import db
 from exceptions import BusinessError
 from sqlalchemy.exc import IntegrityError
 from utils.logger import logger
-from flask import g
+from flask import g, request
 
 from clients.planes_cliente import obtener_comision_asignatura_por_id, obtener_legajo
 from services.estado_inscripcion_service import obtener_estado_por_nombre
@@ -114,14 +114,14 @@ def crear_inscripcion(datos):
             raise BusinessError("No existe el estado Pendiente.", 500)
 
         # Validamos si existe legajo
-        legajo = obtener_legajo(datos["id_legajo"])
+        legajo = obtener_legajo(datos["id_legajo"], headers=request.headers)
         if not legajo:
             logger.warning(f"El legajo {datos['id_legajo']} no existe.")
             raise BusinessError("El legajo no existe.", 404)
 
         # Validamos si existe la comision
         comision = obtener_comision_asignatura_por_id(
-            datos["id_comision_asignatura"], datos["id_legajo"]
+            datos["id_comision_asignatura"], datos["id_legajo"], headers=request.headers
         )
         if not comision:
             logger.warning(f"La comisión {datos['id_comision_asignatura']} no existe.")
@@ -158,9 +158,7 @@ def crear_inscripcion(datos):
         db.session.add(inscripcion)
         db.session.commit()
 
-        logger.info(
-            f"Inscripción {inscripcion.id_inscripcion} creada correctamente."
-        )
+        logger.info(f"Inscripción {inscripcion.id_inscripcion} creada correctamente.")
         return inscripcion
 
     except IntegrityError:
@@ -222,14 +220,10 @@ def modificar_inscripcion(id_inscripcion, datos):
             ):
 
                 comision = obtener_comision_asignatura_por_id(
-                    inscripcion.id_comision_asignatura,
-                    inscripcion.id_legajo
+                    inscripcion.id_comision_asignatura, inscripcion.id_legajo,headers=request.headers
                 )
                 if not comision:
-                    raise BusinessError(
-                        "La comisión no existe.",
-                        404
-                    )
+                    raise BusinessError("La comisión no existe.", 404)
 
                 actualizar_resultado_plan(
                     inscripcion.id_legajo, comision["plan_asignaturas"]["plan"]["id"]
@@ -238,8 +232,7 @@ def modificar_inscripcion(id_inscripcion, datos):
         # cambiar comision
         if "id_comision_asignatura" in datos:
             nueva_comision = obtener_comision_asignatura_por_id(
-                datos["id_comision_asignatura"],
-                inscripcion.id_legajo
+                datos["id_comision_asignatura"], inscripcion.id_legajo,headers=request.headers
             )
 
             if not nueva_comision:
@@ -255,10 +248,7 @@ def modificar_inscripcion(id_inscripcion, datos):
                 logger.warning(
                     f"La comisión {datos['id_comision_asignatura']} no posee cupo."
                 )
-                raise BusinessError(
-                    "La comisión no posee cupo disponible.",
-                    400
-                )
+                raise BusinessError("La comisión no posee cupo disponible.", 400)
 
             inscripcion.id_comision_asignatura = datos["id_comision_asignatura"]
             # Pendiente:Actualizar cupos cuando el microservicio de comisiones exponga su API.

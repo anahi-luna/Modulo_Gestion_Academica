@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
-from flask import g
+from flask import g,request
 from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
@@ -59,7 +59,10 @@ def preparar_datos_evaluacion(datos,id_usuario_autenticado):
 def validar_evaluacion(datos):
 
     # Verifica que exista la comisión.
-    comision = obtener_comision_asignatura_por_id(datos["id_comision_asignatura"])
+    comision = obtener_comision_asignatura_por_id(
+        datos["id_comision_asignatura"],
+        headers=request.headers
+    )
 
     if not comision:
         logger.warning(f"La comisión asignatura {datos['id_comision_asignatura']} no existe.")
@@ -162,7 +165,7 @@ def modificar_evaluacion(id_evaluacion, datos):
         # Comisión
         if "id_comision_asignatura" in datos:
 
-            if not obtener_comision_asignatura_por_id(datos["id_comision_asignatura"]):
+            if not obtener_comision_asignatura_por_id(datos["id_comision_asignatura"],headers=request.headers):
                 logger.warning(f"La comisión asignatura {datos['id_comision_asignatura']} no existe.")
                 raise BusinessError("La comisión asignatura no existe.", 404)
 

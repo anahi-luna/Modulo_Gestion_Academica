@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
-from flask import g
+from flask import g,request
 from models.modelo_resultado_academico import ResultadoAcademico
 from models.modelo_asistencia import Asistencia
 from models.modelo_calificacion import Calificacion
@@ -67,7 +67,8 @@ def obtener_reglas_academicas(inscripcion):
 
     # Obtiene el plan de asignatura.
     plan_asignatura = obtener_plan_asignatura_por_comision_asignatura(
-        inscripcion.id_comision_asignatura
+        inscripcion.id_comision_asignatura,
+        headers=request.headers
     )
 
     if not plan_asignatura:
@@ -312,7 +313,7 @@ def crear_resultado_academico(datos):
 
             finalizar_inscripcion(inscripcion)
 
-            id_plan = obtener_id_plan_por_comision_asignatura(inscripcion.id_comision_asignatura)
+            id_plan = obtener_id_plan_por_comision_asignatura(inscripcion.id_comision_asignatura,headers=request.headers)
             if not id_plan:
                 raise BusinessError("No fue posible obtener el plan de estudio.",404)
             
