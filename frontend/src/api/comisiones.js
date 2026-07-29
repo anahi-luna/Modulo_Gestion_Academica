@@ -1,10 +1,26 @@
-//Url general
-import API_URL from "./api";
 
 //Obtener comisiones
 export async function getComisiones(){
     try{
-        const response = await fetch(`${API_URL}/comisiones-asignaturas`);
+        //console.log("ID que envío:", idLegajo);
+        const response = await fetch(`/api/planes/comisiones-asignaturas/GetDetalleFromLegajoID`);
+
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error("Error al obtener comisiones")
+        }
+
+        return data;
+    }catch(error){
+        console.error(error)
+    }
+}
+
+export async function getComisionesPorIdLegajo(idLegajo){
+    try{
+        //console.log("ID que envío:", idLegajo);
+        const response = await fetch(`/api/planes/comisiones-asignaturas/GetDetalleFromLegajoID?id=${idLegajo}`);
 
         const data = await response.json();
 

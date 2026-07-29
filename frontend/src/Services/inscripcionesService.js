@@ -1,6 +1,6 @@
 // Servicio de Inscripciones
 import { getLegajoPorNumero } from "../api/legajosApi";
-import { getComisiones } from "../api/comisiones";
+import { getComisiones, getComisionesPorIdLegajo } from "../api/comisiones";
 import { crearInscripcion } from "../api/inscripcionesApi";
 import { getListaDeInscripciones } from "../api/inscripcionesApi";
 import { obtenerResultadosAcademicos } from "./resultadoAcademicoService";
@@ -26,6 +26,11 @@ export async function obtenerComisiones() {
     return response.data;
 }
 
+export async function obtenerComisionesPorIdLegajo(idLegajo) {
+    const response = await getComisionesPorIdLegajo(idLegajo);
+    return response.data;
+}
+
 async function obtenerMateriasAprobadas(idLegajo) {
     const resultados = await obtenerResultadosAcademicos(idLegajo);
     const comisiones = await obtenerComisiones();
@@ -40,7 +45,8 @@ async function obtenerMateriasAprobadas(idLegajo) {
 export async function obtenerComisionesDisponibles(numeroLegajo) {
 
     const legajo = await buscarLegajo(numeroLegajo);
-    const comisiones = await obtenerComisiones();
+
+    const comisiones = await obtenerComisionesPorIdLegajo(legajo.id_Legajo);
     const materiasAprobadas = await obtenerMateriasAprobadas(legajo.id_legajo);
 
     return comisiones.filter((comision) => {
