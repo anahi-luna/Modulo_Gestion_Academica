@@ -5,12 +5,13 @@ import user from "../../assets/user.png";
 import logo from "../../images/logo.jpeg";
 import useAuth from "../../auth/hooks/useAuth";
 import { HOME_ROUTE } from "../../auth/config";
+import { logout } from "../../auth/api/auth";
 
 // Componente de barra de navegación (navbar) que muestra el logo, el título del sistema, los links a los módulos
 // disponibles según los permisos del usuario, y un menú de usuario con opciones de notificaciones y cerrar sesión.
 export default function Navbar({ modulo }) {
   // useAuth devuelve el usuario logueado, sus roles y funciones para verificar permisos y cerrar sesión.
-  const { user: usuario, roles, hasPermission, hasRole, logout } = useAuth();
+  const { user: usuario, roles, hasPermission, hasRole } = useAuth();
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -31,6 +32,7 @@ export default function Navbar({ modulo }) {
        ? "bg-red-600 text-white"
        : "text-red-100 hover:bg-red-700"
      }`;
+
 
 // Lista de links a los módulos del sistema, con la ruta, el label y el permiso requerido para mostrarlos.
   const links = [
