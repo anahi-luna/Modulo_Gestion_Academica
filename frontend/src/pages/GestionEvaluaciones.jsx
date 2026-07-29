@@ -21,7 +21,7 @@ export default function GestionEvaluaciones() {
     const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {
-        return <VistaAlumno idLegajo={idLegajo} />;
+        return <VistaAlumno idLegajo={usuario?.id_legajo} />;
     }
 
     return (

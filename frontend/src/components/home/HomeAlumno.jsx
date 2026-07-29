@@ -43,11 +43,11 @@ export default function HomeAlumno({ usuario }) {
       try {
         const [misInscripciones, miPlan, misClases, miAsistencia, misCertificados] =
           await Promise.all([
-            obtenerMisInscripciones(idLegajo),
-            obtenerMiPlan(idLegajo),
-            obtenerMisClases(idLegajo),
-            obtenerMiAsistencia(idLegajo),
-            obtenerMisCertificados(idLegajo),
+            obtenerMisInscripciones(usuario?.id_legajo),
+            obtenerMiPlan(usuario?.id_legajo),
+            obtenerMisClases(usuario?.id_legajo),
+            obtenerMiAsistencia(usuario?.id_legajo),
+            obtenerMisCertificados(usuario?.id_legajo),
           ]);
         setInscripciones(misInscripciones);
         setPlan(miPlan);
@@ -64,7 +64,7 @@ export default function HomeAlumno({ usuario }) {
       }
     }
     cargar();
-  }, [idLegajo]);
+  }, [usuario?.id_legajo]);
 
   const tieneInscripciones = inscripciones.length > 0;
 

@@ -18,7 +18,7 @@ export default function GestionClases() {
     const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {
-        return <VistaAlumno idLegajo={idLegajo} />;
+        return <VistaAlumno idLegajo={usuario?.id_legajo} />;
     }
 
     return (
