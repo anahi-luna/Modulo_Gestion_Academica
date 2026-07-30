@@ -21,7 +21,7 @@ export async function getListaDeInscripciones() {
 export async function getInscripcionPorId(id) {
     try{
         const response = await fetch(`${API_URL}/inscripciones/${id}`);
-        const data = await responde.json();
+        const data = await response.json();
         if(!response.ok){
             throw new Error("No se pudo obtener la inscripción")
         }

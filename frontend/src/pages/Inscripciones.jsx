@@ -2,6 +2,7 @@
 // Maneja el estado y los handlers del flujo de 3 pasos.
 // Cada paso tiene su propio componente en components/inscripciones/.
 
+
 import { useState } from "react";
 import {
     buscarLegajo,
@@ -73,13 +74,6 @@ export default function Inscripciones() {
         setError(null);
     }
 
-    function handleGenerarAleatorio() {
-        const legajos = ["000123", "000124", "000125", "000126", "000127"];
-        const random = legajos[Math.floor(Math.random() * legajos.length)];
-        setNroLegajo(random);
-        setError(null);
-    }
-
     return (
         <div className="min-h-screen bg-gray-100">
             <main className="max-w-5xl mx-auto px-4 py-6">
@@ -91,7 +85,6 @@ export default function Inscripciones() {
                         nroLegajo={nroLegajo}
                         onChange={(e) => { setNroLegajo(e.target.value); setError(null); }}
                         onSubmit={handleBuscarLegajo}
-                        onGenerarAleatorio={handleGenerarAleatorio}
                         error={error}
                         cargando={cargando}
                     />
