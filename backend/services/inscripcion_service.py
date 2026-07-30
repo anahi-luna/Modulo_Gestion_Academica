@@ -5,7 +5,11 @@ from sqlalchemy.exc import IntegrityError
 from utils.logger import logger
 from flask import g, request
 
-from clients.planes_cliente import obtener_comision_asignatura_por_id, obtener_legajo
+from clients.planes_cliente import (
+    obtener_comision_asignatura_por_id,
+    obtener_legajo,
+    obtener_comision_asignatura_por_id_general,
+)
 from services.estado_inscripcion_service import obtener_estado_por_nombre
 from services.resultado_plan_service import actualizar_resultado_plan
 
@@ -15,45 +19,7 @@ from models.modelo_asistencia import Asistencia
 from models.modelo_calificacion import Calificacion
 
 
-# Verifica si ya existe una inscripción para el mismo alumno y comisión.
-def existe_inscripcion(id_legajo, id_comision_asignatura):
-    return (
-        Inscripcion.query.filter_by(
-            id_legajo=id_legajo, id_comision_asignatura=id_comision_asignatura
-        ).first()
-        is not None
-    )
-
-
-# Prepara los datos para crear una nueva inscripción
-def preparar_datos_inscripcion(inscripcion_data, id_estado, id_usuario_autenticado):
-    ahora = datetime.now()
-
-    return {
-        "id_legajo": inscripcion_data["id_legajo"],
-        "id_comision_asignatura": inscripcion_data["id_comision_asignatura"],
-        "id_estado": id_estado,
-        "fecha_inscripcion": ahora,
-        "id_usuario_creacion": id_usuario_autenticado,
-        "id_usuario_modificacion": None,
-        "ts_creacion": ahora,
-        "ts_modificacion": None,
-    }
-
-
-# Verifica si una inscripción posee asistencias registradas.
-def existe_asistencia_inscripcion(id_inscripcion):
-
-    return Asistencia.query.filter_by(id_inscripcion=id_inscripcion).first() is not None
-
-
-# Verifica si una inscripción posee calificaciones registradas.
-def existe_calificacion_inscripcion(id_inscripcion):
-
-    return (
-        Calificacion.query.filter_by(id_inscripcion=id_inscripcion).first() is not None
-    )
-
+# -------------------CONSULTAS-------------------#
 
 # Obtiene el listado de inscripciones con filtros opcionales.
 def obtener_lista_de_inscripciones(
@@ -82,6 +48,34 @@ def obtener_inscripcion_por_id(id_inscripcion):
     return db.session.get(Inscripcion, id_inscripcion)
 
 
+
+# -------------------VALIDACIONES-------------------#
+
+# Verifica si ya existe una inscripción para el mismo alumno y comisión.
+def existe_inscripcion(id_legajo, id_comision_asignatura):
+    return (
+        Inscripcion.query.filter_by(
+            id_legajo=id_legajo, id_comision_asignatura=id_comision_asignatura
+        ).first()
+        is not None
+    )
+
+# Verifica si una inscripción posee asistencias registradas.
+def existe_asistencia_inscripcion(id_inscripcion):
+
+    return Asistencia.query.filter_by(id_inscripcion=id_inscripcion).first() is not None
+
+
+# Verifica si una inscripción posee calificaciones registradas.
+def existe_calificacion_inscripcion(id_inscripcion):
+
+    return (
+        Calificacion.query.filter_by(id_inscripcion=id_inscripcion).first() is not None
+    )
+
+
+# -------------------CÁLCULOS-------------------#
+
 # Calcula el número de inscriptos en una comision asignatura
 def contar_inscriptos(id_comision_asignatura):
 
@@ -95,6 +89,26 @@ def contar_inscriptos(id_comision_asignatura):
         ),
     ).count()
 
+
+# -------------------PREPARACIÓN DE DATOS-------------------#
+
+# Prepara los datos para crear una nueva inscripción
+def preparar_datos_inscripcion(inscripcion_data, id_estado, id_usuario_autenticado):
+    ahora = datetime.now()
+
+    return {
+        "id_legajo": inscripcion_data["id_legajo"],
+        "id_comision_asignatura": inscripcion_data["id_comision_asignatura"],
+        "id_estado": id_estado,
+        "fecha_inscripcion": ahora,
+        "id_usuario_creacion": id_usuario_autenticado,
+        "id_usuario_modificacion": None,
+        "ts_creacion": ahora,
+        "ts_modificacion": None,
+    }
+
+
+# -------------------CRUD-------------------#
 
 # Registra una nueva inscripción.
 def crear_inscripcion(datos):
@@ -120,12 +134,23 @@ def crear_inscripcion(datos):
             raise BusinessError("El legajo no existe.", 404)
 
         # Validamos si existe la comision
+        comision = obtener_comision_asignatura_por_id_general(
+            datos["id_comision_asignatura"], headers=request.headers
+        )
+
+        if not comision:
+            raise BusinessError("La comisión no existe.", 404)
+
+        #Validamos si el Legajo puede inscribirse a la comision asignatura 
         comision = obtener_comision_asignatura_por_id(
             datos["id_comision_asignatura"], datos["id_legajo"], headers=request.headers
         )
+
         if not comision:
-            logger.warning(f"La comisión {datos['id_comision_asignatura']} no existe.")
-            raise BusinessError("La comisión no existe.", 404)
+            raise BusinessError(
+                "El legajo no cumple los requisitos para inscribirse en esta comisión asignatura.",
+                403,
+            )
 
         # Validamos cupo de comision
         if (
@@ -220,7 +245,9 @@ def modificar_inscripcion(id_inscripcion, datos):
             ):
 
                 comision = obtener_comision_asignatura_por_id(
-                    inscripcion.id_comision_asignatura, inscripcion.id_legajo,headers=request.headers
+                    inscripcion.id_comision_asignatura,
+                    inscripcion.id_legajo,
+                    headers=request.headers,
                 )
                 if not comision:
                     raise BusinessError("La comisión no existe.", 404)
@@ -232,7 +259,9 @@ def modificar_inscripcion(id_inscripcion, datos):
         # cambiar comision
         if "id_comision_asignatura" in datos:
             nueva_comision = obtener_comision_asignatura_por_id(
-                datos["id_comision_asignatura"], inscripcion.id_legajo,headers=request.headers
+                datos["id_comision_asignatura"],
+                inscripcion.id_legajo,
+                headers=request.headers,
             )
 
             if not nueva_comision:

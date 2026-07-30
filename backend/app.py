@@ -51,6 +51,8 @@ def create_app():
 
 app = create_app()
 
+# Solo se ejecuta al iniciar la aplicación directamente.
+# Crea las tablas y carga los datos iniciales.
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

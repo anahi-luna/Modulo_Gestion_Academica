@@ -10,6 +10,8 @@ from services.evaluacion_service import obtener_evaluacion_por_id
 from services.inscripcion_service import obtener_inscripcion_por_id
 
 
+# -------------------CONSULTAS-------------------#
+
 # Obtiene el listado de calificaciones.
 # Permite filtrar por evaluación o inscripción.
 def obtener_lista_de_calificaciones(id_evaluacion=None, id_inscripcion=None):
@@ -46,6 +48,7 @@ def existe_calificacion(id_evaluacion, id_inscripcion):
         is not None
     )
 
+# -------------------VALIDACIONES-------------------#
 
 # Valida que una calificación pueda registrarse.
 def validar_item_calificacion(item, evaluacion):
@@ -101,6 +104,8 @@ def validar_item_calificacion(item, evaluacion):
         raise BusinessError("El puntaje supera el máximo permitido.", 400)
 
 
+# -------------------PREPARACIÓN DE DATOS-------------------#
+
 # Prepara los datos necesarios para crear
 # una calificación.
 def preparar_datos_calificacion(item, id_evaluacion, fecha, id_usuario_autenticado):
@@ -117,6 +122,8 @@ def preparar_datos_calificacion(item, id_evaluacion, fecha, id_usuario_autentica
     }
 
 
+# -------------------CRUD-------------------#
+
 # Registra las calificaciones de una evaluación.
 def crear_calificaciones(datos):
     # Obtiene el usuario autenticado.
@@ -126,6 +133,12 @@ def crear_calificaciones(datos):
         f"Usuario {id_usuario_autenticado} " "inició el registro de calificaciones."
     )
 
+    if not datos["calificaciones"]:
+        raise BusinessError(
+            "Debe enviar al menos una calificación.",
+            400
+        )
+    
     lista_calificaciones = []
 
     try:
@@ -142,8 +155,20 @@ def crear_calificaciones(datos):
 
         ahora = datetime.now()
 
+        inscripciones_procesadas = set()
+
         # Recorre todas las calificaciones.
         for item in datos["calificaciones"]:
+            if item["id_inscripcion"] in inscripciones_procesadas:
+                logger.warning(
+                    f"La inscripción {item['id_inscripcion']} está repetida en la solicitud."
+                )
+                raise BusinessError(
+                    "La solicitud contiene calificaciones duplicadas para la misma inscripción.",
+                    400,
+                )
+
+            inscripciones_procesadas.add(item["id_inscripcion"])
 
             validar_item_calificacion(item, evaluacion)
 

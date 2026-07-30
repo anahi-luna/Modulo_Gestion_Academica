@@ -29,8 +29,37 @@ def _get(endpoint: str, params=None, headers=None):
             logger.error(f"Respuesta del servidor: {e.response.text}")
         return None
 
+#Obtiene todas las comisiones asignaturas existen en el Microservicio 1
+def obtener_comisiones_asignaturas(headers=None):
 
-# Temporalmente continúa usando el mock hasta que MS1 finalice el endpoint.
+    logger.info("Obteniendo todas las comisiones asignaturas.")
+
+    respuesta = _get(
+        "comisiones-asignaturas/GetDetalleFromLegajoID",
+        headers=headers
+    )
+
+    if not respuesta:
+        return None
+
+    return respuesta.get("data")
+
+#Obtiene la comisión asignatura del listado general por su id
+def obtener_comision_asignatura_por_id_general(id_comision_asignatura, headers=None):
+
+    comisiones = obtener_comisiones_asignaturas(headers=headers)
+
+    if not comisiones:
+        return None
+
+    for comision in comisiones:
+        if comision["id_comision_asignatura"] == id_comision_asignatura:
+            return comision
+
+    return None
+
+
+# Obtiene todas la comisiones asignaturas de acuerdo al rango del legajo
 def obtener_comisiones_disponibles(id_legajo=None, headers=None):
 
     logger.info(f"Obteniendo comisiones disponibles para legajo {id_legajo}.")

@@ -13,6 +13,8 @@ from clients.planes_cliente import obtener_comision_asignatura_por_id
 from services.tipo_evaluacion_service import obtener_tipo_evaluacion_por_id
 
 
+# -------------------CONSULTAS-------------------#
+
 # Obtiene el listado de evaluaciones.
 # Permite filtrar por comisión o tipo de evaluación.
 def obtener_lista_de_evaluaciones(id_comision_asignatura=None, id_tipo_evaluacion=None):
@@ -37,23 +39,18 @@ def obtener_evaluacion_por_id(id_evaluacion):
 
     return db.session.get(Evaluacion, id_evaluacion)
 
+# Verifica si una evaluación posee calificaciones registradas.
+def existe_calificacion_evaluacion(id_evaluacion):
 
-# Prepara los datos necesarios para crear una evaluación.
-def preparar_datos_evaluacion(datos,id_usuario_autenticado):
-    ahora = datetime.now()
-    return {
-        "id_comision_asignatura": datos["id_comision_asignatura"],
-        "id_tipo_evaluacion": datos["id_tipo_evaluacion"],
-        "titulo": datos["titulo"],
-        "fecha_evaluacion": datos["fecha_evaluacion"],
-        "puntaje_maximo": datos["puntaje_maximo"],
-        "id_evaluacion_origen": datos.get("id_evaluacion_origen"),
-        "id_usuario_creacion": id_usuario_autenticado,
-        "id_usuario_modificacion": None,
-        "ts_creacion": ahora,
-        "ts_modificacion": None,
-    }
+    return (
+        Calificacion.query.filter_by(
+            id_evaluacion=id_evaluacion
+        ).first()
+        is not None
+    )
 
+
+# -------------------VALIDACIONES-------------------#
 
 # Verifica que los datos de una evaluación sean válidos.
 def validar_evaluacion(datos):
@@ -94,6 +91,28 @@ def validar_evaluacion(datos):
             logger.warning("La evaluación origen no existe.")
             raise BusinessError("La evaluación origen no existe.", 404)
 
+        
+
+# -------------------PREPARACIÓN DE DATOS-------------------#        
+
+# Prepara los datos necesarios para crear una evaluación.
+def preparar_datos_evaluacion(datos,id_usuario_autenticado):
+    ahora = datetime.now()
+    return {
+        "id_comision_asignatura": datos["id_comision_asignatura"],
+        "id_tipo_evaluacion": datos["id_tipo_evaluacion"],
+        "titulo": datos["titulo"],
+        "fecha_evaluacion": datos["fecha_evaluacion"],
+        "puntaje_maximo": datos["puntaje_maximo"],
+        "id_evaluacion_origen": datos.get("id_evaluacion_origen"),
+        "id_usuario_creacion": id_usuario_autenticado,
+        "id_usuario_modificacion": None,
+        "ts_creacion": ahora,
+        "ts_modificacion": None,
+    }
+
+
+# -------------------CRUD-------------------#
 
 # Crea una nueva evaluación.
 def crear_evaluacion(datos):
@@ -336,12 +355,3 @@ def eliminar_evaluacion(id_evaluacion):
         raise BusinessError("Ocurrió un error interno del servidor.", 500)
 
 
-# Verifica si una evaluación posee calificaciones registradas.
-def existe_calificacion_evaluacion(id_evaluacion):
-
-    return (
-        Calificacion.query.filter_by(
-            id_evaluacion=id_evaluacion
-        ).first()
-        is not None
-    )

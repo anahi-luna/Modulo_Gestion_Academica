@@ -11,6 +11,7 @@ from services.clase_service import obtener_clase_por_id
 from services.estado_asistencia_services import obtener_estado_asistencia_por_id
 from services.inscripcion_service import obtener_inscripcion_por_id
 
+# -------------------CONSULTAS-------------------#
 
 # Obtiene el listado de asistencias.
 # Permite filtrar por clase o inscripción.
@@ -44,6 +45,8 @@ def existe_asistencia(id_inscripcion, id_clase):
         is not None
     )
 
+
+# -------------------VALIDACIONES-------------------#
 
 # Valida que una asistencia pueda registrarse.
 def validar_item_asistencia(item, clase, id_clase):
@@ -90,8 +93,10 @@ def validar_item_asistencia(item, clase, id_clase):
         raise BusinessError("La asistencia ya fue registrada.", 400)
 
 
+# -------------------PREPARACIÓN DE DATOS-------------------#
+
 # Prepara los datos necesarios para crear una asistencia.
-def preparar_datos_asistencia(item, id_clase, fecha,id_usuario_autenticado):
+def preparar_datos_asistencia(item, id_clase, fecha, id_usuario_autenticado):
 
     return {
         "id_inscripcion": item["id_inscripcion"],
@@ -106,6 +111,8 @@ def preparar_datos_asistencia(item, id_clase, fecha,id_usuario_autenticado):
     }
 
 
+# -------------------CRUD-------------------#
+
 # Registra las asistencias de una clase.
 def crear_asistencias(datos):
     # Obtiene el usuario autenticado.
@@ -114,6 +121,11 @@ def crear_asistencias(datos):
         f"Usuario {id_usuario_autenticado} inició el registro "
         f"de asistencias para la clase {datos['id_clase']}."
     )
+
+    # Debe enviarse al menos una asistencia.
+    if not datos["asistencias"]:
+        logger.warning("No se enviaron asistencias para registrar.")
+        raise BusinessError("Debe enviar al menos una asistencia para registrar.", 400)
 
     # Lista donde se almacenarán todas las asistencias
     # antes de guardarlas en la base de datos.
@@ -140,13 +152,28 @@ def crear_asistencias(datos):
 
         ahora = datetime.now()
 
+        inscripciones_procesadas = set()
+
         # Recorre todas las asistencias enviadas.
         for item in datos["asistencias"]:
+            if item["id_inscripcion"] in inscripciones_procesadas:
+                logger.warning(
+                    f"La inscripción {item['id_inscripcion']} está repetida en la solicitud."
+                )
+                raise BusinessError(
+                    "La solicitud contiene asistencias duplicadas para la misma inscripción.",
+                    400,
+                )
+
+            inscripciones_procesadas.add(item["id_inscripcion"])
+
             # Valida la asistencia.
             validar_item_asistencia(item, clase, datos["id_clase"])
 
             # Prepara los datos de la asistencia.
-            nueva_asistencia = preparar_datos_asistencia(item, datos["id_clase"], ahora,id_usuario_autenticado)
+            nueva_asistencia = preparar_datos_asistencia(
+                item, datos["id_clase"], ahora, id_usuario_autenticado
+            )
 
             # Agrega la asistencia a la lista.
             lista_asistencias.append(Asistencia(**nueva_asistencia))
@@ -191,7 +218,8 @@ def modificar_asistencia(id_asistencia, datos):
     # Obtiene el usuario autenticado.
     id_usuario_autenticado = g.id_usuario
     logger.info(
-        f"Usuario {id_usuario_autenticado} " f"modificando la asistencia {id_asistencia}."
+        f"Usuario {id_usuario_autenticado} "
+        f"modificando la asistencia {id_asistencia}."
     )
 
     # Busca la asistencia.
@@ -277,7 +305,6 @@ def modificar_asistencia(id_asistencia, datos):
 
 
 # Elimina una asistencia.
-# SOLO PARA DESARROLLO.
 def eliminar_asistencia(id_asistencia):
     # Obtiene el usuario autenticado.
     id_usuario_autenticado = g.id_usuario
