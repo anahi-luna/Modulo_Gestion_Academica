@@ -46,7 +46,7 @@ export async function obtenerComisionesDisponibles(numeroLegajo) {
 
     const legajo = await buscarLegajo(numeroLegajo);
 
-    const comisiones = await obtenerComisionesPorIdLegajo(legajo.id_Legajo);
+    const comisiones = await obtenerComisionesPorIdLegajo(legajo.id_legajo);
     const materiasAprobadas = await obtenerMateriasAprobadas(legajo.id_legajo);
 
     return comisiones.filter((comision) => {
