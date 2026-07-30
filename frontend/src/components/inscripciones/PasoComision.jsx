@@ -106,7 +106,7 @@ export default function PasoComision({
                             </p>
                         </div>
                         <button
-                            onClick={onConfirmar}
+                            onClick={() => onConfirmar(comisionElegida.id_comision_asignatura)}
                             disabled={enviando}
                             className="w-full sm:w-auto px-6 py-2.5 bg-red-700 hover:bg-red-800
                                        disabled:opacity-50 text-white font-medium rounded-lg

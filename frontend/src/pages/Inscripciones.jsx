@@ -47,12 +47,16 @@ export default function Inscripciones() {
         }
     }
 
-    async function handleConfirmar() {
-        if (!comisionElegida) return;
+    async function handleConfirmar(idComisionAsignatura) {
+        // Si no se pasó por parámetro, evaluamos con el estado general por seguridad
+        const idAUsar = idComisionAsignatura || comisionElegida?.id_comision_asignatura;
+        
+        if (!idAUsar) return;
+        
         setError(null);
         setEnviando(true);
         try {
-            const res = await crearSolicitudInscripcion(nroLegajo, comisionElegida.id);
+            const res = await crearSolicitudInscripcion(nroLegajo, idAUsar);
             setResultado(res.data);
             setPaso(3);
         } catch (err) {
