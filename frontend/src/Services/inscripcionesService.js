@@ -46,7 +46,7 @@ export async function obtenerComisionesDisponibles(numeroLegajo) {
 
     const legajo = await buscarLegajo(numeroLegajo);
 
-    const comisiones = await obtenerComisionesPorIdLegajo(legajo.id_Legajo);
+    const comisiones = await obtenerComisionesPorIdLegajo(legajo.id_legajo);
     const materiasAprobadas = await obtenerMateriasAprobadas(legajo.id_legajo);
 
     return comisiones.filter((comision) => {
@@ -108,11 +108,9 @@ export async function crearSolicitudInscripcion(
 
     // Enviamos la solicitud al backend por POST
     const response = await crearInscripcion({
-
-        id_legajo: legajo.id_legajo,
-        id_comision: idComision
-
-    });
+    id_legajo: legajo.id_legajo,
+    id_comision_asignatura: idComision
+});
 
     // Si el backend rechazó la inscripción,
     // propagamos el mensaje hacia la vista.

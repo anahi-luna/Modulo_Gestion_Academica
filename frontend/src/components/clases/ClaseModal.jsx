@@ -12,7 +12,7 @@ export default function ModalClase({
 }) {
 
     const [formulario, setFormulario] = useState({
-        id_comision: "",
+        id_comision_asignatura: "",
         numero_clase: "",
         fecha: "",
         hora_inicio: "",
@@ -26,7 +26,7 @@ export default function ModalClase({
         if (clase) {
 
             setFormulario({
-                id_comision: clase.id_comision,
+                id_comision_asignatura: clase.id_comision_asignatura,
                 numero_clase: clase.numero_clase,
                 fecha: clase.fecha,
                 hora_inicio: clase.hora_inicio,
@@ -38,7 +38,7 @@ export default function ModalClase({
         } else {
 
             setFormulario({
-                id_comision: "",
+                id_comision_asignatura: "",
                 numero_clase: "",
                 fecha: "",
                 hora_inicio: "",
@@ -57,7 +57,7 @@ export default function ModalClase({
         return null;
 
     const comisionSeleccionada = comisiones.find(
-        c => c.id_comision_asignatura === Number(formulario.id_comision)
+        c => c.id_comision_asignatura === Number(formulario.id_comision_asignatura)
     );
 
     return (

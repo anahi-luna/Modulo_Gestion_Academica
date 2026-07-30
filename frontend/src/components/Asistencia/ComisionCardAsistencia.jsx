@@ -8,7 +8,7 @@ export default function ComisionCard({
     onClick,
 
 }){
-
+    console.log("Renderizando card", comision);
     return(
 
         <div
@@ -24,11 +24,11 @@ export default function ComisionCard({
         >
 
             <h3 className="font-semibold">
-                {comision.materia}
+                {comision.nombre}
             </h3>
 
             <p className="text-sm text-gray-500 mt-1">
-                {comision.codigo}
+                {comision.comision.descripcion}
             </p>
 
             <p className="text-sm text-gray-500">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ComisionCard from "../Asistencia/ComisionCard";
+import ComisionCard from "../Asistencia/ComisionCardAsistencia";
 import Alert from "../Alert";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getComisiones, obtenerDocenteTitular } from "../../api/comisiones";

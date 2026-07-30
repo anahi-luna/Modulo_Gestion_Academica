@@ -2,6 +2,7 @@
 // Maneja el estado y los handlers del flujo de 3 pasos.
 // Cada paso tiene su propio componente en components/inscripciones/.
 
+
 import { useState } from "react";
 import {
     buscarLegajo,
@@ -46,12 +47,16 @@ export default function Inscripciones() {
         }
     }
 
-    async function handleConfirmar() {
-        if (!comisionElegida) return;
+    async function handleConfirmar(idComisionAsignatura) {
+        // Si no se pasó por parámetro, evaluamos con el estado general por seguridad
+        const idAUsar = idComisionAsignatura || comisionElegida?.id_comision_asignatura;
+        
+        if (!idAUsar) return;
+        
         setError(null);
         setEnviando(true);
         try {
-            const res = await crearSolicitudInscripcion(nroLegajo, comisionElegida.id);
+            const res = await crearSolicitudInscripcion(nroLegajo, idAUsar);
             setResultado(res.data);
             setPaso(3);
         } catch (err) {
@@ -73,13 +78,6 @@ export default function Inscripciones() {
         setError(null);
     }
 
-    function handleGenerarAleatorio() {
-        const legajos = ["000123", "000124", "000125", "000126", "000127"];
-        const random = legajos[Math.floor(Math.random() * legajos.length)];
-        setNroLegajo(random);
-        setError(null);
-    }
-
     return (
         <div className="min-h-screen bg-gray-100">
             <main className="max-w-5xl mx-auto px-4 py-6">
@@ -91,7 +89,6 @@ export default function Inscripciones() {
                         nroLegajo={nroLegajo}
                         onChange={(e) => { setNroLegajo(e.target.value); setError(null); }}
                         onSubmit={handleBuscarLegajo}
-                        onGenerarAleatorio={handleGenerarAleatorio}
                         error={error}
                         cargando={cargando}
                     />

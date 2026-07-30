@@ -4,7 +4,7 @@ import { Bars3Icon, BellIcon, XMarkIcon, ArrowRightStartOnRectangleIcon } from '
 import user from "../../assets/user.png";
 import logo from "../../images/logo.jpeg";
 import useAuth from "../../auth/hooks/useAuth";
-import { HOME_ROUTE } from "../../auth/config";
+import { LOGIN_ROUTE } from "../../auth/config";
 import { logout } from "../../auth/api/auth";
 
 // Componente de barra de navegación (navbar) que muestra el logo, el título del sistema, los links a los módulos
@@ -16,7 +16,7 @@ export default function Navbar({ modulo }) {
 
   async function handleLogout() {
     await logout();
-    navigate(HOME_ROUTE);
+    navigate(LOGIN_ROUTE, { replace: true });
   }
 
   const linkClass = ({ isActive }) =>

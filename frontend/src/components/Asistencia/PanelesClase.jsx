@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getComisiones } from "../../api/comisiones";
-import ComisionCard from "./ComisionCard";
+import ComisionCard from "./ComisionCardAsistencia";
 import Alert from "../Alert";
 
 // Componente para mostrar el panel de clases de una comisión, incluyendo la búsqueda y selección de clases.
@@ -29,6 +29,8 @@ export default function PanelesClase({
         }
         cargarComisiones();
     }, []);
+
+    console.log(comisiones);
 
     return (
         <div className="lg:col-span-3 bg-white rounded-xl shadow border p-4 sm:p-5">
