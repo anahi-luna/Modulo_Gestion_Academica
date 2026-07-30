@@ -45,7 +45,7 @@ export default function ModalValidarInscripcion({
     useEffect(()=>{
         if (inscripcion){
             setEstado(inscripcion.estado);
-            setComision(inscripcion.id_comision);
+            setComision(inscripcion.id_comision_asignatura);
         }
     },[inscripcion]);
 
@@ -151,7 +151,7 @@ export default function ModalValidarInscripcion({
                             onGuardar({
                                 id_estado:
                                     estadoSeleccionado.id,
-                                id_comision:
+                                id_comision_asignatura:
                                     comision
                             });
                         }}

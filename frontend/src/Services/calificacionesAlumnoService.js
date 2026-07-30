@@ -24,7 +24,7 @@ export async function obtenerMisCalificaciones(idLegajo) {
     const resultado = await Promise.all(
         inscripciones.map(async (inscripcion) => {
             const [evaluaciones, calificacionesRes] = await Promise.all([
-                getEvaluaciones(inscripcion.id_comision),
+                getEvaluaciones(inscripcion.id_comision_asignatura),
                 getCalificacionesPorInscripcion(inscripcion.id),
             ]);
 
@@ -56,7 +56,7 @@ export async function obtenerMisCalificaciones(idLegajo) {
             }
 
             return {
-                id_comision: inscripcion.id_comision,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
                 comision: inscripcion.comision,
                 materia: inscripcion.materia,
                 evaluaciones: detalle,

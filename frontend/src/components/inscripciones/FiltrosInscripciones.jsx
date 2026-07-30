@@ -34,7 +34,7 @@ export default function FiltrosInscripciones({
                 >
                     <option value="">Todas las comisiones</option>
                     {comisiones.map(c => (
-                        <option key={c.id_comision_asignatura} value={id_comision_asignatura}>
+                        <option key={c.id_comision_asignatura} value={c.id_comision_asignatura}>
                             {c.comision.descripcion} - {c.nombre}
                         </option>
                     ))}

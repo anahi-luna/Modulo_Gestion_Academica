@@ -9,7 +9,7 @@ export async function generarResultadosAcademicos(idComision) {
         const response = await fetch(`${API_URL}/resultados-academicos/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id_comision: idComision }),
+            body: JSON.stringify({ id_comision_asignatura: idComision }),
         });
 
         const data = await response.json();

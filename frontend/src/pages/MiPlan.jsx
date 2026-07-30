@@ -158,7 +158,7 @@ export default function MiPlan() {
               )}
 
               {materias.map((materia) => (
-                <ResumenMateriaPlanCard key={materia.id_comision} materia={materia} />
+                <ResumenMateriaPlanCard key={materia.id_comision_asignatura} materia={materia} />
               ))}
             </div>
           </>

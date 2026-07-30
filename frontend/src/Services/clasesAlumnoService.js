@@ -21,12 +21,12 @@ export async function obtenerMisClases(idLegajo) {
 
     const porComision = await Promise.all(
         inscripciones.map(async (inscripcion) => {
-            const clases = await getClases(inscripcion.id_comision);
+            const clases = await getClases(inscripcion.id_comision_asignatura);
             const ordenadas = [...clases].sort(
                 (a, b) => new Date(a.fecha) - new Date(b.fecha)
             );
             return {
-                id_comision: inscripcion.id_comision,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
                 materia: inscripcion.materia,
                 comision: inscripcion.comision,
                 clases: ordenadas,

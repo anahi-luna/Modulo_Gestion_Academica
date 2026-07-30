@@ -27,7 +27,7 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
             ).data;
 
             const comision = comisiones.find(
-                c => c.id_comision_asignatura === inscripcion.id_comision
+                c => c.id_comision_asignatura === inscripcion.id_comision_asignatura
             );
 
             return {
@@ -45,7 +45,7 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
 
                 id_inscripcion: inscripcion.id_inscripcion,
 
-                id_comision: inscripcion.id_comision,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
 
                 codigo_comision: comision?.comision.descripcion ?? "-",
 
@@ -157,7 +157,7 @@ export async function obtenerHistorialCalificacionesPorComision(idComision) {
 
                 return {
                     id: evaluacion.id_evaluacion,
-                    id_comision: evaluacion.id_comision,
+                    id_comision_asignatura: evaluacion.id_comision_asignatura,
                     titulo: evaluacion.titulo,
                     tipo: evaluacion.tipo_evaluacion?.nombre ?? "-",
                     fecha: evaluacion.fecha_evaluacion,

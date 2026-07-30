@@ -92,7 +92,7 @@ export default function ProximasClasesPorComision({ porComision }) {
   return (
     <>
       {porComision.map((c) => (
-        <ComisionClasesCard key={c.id_comision} comision={c} />
+        <ComisionClasesCard key={c.id_comision_asignatura} comision={c} />
       ))}
     </>
   );

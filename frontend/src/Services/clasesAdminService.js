@@ -12,14 +12,14 @@ export async function getClases(idComision) {
     const resultado = response.data.map((clase) => {
 
         const comision = comisiones.find(
-            c => c.id_comision_asignatura === clase.id_comision
+            c => c.id_comision_asignatura === clase.id_comision_asignatura
         );
 
         return {
 
             id: clase.id_clase,
 
-            id_comision: clase.id_comision,
+            id_comision_asignatura: clase.id_comision_asignatura,
 
             numero_clase: clase.numero_clase,
 
@@ -56,14 +56,14 @@ export async function getClase(id) {
     const comisiones = (await getComisiones()).data;
 
     const comision = comisiones.find(
-        c => c.id_comision_asignatura === response.data.id_comision
+        c => c.id_comision_asignatura === response.data.id_comision_asignatura
     );
 
     return {
 
         id: response.data.id_clase,
 
-        id_comision: response.data.id_comision,
+        id_comision_asignatura: response.data.id_comision_asignatura,
 
         numero_clase: response.data.numero_clase,
 

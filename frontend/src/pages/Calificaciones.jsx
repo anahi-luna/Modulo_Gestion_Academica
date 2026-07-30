@@ -120,7 +120,7 @@ function VistaAlumno({ idLegajo }) {
         )}
 
         {comisiones.map((c) => (
-          <ResumenComisionCard key={c.id_comision} comision={c} />
+          <ResumenComisionCard key={c.id_comision_asignatura} comision={c} />
         ))}
 
       </div>

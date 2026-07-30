@@ -90,7 +90,7 @@ export async function obtenerMisMateriasDePlan(idLegajo) {
     ]);
 
     return materias.map((materia) => {
-        const resultado = resultados.find((r) => r.id_comision === materia.id_comision);
+        const resultado = resultados.find((r) => r.id_comision_asignatura === materia.id_comision_asignatura);
 
         if (!resultado) {
             // Todavía no se generó el resultado académico: pendiente/cursando.

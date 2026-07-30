@@ -20,7 +20,7 @@ function mapearResultado(r) {
         // El back nos devuelve la inscripción anidada (resumen), de ahí
         // saco a qué legajo y a qué comisión pertenece este resultado.
         id_legajo: r.inscripcion?.id_legajo,
-        id_comision: r.inscripcion?.id_comision,
+        id_comision_asignatura: r.inscripcion?.id_comision_asignatura,
         promedio_final: r.promedio_final,
         porcentaje_asistencia: r.porcentaje_asistencia,
         estado_academico: r.estado?.nombre ?? ESTADOS_ACADEMICOS[r.id_estado_academico] ?? "-",

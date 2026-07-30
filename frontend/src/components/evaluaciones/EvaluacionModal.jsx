@@ -13,7 +13,7 @@ export default function EvaluacionModal({
 }) {
 
     const [formulario, setFormulario] = useState({
-        id_comision: "",
+        id_comision_asignatura: "",
         titulo: "",
         tipo: "Parcial",
         fecha: "",
@@ -25,7 +25,7 @@ export default function EvaluacionModal({
         if (evaluacion) {
 
             setFormulario({
-                id_comision: evaluacion.id_comision,
+                id_comision_asignatura: evaluacion.id_comision_asignatura,
                 titulo: evaluacion.titulo,
                 tipo: evaluacion.tipo,
                 fecha: evaluacion.fecha,
@@ -35,7 +35,7 @@ export default function EvaluacionModal({
         } else {
 
             setFormulario({
-                id_comision: "",
+                id_comision_asignatura: "",
                 titulo: "",
                 tipo: "Parcial",
                 fecha: "",
@@ -52,7 +52,7 @@ export default function EvaluacionModal({
         return null;
 
     const comisionSeleccionada = comisiones.find(
-        c => c.id === Number(formulario.id_comision)
+        c => c.id === Number(formulario.id_comision_asignatura)
     );
 
     return (
@@ -74,11 +74,11 @@ export default function EvaluacionModal({
                         </label>
                         <select
                             id="evaluacion-comision"
-                            value={formulario.id_comision}
+                            value={formulario.id_comision_asignatura}
                             onChange={(e) =>
                                 setFormulario({
                                     ...formulario,
-                                    id_comision: Number(e.target.value),
+                                    id_comision_asignatura: Number(e.target.value),
                                 })
                             }
                             className="w-full rounded-lg border border-gray-300 px-3 py-2"

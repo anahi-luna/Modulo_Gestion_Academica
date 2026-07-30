@@ -14,7 +14,7 @@ export async function obtenerAsistenciasPorClase(idClase) {
         response.data.map(async (asistencia) => {
             const inscripcion = (await getInscripcionPorId(asistencia.id_inscripcion)).data;
             const legajo      = (await legajosApi.getLegajoPorId(inscripcion.id_legajo)).data;
-            const comision    = comisiones.find(c => c.id_comision_asignatura === inscripcion.id_comision);
+            const comision    = comisiones.find(c => c.id_comision_asignatura === inscripcion.id_comision_asignatura);
 
             return {
                 id:              asistencia.id_asistencia,
@@ -22,7 +22,7 @@ export async function obtenerAsistenciasPorClase(idClase) {
                 alumno:          `${legajo.nombre} ${legajo.apellido}`,
                // rango:           legajo.rango,
                 id_inscripcion:  inscripcion.id_inscripcion,
-                id_comision:     inscripcion.id_comision,
+                id_comision_asignatura:     inscripcion.id_comision_asignatura,
                 codigo_comision: comision?.comision.descripcion   ?? "-",
                 materia:         comision?.nombre  ?? "-",
 
@@ -53,7 +53,7 @@ export async function actualizarEstadoAutomaticamente(clase) {
 
     if (clase.estado === "PROGRAMADA" && inicio <= ahora) {
         await modificarClase(clase.id, {
-            id_comision: clase.id_comision,
+            id_comision_asignatura: clase.id_comision_asignatura,
             estado: "DICTADA",
         });
         return { ...clase, estado: "DICTADA" };

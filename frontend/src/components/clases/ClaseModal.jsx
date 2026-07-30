@@ -86,11 +86,11 @@ export default function ModalClase({
 
                         <select
                             id="clase-comision"
-                            value={formulario.id_comision}
+                            value={formulario.id_comision_asignatura}
                             onChange={(e) =>
                                 setFormulario({
                                     ...formulario,
-                                    id_comision: Number(e.target.value),
+                                    id_comision_asignatura: Number(e.target.value),
                                 })
                             }
                             className="w-full rounded-lg border border-gray-300 px-3 py-2"

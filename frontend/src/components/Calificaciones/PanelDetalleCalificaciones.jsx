@@ -101,7 +101,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
                         id_legajo: i.id_legajo,
                         alumno: i.alumno,
                         id_inscripcion: i.id_inscripcion,
-                        id_comision: i.id_comision,
+                        id_comision_asignatura: i.id_comision_asignatura,
                         nota: null,
                         observacion: "",
                     }))

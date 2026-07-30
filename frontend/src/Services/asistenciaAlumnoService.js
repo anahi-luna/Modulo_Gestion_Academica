@@ -39,7 +39,7 @@ export async function obtenerMiAsistencia(idLegajo) {
 
     const porComision = await Promise.all(
         inscripciones.map(async (inscripcion) => {
-            const clases = await getClases(inscripcion.id_comision);
+            const clases = await getClases(inscripcion.id_comision_asignatura);
 
             const detalle = await Promise.all(
                 clases.map(async (clase) => {
@@ -68,7 +68,7 @@ export async function obtenerMiAsistencia(idLegajo) {
                 : 0;
 
             return {
-                id_comision: inscripcion.id_comision,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
                 materia: inscripcion.materia,
                 comision: inscripcion.comision,
                 detalle,

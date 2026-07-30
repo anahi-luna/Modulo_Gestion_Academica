@@ -27,7 +27,7 @@ export async function obtenerInscripciones() {
             ).data;
 
             const comision = comisiones.find(
-                c => c.id_comision_asignatura === inscripcion.id_comision
+                c => c.id_comision_asignatura === inscripcion.id_comision_asignatura
             );
 
             return {
@@ -38,7 +38,7 @@ export async function obtenerInscripciones() {
 
                 alumno: `${legajo.nombre} ${legajo.apellido}`,
 
-                id_comision: inscripcion.id_comision,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
 
                 comision: comision?.comision.descripcion ?? "-",
 
@@ -81,7 +81,7 @@ export async function obtenerInscripcionesPorComision(idComision) {
             ).data;
 
             const comision = comisiones.find(
-                c => c.id_comision_asignatura === inscripcion.id_comision
+                c => c.id_comision_asignatura === inscripcion.id_comision_asignatura
             );
 
             return {
@@ -96,7 +96,7 @@ export async function obtenerInscripcionesPorComision(idComision) {
 
                 //rango: legajo.rango,
 
-                id_comision: inscripcion.id_comision,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
 
                 materia: comision?.nombre ?? "-",
 

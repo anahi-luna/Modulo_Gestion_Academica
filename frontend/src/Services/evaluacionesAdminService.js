@@ -41,14 +41,14 @@ export async function getEvaluaciones(idComision) {
     const resultado = response.data.map((evaluacion) => {
 
         const comision = comisiones.find(
-            c => c.id_comision_asignatura === evaluacion.id_comision
+            c => c.id_comision_asignatura === evaluacion.id_comision_asignatura
         );
 
         return {
 
             id: evaluacion.id_evaluacion,
 
-            id_comision: evaluacion.id_comision,
+            id_comision_asignatura: evaluacion.id_comision_asignatura,
 
             codigo: comision?.comision.descripcion ?? "-",
 
@@ -79,14 +79,14 @@ export async function getEvaluacion(id) {
     const comisiones = (await getComisiones()).data;
 
     const comision = comisiones.find(
-        c => c.id_comision_asignatura === response.data.id_comision
+        c => c.id_comision_asignatura === response.data.id_comision_asignatura
     );
 
     return {
 
         id: response.data.id_evaluacion,
 
-        id_comision: response.data.id_comision,
+        id_comision_asignatura: response.data.id_comision_asignatura,
 
         codigo: comision?.comision.descripcion ?? "-",
 
@@ -111,7 +111,7 @@ export async function getEvaluacion(id) {
 // { id_comision, id_tipo_evaluacion, titulo, fecha_evaluacion, puntaje_maximo }.
 function aPayloadBack(datos) {
     return {
-        id_comision: datos.id_comision,
+        id_comision_asignatura: datos.id_comision_asignatura,
         id_tipo_evaluacion: ID_POR_TIPO[datos.tipo] ?? 1,
         titulo: datos.titulo,
         fecha_evaluacion: datos.fecha,

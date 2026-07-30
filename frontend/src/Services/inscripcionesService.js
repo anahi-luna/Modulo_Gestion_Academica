@@ -37,7 +37,7 @@ async function obtenerMateriasAprobadas(idLegajo) {
 
     return resultados
         .filter(r => r.estado_academico === "Aprobado")
-        .map(r => comisiones.find(c => c.id_comision_asignatura === r.id_comision)?.plan_asignaturas?.asignatura_id)
+        .map(r => comisiones.find(c => c.id_comision_asignatura === r.id_comision_asignatura)?.plan_asignaturas?.asignatura_id)
         .filter(Boolean);
 }
 
@@ -161,10 +161,10 @@ export async function obtenerMisInscripciones(idLegajo) {
     );
     //(Modificar horario cuando este)
     return mias.map(ins => {
-        const com = comisiones.find(c => c.id_comision_asignatura === ins.id_comision);
+        const com = comisiones.find(c => c.id_comision_asignatura === ins.id_comision_asignatura);
         return {
             id: ins.id_inscripcion,
-            id_comision: ins.id_comision,
+            id_comision_asignatura: ins.id_comision_asignatura,
             materia: com?.nombre ?? "-",
             comision: com?.comision.descripcion ?? "-",
             horario: com?.modalidad ?? "-",
