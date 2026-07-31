@@ -1,22 +1,21 @@
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline'
-import user from "../../assets/user.png";
+import userAvatar from "../../assets/user.png";
 import logo from "../../images/logo.jpeg";
 import useAuth from "../../auth/hooks/useAuth";
 import { LOGIN_ROUTE } from "../../auth/config";
-import { logout } from "../../auth/api/auth";
 
 // Componente de barra de navegación (navbar) que muestra el logo, el título del sistema, los links a los módulos
 // disponibles según los permisos del usuario, y un menú de usuario con opciones de notificaciones y cerrar sesión.
 export default function Navbar({ modulo }) {
   // useAuth devuelve el usuario logueado, sus roles y funciones para verificar permisos y cerrar sesión.
-  const { user: usuario, roles, hasPermission, hasRole } = useAuth();
+  const { user, roles, hasPermission, hasRole, logout } = useAuth();
   const navigate = useNavigate();
 
   async function handleLogout() {
     await logout();
-    navigate(LOGIN_ROUTE, { replace: true });
+    window.location.href = LOGIN_ROUTE;
   }
 
   const linkClass = ({ isActive }) =>
@@ -50,7 +49,7 @@ export default function Navbar({ modulo }) {
     return hasPermission(link.permiso);
   }
 
-  if (!usuario) {
+  if (!user) {
     // Mientras no sé quién es el usuario todavía (se está restaurando
     // la sesión desde sessionStorage), muestro una navbar "pelada" (sin
     // links) para no mostrar de más ni tirar error.
@@ -90,7 +89,13 @@ export default function Navbar({ modulo }) {
 
             <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <div className="flex space-x-1 xl:space-x-2">
-                <NavLink to="/" className={linkClass} end>Home</NavLink>
+                <a
+                  type="button"
+                  onClick={() => window.location.href = "http://localhost:8480"}
+                  className={linkClass({ isActive: false })}
+                >
+                  Inicio
+                </a>
 
                 {esAlumno && (
                   <NavLink to="/mi-plan" className={linkClass} end>Mi plan</NavLink>
@@ -128,7 +133,7 @@ export default function Navbar({ modulo }) {
                 <span className="sr-only">Menú usuario</span>
                 <img
                   alt="Usuario"
-                  src={user}
+                  src={userAvatar}
                   className="size-8 rounded-full bg-red-900 outline -outline-offset-1 outline-white/10"
                 />
               </MenuButton>
@@ -142,9 +147,9 @@ export default function Navbar({ modulo }) {
                     no confirmamos si el back de Auth lo manda en el
                     user o no -- si no aparece, sacar esta línea. */}
                 <div className="px-4 py-2 border-b border-white/10">
-                  <p className="text-sm text-white font-medium">{usuario?.nombre ?? usuario?.email}</p>
-                  {usuario?.cargo && (
-                    <p className="text-xs text-gray-400">{usuario.cargo}</p>
+                  <p className="text-sm text-white font-medium">{user?.nombre ?? user?.email}</p>
+                  {user?.cargo && (
+                    <p className="text-xs text-gray-400">{user.cargo}</p>
                   )}
                   <p className="text-xs text-gray-500 mt-1">
                     {roles.map((r) => r.nombre).join(", ")}
