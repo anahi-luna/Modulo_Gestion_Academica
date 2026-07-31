@@ -48,7 +48,6 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
                             ?evaluacion: null;
                     })
                 );
-
                 const evaluacionesPendientes = evaluacionesVerificadas.filter(Boolean);
 
                 setEvaluaciones(evaluacionesPendientes);

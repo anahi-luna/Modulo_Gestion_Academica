@@ -8,7 +8,7 @@ export default function ComisionCard({
     onClick,
 
 }){
-    console.log("Renderizando card", comision);
+
     return(
 
         <div

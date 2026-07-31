@@ -3,7 +3,7 @@ import API_URL from "./api"; //importamos la url de la api general
 // Calificaciones de una evaluación puntual (para la planilla del docente)
 export async function getCalificacionesPorEvaluacion(idEvaluacion) {
     try{
-        const response = await fetch(`${API_URL}/calificaciones?id_evaluacion=${idEvaluacion}`);
+        const response = await fetch(`${API_URL}/calificaciones/?id_evaluacion=${idEvaluacion}`);
         const data = await response.json();
 
         if(!response.ok) {

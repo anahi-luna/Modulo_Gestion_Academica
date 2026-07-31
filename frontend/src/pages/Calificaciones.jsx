@@ -56,7 +56,7 @@ function VistaComisiones({ puedeEditar }) {
         />
 
         <PanelDetalleCalificaciones
-          idComision={comisionSeleccionada?.id}
+          idComision={comisionSeleccionada?.id_comision_asignatura}
           soloLectura={!puedeEditar}
         />
 

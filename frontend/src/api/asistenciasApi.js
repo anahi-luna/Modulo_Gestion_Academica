@@ -3,7 +3,7 @@ import API_URL from "./api"; //importamos la url de la api general
 // Asistencias de una clase puntual (para la planilla del docente)
 export async function getAsistenciaPorClase(idClase) {
     try{
-        const response = await fetch(`${API_URL}/asistencias?id_clase=${idClase}`); //Guarda la lista en la variable response
+        const response = await fetch(`${API_URL}/asistencias/?id_clase=${idClase}`); //Guarda la lista en la variable response
         const data = await response.json();
 
         if(!response.ok) {

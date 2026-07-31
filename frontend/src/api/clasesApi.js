@@ -8,7 +8,6 @@ export async function getListaClases(idComision) {
             ? `${API_URL}/clases/?id_comision_asignatura=${idComision}`
             :`${API_URL}/clases/`
         
-        console.log("URL construida:", url);
 
        const response = await fetch(url); //Guarda la lista en la variable response
 
