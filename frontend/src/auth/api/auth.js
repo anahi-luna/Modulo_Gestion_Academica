@@ -12,7 +12,7 @@ export const API_URL = AUTH_API;
 // Si la autenticación es exitosa, devuelve la información de la sesión del usuario
 export async function login({ email, password }) {
   // Realiza la petición al endpoint de login.
-  const response = await fetch(`${API_URL}/auth/login`, {
+  const response = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
 
@@ -59,7 +59,7 @@ export async function login({ email, password }) {
 // Se utiliza cuando el Access Token expiro
 export async function refresh(refreshToken) {
   // Realiza la peticion al endpoint de renovación de sesion
-  const response = await fetch(`${API_URL}/auth/refresh`, {
+  const response = await fetch(`${API_URL}/api/auth/refresh`, {
     method: "POST",
 
     // Envia el Refresh Token en el encabezado Authorization
@@ -84,7 +84,7 @@ export async function refresh(refreshToken) {
 // Informa al backend para invalidar la sesion o el Refresh Token
 export async function logout(accessToken) {
   // Realiza la petición al endpoint de cierre de sesion
-  await fetch(`${API_URL}/auth/logout`, {
+  await fetch(`${API_URL}/api/auth/logout`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
