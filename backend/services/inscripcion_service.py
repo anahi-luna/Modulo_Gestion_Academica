@@ -18,8 +18,8 @@ from models.modelo_estado_inscripcion import EstadoInscripcion
 from models.modelo_asistencia import Asistencia
 from models.modelo_calificacion import Calificacion
 
-
 # -------------------CONSULTAS-------------------#
+
 
 # Obtiene el listado de inscripciones con filtros opcionales.
 def obtener_lista_de_inscripciones(
@@ -48,8 +48,8 @@ def obtener_inscripcion_por_id(id_inscripcion):
     return db.session.get(Inscripcion, id_inscripcion)
 
 
-
 # -------------------VALIDACIONES-------------------#
+
 
 # Verifica si ya existe una inscripción para el mismo alumno y comisión.
 def existe_inscripcion(id_legajo, id_comision_asignatura):
@@ -59,6 +59,7 @@ def existe_inscripcion(id_legajo, id_comision_asignatura):
         ).first()
         is not None
     )
+
 
 # Verifica si una inscripción posee asistencias registradas.
 def existe_asistencia_inscripcion(id_inscripcion):
@@ -74,7 +75,36 @@ def existe_calificacion_inscripcion(id_inscripcion):
     )
 
 
+def validar_transicion_estado(estado_actual, estado_nuevo):
+
+    # Una inscripción cancelada no puede modificarse.
+    if estado_actual.nombre == "Cancelada":
+        raise BusinessError(
+            "Una inscripción cancelada no puede modificarse.",
+            400,
+        )
+
+    # Una inscripción finalizada no puede modificarse.
+    if estado_actual.nombre == "Finalizada":
+        raise BusinessError(
+            "Una inscripción finalizada no puede modificarse.",
+            400,
+        )
+
+    # Una inscripción aceptada no puede volver a pendiente.
+    if estado_actual.nombre == "Aceptada" and estado_nuevo.nombre == "Pendiente":
+        raise BusinessError(
+            "Una inscripción aceptada no puede volver a estado Pendiente.",
+            400,
+        )
+
+    # No hacer nada si el estado no cambia.
+    if estado_actual.id_estado == estado_nuevo.id_estado:
+        return
+
+
 # -------------------CÁLCULOS-------------------#
+
 
 # Calcula el número de inscriptos en una comision asignatura
 def contar_inscriptos(id_comision_asignatura):
@@ -91,6 +121,7 @@ def contar_inscriptos(id_comision_asignatura):
 
 
 # -------------------PREPARACIÓN DE DATOS-------------------#
+
 
 # Prepara los datos para crear una nueva inscripción
 def preparar_datos_inscripcion(inscripcion_data, id_estado, id_usuario_autenticado):
@@ -109,6 +140,7 @@ def preparar_datos_inscripcion(inscripcion_data, id_estado, id_usuario_autentica
 
 
 # -------------------CRUD-------------------#
+
 
 # Registra una nueva inscripción.
 def crear_inscripcion(datos):
@@ -141,7 +173,7 @@ def crear_inscripcion(datos):
         if not comision:
             raise BusinessError("La comisión no existe.", 404)
 
-        #Validamos si el Legajo puede inscribirse a la comision asignatura 
+        # Validamos si el Legajo puede inscribirse a la comision asignatura
         comision = obtener_comision_asignatura_por_id(
             datos["id_comision_asignatura"], datos["id_legajo"], headers=request.headers
         )
@@ -215,32 +247,66 @@ def modificar_inscripcion(id_inscripcion, datos):
         logger.info(
             f"Usuario {id_usuario_autenticado} modificando la inscripción {id_inscripcion}."
         )
-        # Cambia el estado de la inscripción.
+
+        # Busca la inscripción.
         inscripcion = obtener_inscripcion_por_id(id_inscripcion)
 
         if not inscripcion:
             logger.warning(f"La inscripción {id_inscripcion} no existe.")
             return None
 
+        # Solo se permite modificar el estado de la inscripción.
+        campos_permitidos = {"id_estado"}
+
+        campos_invalidos = set(datos.keys()) - campos_permitidos
+
+        if campos_invalidos:
+            logger.warning(
+                f"Se intentó modificar campos no permitidos: {campos_invalidos}"
+            )
+
+            raise BusinessError(
+                "Solo está permitido modificar el estado de la inscripción.",
+                400,
+            )
+
         # Cambiar estado.
         if "id_estado" in datos:
 
-            nuevo_estado = db.session.get(EstadoInscripcion, datos["id_estado"])
+            # Obtiene el estado actual de la inscripción.
+            estado_actual = db.session.get(
+                EstadoInscripcion,
+                inscripcion.id_estado,
+            )
+
+            # Obtiene el nuevo estado solicitado.
+            nuevo_estado = db.session.get(
+                EstadoInscripcion,
+                datos["id_estado"],
+            )
 
             if not nuevo_estado:
 
                 logger.warning(f"El estado {datos['id_estado']} no existe.")
 
-                raise BusinessError("El estado de inscripción no existe.", 404)
+                raise BusinessError(
+                    "El estado de inscripción no existe.",
+                    404,
+                )
 
-            estado_anterior = inscripcion.id_estado
+            # Valida que la transición de estado sea válida.
+            validar_transicion_estado(
+                estado_actual,
+                nuevo_estado,
+            )
 
-            inscripcion.id_estado = datos["id_estado"]
+            # Actualiza el estado.
+            inscripcion.id_estado = nuevo_estado.id_estado
 
             # Cuando una inscripción pasa por primera vez
             # a estado ACEPTADA se crea el ResultadoPlan.
             if (
-                estado_anterior != nuevo_estado.id_estado
+                estado_actual.id_estado != nuevo_estado.id_estado
                 and nuevo_estado.nombre == "Aceptada"
             ):
 
@@ -249,45 +315,23 @@ def modificar_inscripcion(id_inscripcion, datos):
                     inscripcion.id_legajo,
                     headers=request.headers,
                 )
+
                 if not comision:
                     raise BusinessError("La comisión no existe.", 404)
 
                 actualizar_resultado_plan(
-                    inscripcion.id_legajo, comision["plan_asignaturas"]["plan"]["id"]
+                    inscripcion.id_legajo,
+                    comision["plan_asignaturas"]["plan"]["id"],
                 )
-
-        # cambiar comision
-        if "id_comision_asignatura" in datos:
-            nueva_comision = obtener_comision_asignatura_por_id(
-                datos["id_comision_asignatura"],
-                inscripcion.id_legajo,
-                headers=request.headers,
-            )
-
-            if not nueva_comision:
-                logger.warning(
-                    f"La comisión {datos['id_comision_asignatura']} no existe."
-                )
-                raise BusinessError("La comisión no existe.", 404)
-
-            if (
-                contar_inscriptos(datos["id_comision_asignatura"])
-                >= nueva_comision["cupo_maximo"]
-            ):
-                logger.warning(
-                    f"La comisión {datos['id_comision_asignatura']} no posee cupo."
-                )
-                raise BusinessError("La comisión no posee cupo disponible.", 400)
-
-            inscripcion.id_comision_asignatura = datos["id_comision_asignatura"]
-            # Pendiente:Actualizar cupos cuando el microservicio de comisiones exponga su API.
 
         # Registra el usuario y fecha de modificación.
         inscripcion.id_usuario_modificacion = id_usuario_autenticado
         inscripcion.ts_modificacion = datetime.now()
 
         db.session.commit()
+
         logger.info(f"Inscripción {id_inscripcion} actualizada correctamente.")
+
         return inscripcion
 
     except IntegrityError:
@@ -296,7 +340,10 @@ def modificar_inscripcion(id_inscripcion, datos):
 
         logger.exception("Error de integridad al actualizar la inscripción.")
 
-        raise BusinessError("No fue posible actualizar la inscripción.", 500)
+        raise BusinessError(
+            "No fue posible actualizar la inscripción.",
+            500,
+        )
 
     except BusinessError:
 
@@ -310,7 +357,10 @@ def modificar_inscripcion(id_inscripcion, datos):
 
         logger.exception("Ocurrió un error inesperado al actualizar la inscripción.")
 
-        raise BusinessError("Ocurrió un error interno del servidor.", 500)
+        raise BusinessError(
+            "Ocurrió un error interno del servidor.",
+            500,
+        )
 
 
 def eliminar_inscripcion(id_inscripcion):

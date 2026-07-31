@@ -69,7 +69,7 @@ export default function Home() {
             {usuario.cargo} — Instituto de Formación de Bomberos
           </p>
 
-          {hasPermission("micro2.inscripciones.leer") && (
+          {hasPermission("inscripcion.inscripciones.leer") && (
             <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-red-900/50 rounded-xl px-4 py-3">
                 <p className="text-red-200 text-xs">Total inscripciones</p>

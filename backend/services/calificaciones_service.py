@@ -6,6 +6,7 @@ from exceptions import BusinessError
 from utils.logger import logger
 
 from models.modelo_calificacion import Calificacion
+from services.estado_inscripcion_service import obtener_estado_por_nombre
 from services.evaluacion_service import obtener_evaluacion_por_id
 from services.inscripcion_service import obtener_inscripcion_por_id
 
@@ -61,7 +62,22 @@ def validar_item_calificacion(item, evaluacion):
         logger.warning(f"La inscripción " f"{item['id_inscripcion']} no existe.")
 
         raise BusinessError(f"La inscripción {item['id_inscripcion']} no existe.", 404)
+    
+    # Verifica que la inscripción se encuentre aceptada.
+    estado_aceptada = obtener_estado_por_nombre("Aceptada")
 
+    if inscripcion.id_estado != estado_aceptada.id_estado:
+
+        logger.warning(
+            f"No es posible registrar calificación para la inscripción "
+            f"{inscripcion.id_inscripcion} porque no se encuentra aceptada."
+        )
+
+        raise BusinessError(
+            "Solo es posible registrar calificaciones de inscripciones aceptadas.",
+            400,
+        )
+    
     # Verifica que la inscripción pertenezca
     # a la comisión de la evaluación.
     if inscripcion.id_comision_asignatura != evaluacion.id_comision_asignatura:

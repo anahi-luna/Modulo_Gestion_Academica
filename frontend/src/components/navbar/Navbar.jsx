@@ -146,7 +146,7 @@ export default function Navbar({ modulo }) {
                     "cargo" queda con optional chaining porque todavía
                     no confirmamos si el back de Auth lo manda en el
                     user o no -- si no aparece, sacar esta línea. */}
-                <div className="px-4 py-2 border-b border-white/10">
+                {/* <div className="px-4 py-2 border-b border-white/10">
                   <p className="text-sm text-white font-medium">{user?.nombre ?? user?.email}</p>
                   {user?.cargo && (
                     <p className="text-xs text-gray-400">{user.cargo}</p>
@@ -154,8 +154,7 @@ export default function Navbar({ modulo }) {
                   <p className="text-xs text-gray-500 mt-1">
                     {roles.map((r) => r.nombre).join(", ")}
                   </p>
-                </div>
-
+                </div> */}
                 <MenuItem>
                   <button
                     onClick={handleLogout}

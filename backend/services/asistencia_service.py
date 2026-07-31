@@ -8,6 +8,7 @@ from flask import g
 from models.modelo_asistencia import Asistencia, TipoRegistro
 from models.modelo_clase import EstadoClase
 from services.clase_service import obtener_clase_por_id
+from services.estado_inscripcion_service import obtener_estado_por_nombre
 from services.estado_asistencia_services import obtener_estado_asistencia_por_id
 from services.inscripcion_service import obtener_inscripcion_por_id
 
@@ -58,6 +59,20 @@ def validar_item_asistencia(item, clase, id_clase):
 
         raise BusinessError(
             f"La inscripción " f"{item['id_inscripcion']} no existe.", 404
+        )
+    
+    # Verifica que la inscripción se encuentre aceptada.
+    estado_aceptada = obtener_estado_por_nombre("Aceptada")
+
+    if inscripcion.id_estado != estado_aceptada.id_estado:
+        logger.warning(
+            f"No es posible registrar asistencia para la inscripción "
+            f"{inscripcion.id_inscripcion} porque no se encuentra aceptada."
+        )
+
+        raise BusinessError(
+            "Solo es posible registrar asistencias de inscripciones aceptadas.",
+            400,
         )
 
     # Verifica que la inscripción pertenezca
