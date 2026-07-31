@@ -19,24 +19,28 @@ export default function ModalValidarInscripcion({
     const [comision, setComision] = useState("");
 
     // Estados disponibles para una inscripción
-    const estados = [
-        {
-            id: 1,
-            nombre: "Pendiente"
-        },
-        {
-            id: 2,
-            nombre: "Aceptada"
-        },
-        {
-            id: 3,
-            nombre: "Rechazada"
-        },
-        {
-            id: 4,
-            nombre: "Cancelada"
-        }
-    ];
+    const TODOS_LOS_ESTADOS = [
+  { id: 1, nombre: "Pendiente" },
+  { id: 2, nombre: "Aceptada" },
+  { id: 3, nombre: "Rechazada" },
+  { id: 4, nombre: "Cancelada" },
+];
+
+function estadosPermitidos(estadoActual) {
+  // Desde Aceptada solo se puede cancelar (y dejar Aceptada)
+  if (estadoActual === "Aceptada") {
+    return TODOS_LOS_ESTADOS.filter((e) =>
+      ["Aceptada", "Cancelada"].includes(e.nombre)
+    );
+  }
+  // Pendiente: puede ir a cualquiera de los 4
+  if (estadoActual === "Pendiente") {
+    return TODOS_LOS_ESTADOS;
+  }
+  // Rechazada / Cancelada / Finalizado: no deberían abrir el modal;
+  // por las dudas, solo el estado actual
+  return TODOS_LOS_ESTADOS.filter((e) => e.nombre === estadoActual);
+}
 
     /*
      * Cuando cambia la inscripción seleccionada,
@@ -120,16 +124,13 @@ export default function ModalValidarInscripcion({
                             }
                             className="w-full mt-1 border rounded-lg px-3 py-2"
                         >
-                            {
-                                estados.map(estado => (
-                                    <option
-                                        key={estado.id}
-                                        value={estado.nombre}
-                                    >
-                                        {estado.nombre}
-                                    </option>
-                                ))
-                            }
+                            
+                                {estadosPermitidos(inscripcion.estado).map((e) => (
+                                    <option key={e.id} value={e.nombre}>
+                                      {e.nombre}
+                                         </option>
+                            ))}
+                            
                         </select>
                     </div>
                 </div>

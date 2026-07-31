@@ -67,48 +67,30 @@ export async function obtenerInscripcion(id) {
 }
 
 export async function obtenerInscripcionesPorComision(idComision) {
+  const response = await getInscripcionesPorComision(idComision);
+  const comisiones = (await getComisiones()).data;
 
-    const response = await getInscripcionesPorComision(idComision);
+  const resultado = await Promise.all(
+    (response?.data ?? []).map(async (inscripcion) => {
+      const legajo = (await getLegajoPorId(inscripcion.id_legajo)).data;
+      const comision = comisiones.find(
+        (c) => c.id_comision_asignatura === inscripcion.id_comision_asignatura
+      );
 
-    const comisiones = (await getComisiones()).data;
+      return {
+        id_inscripcion: inscripcion.id_inscripcion,
+        id_legajo: legajo.numero_legajo,
+        alumno: `${legajo.nombre} ${legajo.apellido}`,
+        dni: legajo.dni,
+        id_comision_asignatura: inscripcion.id_comision_asignatura,
+        materia: comision?.nombre ?? "-",
+        estado: inscripcion.estado?.nombre ?? inscripcion.estado,
+      };
+    })
+  );
 
-    const resultado = await Promise.all(
-
-        response.data.map(async (inscripcion) => {
-
-            const legajo = (
-                await getLegajoPorId(inscripcion.id_legajo)
-            ).data;
-
-            const comision = comisiones.find(
-                c => c.id_comision_asignatura === inscripcion.id_comision_asignatura
-            );
-
-            return {
-
-                id_inscripcion: inscripcion.id_inscripcion,
-
-                id_legajo: legajo.numero_legajo,
-
-                alumno: `${legajo.nombre} ${legajo.apellido}`,
-
-                dni: legajo.dni,
-
-                //rango: legajo.rango,
-
-                id_comision_asignatura: inscripcion.id_comision_asignatura,
-
-                materia: comision?.nombre ?? "-",
-
-                estado: inscripcion.estado.nombre,
-
-            };
-
-        })
-
-    );
-
-    return resultado;
+  // Solo Aceptada para planillas de asistencia y calificaciones
+  return resultado.filter((i) => i.estado === "Aceptada");
 }
 
 // Actualizar inscripción
