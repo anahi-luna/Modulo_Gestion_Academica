@@ -68,7 +68,7 @@ export async function obtenerMiAsistencia(idLegajo) {
                 : 0;
 
             return {
-                id_comision_asignatura: inscripcion.id_comision_asignatura,
+                id_comision: inscripcion.id_comision_asignatura,
                 materia: inscripcion.materia,
                 comision: inscripcion.comision,
                 detalle,

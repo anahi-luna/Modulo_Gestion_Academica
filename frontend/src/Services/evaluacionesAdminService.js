@@ -48,8 +48,10 @@ export async function getEvaluaciones(idComision) {
 
             id: evaluacion.id_evaluacion,
 
+            id_comision: evaluacion.id_comision_asignatura,
+            
             id_comision_asignatura: evaluacion.id_comision_asignatura,
-
+            
             codigo: comision?.comision.descripcion ?? "-",
 
             materia: comision?.nombre ?? "-",
@@ -83,26 +85,17 @@ export async function getEvaluacion(id) {
     );
 
     return {
-
-        id: response.data.id_evaluacion,
-
-        id_comision_asignatura: response.data.id_comision_asignatura,
-
-        codigo: comision?.comision.descripcion ?? "-",
-
-        materia: comision?.nombre ?? "-",
-
-        docente: obtenerDocenteTitular(comision),
-
-        titulo: response.data.titulo,
-
-        tipo: idATipo(response.data.id_tipo_evaluacion, response.data.tipo_evaluacion?.nombre),
-
-        fecha: response.data.fecha_evaluacion,
-
-        puntaje_maximo: response.data.puntaje_maximo,
-
-    };
+  id: response.data.id_evaluacion,
+  id_comision: response.data.id_comision_asignatura,
+  id_comision_asignatura: response.data.id_comision_asignatura,
+  codigo: comision?.comision.descripcion ?? "-",
+  materia: comision?.nombre ?? "-",
+  docente: obtenerDocenteTitular(comision),
+  titulo: response.data.titulo,
+  tipo: idATipo(response.data.id_tipo_evaluacion, response.data.tipo_evaluacion?.nombre),
+  fecha: response.data.fecha_evaluacion,
+  puntaje_maximo: response.data.puntaje_maximo,
+};
 
 }
 
@@ -110,13 +103,15 @@ export async function getEvaluacion(id) {
 // puntaje_maximo }. Acá lo traduzco a lo que pide el back:
 // { id_comision, id_tipo_evaluacion, titulo, fecha_evaluacion, puntaje_maximo }.
 function aPayloadBack(datos) {
-    return {
-        id_comision_asignatura: datos.id_comision_asignatura,
-        id_tipo_evaluacion: ID_POR_TIPO[datos.tipo] ?? 1,
-        titulo: datos.titulo,
-        fecha_evaluacion: datos.fecha,
-        puntaje_maximo: datos.puntaje_maximo,
-    };
+  return {
+    id_comision_asignatura: Number(
+      datos.id_comision_asignatura ?? datos.id_comision
+    ),
+    id_tipo_evaluacion: ID_POR_TIPO[datos.tipo] ?? 1,
+    titulo: datos.titulo,
+    fecha_evaluacion: datos.fecha, // tiene que ser YYYY-MM-DD
+    puntaje_maximo: Number(datos.puntaje_maximo),
+  };
 }
 
 export async function registrarEvaluacion(datos) {

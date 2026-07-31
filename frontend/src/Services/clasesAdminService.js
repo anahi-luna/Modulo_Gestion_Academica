@@ -19,6 +19,8 @@ export async function getClases(idComision) {
 
             id: clase.id_clase,
 
+            id_comision: clase.id_comision_asignatura,
+            
             id_comision_asignatura: clase.id_comision_asignatura,
 
             numero_clase: clase.numero_clase,
@@ -63,8 +65,10 @@ export async function getClase(id) {
 
         id: response.data.id_clase,
 
-        id_comision_asignatura: response.data.id_comision_asignatura,
+        id_comision: response.data.id_comision_asignatura,
 
+        id_comision_asignatura: response.data.id_comision_asignatura,
+       
         numero_clase: response.data.numero_clase,
 
         codigo: comision?.comision.descripcion ?? "-",
@@ -91,15 +95,17 @@ export async function getClase(id) {
 
 
 export async function registrarClase(datos) {
-
-    return await crearClase(datos);
-
+  return await crearClase({
+    ...datos,
+    id_comision_asignatura: datos.id_comision_asignatura ?? datos.id_comision,
+  });
 }
 
 export async function modificarClase(id, datos) {
-
-    return await editarClase(id, datos);
-
+  return await editarClase(id, {
+    ...datos,
+    id_comision_asignatura: datos.id_comision_asignatura ?? datos.id_comision,
+  });
 }
 
 export async function borrarClase(id) {
