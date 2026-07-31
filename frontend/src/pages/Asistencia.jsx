@@ -45,10 +45,12 @@ export default function Asistencia() {
         <PanelesClase
           comisionSeleccionada={comisionSeleccionada}
           setComisionSeleccionada={setComisionSeleccionada}
+          
+          
         />
 
         <PanelDetalleClase
-          idComision={comisionSeleccionada?.id}
+          idComision={comisionSeleccionada?.id_comision_asignatura}
           soloLectura={!puedeEditar}
         />
 

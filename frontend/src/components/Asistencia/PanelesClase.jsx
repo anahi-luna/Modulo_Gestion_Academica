@@ -30,7 +30,6 @@ export default function PanelesClase({
         cargarComisiones();
     }, []);
 
-    console.log(comisiones);
 
     return (
         <div className="lg:col-span-3 bg-white rounded-xl shadow border p-4 sm:p-5">

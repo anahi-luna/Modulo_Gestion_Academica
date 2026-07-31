@@ -143,10 +143,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
             const asistenciasExistentes = asistencias.filter((a) => a.id);
 
             const asistenciasNuevas = asistencias.filter((a) => !a.id);
-
-            console.log("Todas las asistencias:", asistencias);
-            console.log("Existentes:", asistenciasExistentes);
-            console.log("Nuevas:", asistenciasNuevas);
+            
 
             if(asistenciasExistentes.length > 0){
                 await Promise.all(
