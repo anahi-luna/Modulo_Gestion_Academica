@@ -52,8 +52,7 @@ export default function EvaluacionModal({
         return null;
 
     const comisionSeleccionada = comisiones.find(
-        c => c.id === Number(formulario.id_comision_asignatura)
-    );
+    c => c.id_comision_asignatura === Number(formulario.id_comision_asignatura));
 
     return (
 
@@ -85,7 +84,7 @@ export default function EvaluacionModal({
                         >
                             <option value="">Seleccione una comisión</option>
                             {comisiones.map((comision) => (
-                                <option key={comision.id_comsion_asignatura} value={comision.id_comision_asignatura}>
+                                <option key={comision.id_comision_asignatura} value={comision.id_comision_asignatura}>
                                     {comision.comision.descripcion} - {comision.nombre}
                                 </option>
                             ))}

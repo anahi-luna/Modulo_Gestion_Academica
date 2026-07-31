@@ -48,8 +48,8 @@ export default function Asistencia() {
         />
 
         <PanelDetalleClase
-          idComision={comisionSeleccionada?.id}
-          soloLectura={!puedeEditar}
+          idComision={comisionSeleccionada?.id_comision_asignatura}
+          soloLectura={!puedeEditar}    
         />
 
       </div>
