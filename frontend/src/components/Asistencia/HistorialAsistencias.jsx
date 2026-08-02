@@ -1,3 +1,4 @@
+// Componente para mostrar el historial de asistencias
 import {
     PencilSquareIcon,
     TrashIcon,

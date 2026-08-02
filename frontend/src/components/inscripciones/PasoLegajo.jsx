@@ -5,7 +5,6 @@ export default function PasoLegajo({
     nroLegajo,
     onChange,
     onSubmit,
-    onGenerarAleatorio,
     error,
     cargando
 }) {
@@ -24,30 +23,15 @@ export default function PasoLegajo({
                         <label htmlFor="numero-legajo" className="block text-xs font-medium text-gray-600 mb-1">
                             Nro. de Legajo *
                         </label>
-                        <div className="flex gap-2">
-                            <input
-                                id="numero-legajo"
-                                type="text"
-                                value={nroLegajo}
-                                onChange={onChange}
-                                placeholder="Ej: 000125"
-                                maxLength={6}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm
-                                           focus:outline-none focus:ring-2 focus:ring-red-300"
-                            />
-                            <button
-                                type="button"
-                                onClick={onGenerarAleatorio}
-                                title="Generar legajo de prueba"
-                                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300
-                                           rounded-lg text-xs text-gray-600 transition-colors whitespace-nowrap"
-                            >
-                                Aleatorio
-                            </button>
-                        </div>
-                        <p className="text-xs text-gray-400 mt-1">
-                            Legajos de prueba: 000123, 000124, 000125
-                        </p>
+                        <input
+                            id="numero-legajo"
+                            type="text"
+                            value={nroLegajo}
+                            onChange={onChange}
+                            placeholder="Ej: LEG-000"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
+                                       focus:outline-none focus:ring-2 focus:ring-red-300"
+                        />
                     </div>
 
                     {error && (

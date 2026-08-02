@@ -1,13 +1,9 @@
-// Arma "mi asistencia" del lado del cliente: agarro mis inscripciones,
-// para cada una traigo sus clases, y para cada clase busco mi propio
-// registro de asistencia filtrando por mi número de legajo.
-// getLegajoPorId sigue siendo del mock porque legajos es el microservicio
-// del otro grupo, no el nuestro.
-
+// servicios relacionados con la asistencia de los alumnos a las clases, para el alumno
+//  muestra su propia asistencia en cada comisión en la que está inscripto.
 import { obtenerMisInscripciones } from "./inscripcionesService";
 import { getClases } from "./clasesAdminService";
 import { obtenerAsistenciasPorClase } from "./asistenciaAdminService";
-import { getLegajoPorId } from "../mocks/legajosMock";
+import { getLegajoPorId } from "../api/legajosApi";
 
 // mismo mapeo que usa EstadoSelect.jsx en la vista de gestión
 const ESTADOS = {
@@ -43,7 +39,7 @@ export async function obtenerMiAsistencia(idLegajo) {
 
     const porComision = await Promise.all(
         inscripciones.map(async (inscripcion) => {
-            const clases = await getClases(inscripcion.id_comision);
+            const clases = await getClases(inscripcion.id_comision_asignatura);
 
             const detalle = await Promise.all(
                 clases.map(async (clase) => {
@@ -72,7 +68,7 @@ export async function obtenerMiAsistencia(idLegajo) {
                 : 0;
 
             return {
-                id_comision: inscripcion.id_comision,
+                id_comision: inscripcion.id_comision_asignatura,
                 materia: inscripcion.materia,
                 comision: inscripcion.comision,
                 detalle,

@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { getComisiones } from "../../mocks/comisionesMock";
-import ComisionCard from "./ComisionCard";
+import { getComisiones } from "../../api/comisiones";
+import ComisionCard from "./ComisionCardAsistencia";
 import Alert from "../Alert";
 
+// Componente para mostrar el panel de clases de una comisión, incluyendo la búsqueda y selección de clases.
 export default function PanelesClase({
     comisionSeleccionada,
     setComisionSeleccionada
 }) {
     const [comisiones, setComisiones] = useState([]);
-    // Antes esto solo se logueaba a consola: la lista se quedaba vacía
-    // sin explicar por qué.
     const [error, setError] = useState(null);
 
     // Carga las comisiones al montar el componente
@@ -30,6 +29,7 @@ export default function PanelesClase({
         }
         cargarComisiones();
     }, []);
+
 
     return (
         <div className="lg:col-span-3 bg-white rounded-xl shadow border p-4 sm:p-5">
@@ -61,9 +61,9 @@ export default function PanelesClase({
             <div className="space-y-3 overflow-y-auto max-h-72 lg:max-h-[600px] pr-1">
                 {comisiones.map((comision) => (
                     <ComisionCard
-                        key={comision.id}
+                        key={comision.id_comision_asignatura}
                         comision={comision}
-                        seleccionada={comision.id === comisionSeleccionada?.id}
+                        seleccionada={comision.id_comision_asignatura === comisionSeleccionada?.id_comision_asignatura}
                         onClick={() => setComisionSeleccionada(comision)}
                     />
                 ))}

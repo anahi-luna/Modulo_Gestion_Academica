@@ -1,5 +1,5 @@
 from extensions import ma
-from marshmallow import fields,validate
+from marshmallow import fields
 from models.modelo_inscripcion import Inscripcion
 from schemas.estado_inscripcion_schema import EstadoInscripcionSchema
 
@@ -23,7 +23,7 @@ class InscripcionResumenSchema(ma.Schema):
 
     id_legajo = fields.Integer()
 
-    id_comision = fields.Integer()
+    id_comision_asignatura = fields.Integer()
 
     id_estado = fields.Integer()
 
@@ -36,10 +36,10 @@ class InscripcionRequestSchema(ma.Schema):
         }
     )
 
-    id_comision = fields.Integer(
+    id_comision_asignatura = fields.Integer(
         required= True,
         error_messages={
-            "required": "El id_comision es obligatorio."
+            "required": "El id_comision_asignatura es obligatorio."
         }
     )
 
@@ -49,7 +49,7 @@ class ModificarInscripcionSchema(ma.Schema):
         required=False
     )
 
-    id_comision = fields.Integer(
+    id_comision_asignatura = fields.Integer(
         required=False
     )
 

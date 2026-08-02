@@ -30,7 +30,7 @@ export default function PasoComision({
                     <p className="font-bold text-gray-800">
                         {legajoData.nombre} {legajoData.apellido}
                     </p>
-                    <p className="text-sm text-gray-500">{legajoData.rango}</p>
+                    {/*<p className="text-sm text-gray-500">{legajoData.rango}</p>*/}
                 </div>
                 <button
                     onClick={onCambiarLegajo}
@@ -78,9 +78,9 @@ export default function PasoComision({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                     {comisiones.map((com) => (
                         <ComisionCard
-                            key={com.id}
+                            key={com.id_comision_asignatura}
                             comision={com}
-                            seleccionada={comisionElegida?.id === com.id}
+                            seleccionada={comisionElegida?.id_comision_asignatura === com.id_comision_asignatura}
                             onSeleccionar={onSeleccionarComision}
                         />
                     ))}
@@ -92,7 +92,7 @@ export default function PasoComision({
                     </div>
                 )}
 
-                {/* Panel de confirmación */}
+                {/* Panel de confirmación IMPORTANTE CHEQUEAR SI FUNCIONA, SINO CAMBIAR DAtOS */}
                 {comisionElegida && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-4
                                     flex flex-col sm:flex-row items-start sm:items-center
@@ -102,11 +102,11 @@ export default function PasoComision({
                                 Seleccionaste: {comisionElegida.materia}
                             </p>
                             <p className="text-xs text-red-600">
-                                {comisionElegida.codigo} · {comisionElegida.horario}
+                                {comisionElegida.codigo} · {comisionElegida.modalidad}
                             </p>
                         </div>
                         <button
-                            onClick={onConfirmar}
+                            onClick={() => onConfirmar(comisionElegida.id_comision_asignatura)}
                             disabled={enviando}
                             className="w-full sm:w-auto px-6 py-2.5 bg-red-700 hover:bg-red-800
                                        disabled:opacity-50 text-white font-medium rounded-lg

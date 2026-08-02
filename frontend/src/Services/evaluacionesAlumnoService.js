@@ -20,7 +20,7 @@ export async function obtenerMisEvaluacionesPlano(idLegajo) {
 
     const porComision = await Promise.all(
         inscripciones.map((inscripcion) =>
-            getEvaluaciones(inscripcion.id_comision)
+            getEvaluaciones(inscripcion.id_comision_asignatura)
         )
     );
 

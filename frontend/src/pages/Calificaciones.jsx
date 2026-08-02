@@ -1,34 +1,29 @@
-//vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión en la que está inscripto. Es exactamente el contenido
-// que antes vivía en pages/MiAsistencia.jsx. 
-//vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de todos los alumnos de una clase.
+//vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión en la que está inscripto. 
+//vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de todos 
+// los alumnos de una clase.
 import { useEffect, useState } from "react";
-import { usePermissions } from "../context/PermissionsContext";
-import { ACCIONES } from "../config/modulos";
-
+import useAuth from "../auth/hooks/useAuth";
 import PanelesComision from "../components/Calificaciones/PanelesComision";
 import PanelDetalleCalificaciones from "../components/Calificaciones/PanelDetalleCalificaciones";
 import ResumenComisionCard from "../components/Calificaciones/ResumenComisionCard";
 import { obtenerMisCalificaciones } from "../Services/calificacionesAlumnoService";
+import { obtenerIdLegajo } from "../config/legajo";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; // ver TODO arriba
+
 
 export default function Calificaciones() {
-  const { usuario, hasAnyPermission } = usePermissions();
+  const { user: usuario, hasPermission, hasRole } = useAuth();
 
-  const esAlumno = usuario?.usuario === "alumno";
-
-  // Puede cargar/editar notas si tiene permiso de crear o actualizar
-  // calificaciones (el alumno nunca los va a tener, así que para él
-  // esto siempre da false y ve todo de solo lectura).
-  const puedeEditar = hasAnyPermission([
-    ACCIONES.CALIFICACIONES_CREAR,
-    ACCIONES.CALIFICACIONES_ACTUALIZAR,
-  ]);
+  const esAlumno = hasRole("Alumno");
+// Si el usuario es un alumno, no puede editar la calificación, solo puede verla.
+// Si el usuario es un docente o administrador, puede editar la calificación si tiene los permisos correspondientes.
+  const puedeEditar = ["inscripcion.calificaciones.crear", "inscripcion.calificaciones.actualizar"].some(hasPermission);
+  const idLegajo = obtenerIdLegajo(usuario)
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
+    return <VistaAlumno idLegajo={usuario?.id_legajo} />;
   }
-
+  
   return <VistaComisiones puedeEditar={puedeEditar} />;
 }
 
@@ -61,7 +56,7 @@ function VistaComisiones({ puedeEditar }) {
         />
 
         <PanelDetalleCalificaciones
-          idComision={comisionSeleccionada?.id}
+          idComision={comisionSeleccionada?.id_comision_asignatura}
           soloLectura={!puedeEditar}
         />
 
@@ -79,6 +74,11 @@ function VistaAlumno({ idLegajo }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);
@@ -120,7 +120,7 @@ function VistaAlumno({ idLegajo }) {
         )}
 
         {comisiones.map((c) => (
-          <ResumenComisionCard key={c.id_comision} comision={c} />
+          <ResumenComisionCard key={c.id_comision_asignatura} comision={c} />
         ))}
 
       </div>

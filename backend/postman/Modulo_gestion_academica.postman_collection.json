@@ -1,0 +1,1284 @@
+{
+  "info": {
+    "_postman_id": "184893b0-4adf-4402-bb5c-4863fa7d2f81",
+    "name": "Modulo_gestion_academica",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53961186",
+    "_collection_link": "https://go.postman.co/collection/53961186-184893b0-4adf-4402-bb5c-4863fa7d2f81?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "inscripciones",
+      "item": [
+        {
+          "name": "inscripcion",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/inscripciones/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "inscripciones",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "lista_Inscripcion",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_legajo\":1,\r\n    \"id_comision_asignatura\":5\r\n}\r\n        ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/inscripciones/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "inscripciones",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "actualizar_inscripcion",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_estado\":2\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/inscripciones/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "inscripciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "eliminar_inscripcion",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/inscripciones/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "inscripciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "clases",
+      "item": [
+        {
+          "name": "lista_clase",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/clases/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "clases",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "clase-post",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_comision_asignatura\": 5,\r\n    \"numero_clase\": 1,\r\n    \"fecha\": \"2026-07-06\",\r\n    \"hora_inicio\": \"18:00:00\",\r\n    \"hora_fin\": \"20:00:00\",\r\n    \"tema\": \"Introducción bomberos voluntarios\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/clases/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "clases",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "actualizar",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_comision_asignatura\":5,\r\n    \"estado\": \"DICTADA\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/clases/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "clases",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_comision\":1,\r\n    \"tema\": \"Primeros Auxilios\",\r\n    \"estado\": \"DICTADA\"\r\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/clases/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "clases",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "asistencia",
+      "item": [
+        {
+          "name": "obtener",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/asistencias/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "asistencias",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "enviar",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_clase\": 1,\r\n    \"asistencias\": [\r\n        {\r\n            \"id_inscripcion\": 1,\r\n            \"id_estado\": 1\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/asistencias/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "asistencias",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "modificar",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_estado\":2,\r\n    \"observacion\":\"No llego\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/asistencias/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "asistencias",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/asistencias/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "asistencias",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "evaluacion",
+      "item": [
+        {
+          "name": "obtener",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/evaluaciones/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "evaluaciones",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "crear",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_comision_asignatura\": 3,\r\n    \"id_tipo_evaluacion\": 1,\r\n    \"titulo\": \"Primer Parcial\",\r\n    \"fecha_evaluacion\": \"2026-07-15\",\r\n    \"puntaje_maximo\": 10\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/evaluaciones/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "evaluaciones",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "modificar",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_comision_asignatura\": 1,\r\n    \"id_tipo_evaluacion\": 1,\r\n    \"titulo\": \"Primer\",\r\n    \"fecha_evaluacion\": \"2026-07-18\",\r\n    \"puntaje_maximo\":10\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/evaluaciones/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "evaluaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/evaluaciones/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "evaluaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "calificaciones",
+      "item": [
+        {
+          "name": "obtener",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/calificaciones/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "calificaciones",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "crear",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_evaluacion\": 3,\r\n    \"calificaciones\": [\r\n        {\r\n            \"id_inscripcion\": 3,\r\n            \"puntaje\": 8,\r\n            \"observacion\": \"Muy bueno\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/calificaciones/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "calificaciones",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "modificar",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"puntaje\": 7,\r\n    \"observacion\": \"Muy buen desempeño\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/calificaciones/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "calificaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/calificaciones/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "calificaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "resultado academico",
+      "item": [
+        {
+          "name": "obtener",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/resultados-academicos/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "resultados-academicos",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "crear",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_comision_asignatura\": 3\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/resultados-academicos/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "resultados-academicos",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_estado_academico\":6\r\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/resultados-academicos/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "resultados-academicos",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "planes resultados",
+      "item": [
+        {
+          "name": "obtener",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Mock-User",
+                "value": "docente",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/resultados-planes/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "resultados-planes",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "cambiar estado",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Mock-User",
+                "value": "docente",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_estado_resultado_plan\":4\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/resultados-planes/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "resultados-planes",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "certificados",
+      "item": [
+        {
+          "name": "obtener",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Mock-User",
+                "value": "docente",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/certificados/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "certificados",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "generar",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id_resultado_plan\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/inscripciones/certificados/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "inscripciones",
+                "certificados",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Planes-api",
+      "item": [
+        {
+          "name": "legajo por id",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "All comisiones asignaturas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8480/api/planes/comisiones-asignaturas/GetDetalleFromLegajoID",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "planes",
+                "comisiones-asignaturas",
+                "GetDetalleFromLegajoID"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "por numero de legajos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8480/api/planes/legajos/GetPersonaFromLegajoNum?numero=LEG-001",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "planes",
+                "legajos",
+                "GetPersonaFromLegajoNum"
+              ],
+              "query": [
+                {
+                  "key": "numero",
+                  "value": "LEG-001"
+                }
+              ]
+            },
+            "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+          },
+          "response": []
+        },
+        {
+          "name": "comisiones asignaturas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Successful POST request\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8480/api/planes/comisiones-asignaturas/GetDetalleFromLegajoID?id=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8480",
+              "path": [
+                "api",
+                "planes",
+                "comisiones-asignaturas",
+                "GetDetalleFromLegajoID"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "loguin",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"admin@test.com\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8480/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8480",
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

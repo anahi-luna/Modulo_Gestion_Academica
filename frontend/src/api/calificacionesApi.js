@@ -2,15 +2,17 @@ import API_URL from "./api"; //importamos la url de la api general
 
 // Calificaciones de una evaluación puntual (para la planilla del docente)
 export async function getCalificacionesPorEvaluacion(idEvaluacion) {
-    try{
-        const response = await fetch(`${API_URL}/calificaciones?id_evaluacion=${idEvaluacion}`);
+    try {
+        const response = await fetch(`${API_URL}/calificaciones/?id_evaluacion=${idEvaluacion}`);
         const data = await response.json();
 
-        if(!response.ok) {
-            throw Error("Error al obtener calificaciones")
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Error al obtener las calificaciones."
+            );
         }
         return data;
-    }catch(error){
+    } catch (error) {
         console.error("Error al obtener la calificación")
         throw error
     }
@@ -19,29 +21,32 @@ export async function getCalificacionesPorEvaluacion(idEvaluacion) {
 // Calificaciones de una inscripción puntual, en todas sus evaluaciones
 // (para "Mis calificaciones" del alumno)
 export async function getCalificacionesPorInscripcion(idInscripcion) {
-    try{
+    try {
         const response = await fetch(`${API_URL}/calificaciones?id_inscripcion=${idInscripcion}`);
         const data = await response.json();
 
-        if(!response.ok) {
-            throw Error("Error al obtener calificaciones")
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Error al obtener las calificaciones."
+            );
         }
         return data;
-    }catch(error){
+    } catch (error) {
         console.error("Error al obtener la calificación")
         throw error
     }
 }
 
+// Calificaciones de una inscripción puntual, en todas sus evaluaciones
 export async function getCalificacionPorId(id) {
-    try{
+    try {
         const response = await fetch(`${API_URL}/calificaciones/${id}`);
         const data = await response.json();
-        if(!response.ok){
+        if (!response.ok) {
             throw new Error(data.message)
         }
         return data;
-    }catch(error){
+    } catch (error) {
         console.error("Error al obtener la calificación", error)
         throw error
     }
@@ -81,34 +86,34 @@ export async function actualizarCalificacion(idCalificacion, datos) {
 }
 
 // Registra en bloque las calificaciones de una evaluación completa
-// (misma forma que registrarAsistencia: { id_evaluacion, calificaciones: [...] })
 export async function registrarCalificaciones(datos) {
 
-    try{
+    try {
         const response = await fetch(
             `${API_URL}/calificaciones/`,
             {
                 method: "POST",
-                headers:{
-                    "Content-Type":"application/json"
+                headers: {
+                    "Content-Type": "application/json"
                 },
-                body:JSON.stringify(datos)
+                body: JSON.stringify(datos)
             }
         );
 
         const data = await response.json();
 
-        if(!response.ok){
+        if (!response.ok) {
             throw new Error(data.message)
         }
         return data;
-    }catch(error){
+    } catch (error) {
         console.error("Error al registrar las calificaciones", error);
         throw error
     }
 
 }
 
+// Elimina una calificación puntual
 export async function eliminarCalificacion(idCalificacion) {
     try {
         const response = await fetch(
@@ -118,11 +123,13 @@ export async function eliminarCalificacion(idCalificacion) {
             }
         );
 
-        
+
         const data = await response.text();
 
         if (!response.ok) {
-            throw new Error("Error al eliminar la calificación");
+            throw new Error(
+                data.message || "Error al eliminar la calificación."
+            );
         }
 
         return data;

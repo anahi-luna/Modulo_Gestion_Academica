@@ -1,14 +1,15 @@
+// API para clases
 import API_URL from "./api";
 
+// Obtiene la lista de clases, con o sin filtro por comision
 export async function getListaClases(idComision) {
     try{   
-
         const url = idComision //Cambia entre obtener las clases por comision o todas segun lo que se ejecute
-            ? `${API_URL}/clases?id_comision=${idComision}`
+            ? `${API_URL}/clases/?id_comision_asignatura=${idComision}`
             :`${API_URL}/clases/`
         
 
-        const response = await fetch(url); //Guarda la lista en la variable response
+       const response = await fetch(url); //Guarda la lista en la variable response
 
         const data = await response.json();
 
@@ -23,7 +24,7 @@ export async function getListaClases(idComision) {
         throw error
     }
 }
-
+// Obtiene una clase por su id
 export async function getClasePorId(id) {
     try{
         const response = await fetch(`${API_URL}/clases/${id}`);
@@ -37,7 +38,7 @@ export async function getClasePorId(id) {
         throw error
     }
 }
-
+// Crea una nueva clase
 export async function crearClase(datos) {
 
     try{
@@ -65,6 +66,7 @@ export async function crearClase(datos) {
     
 } 
 
+// Actualiza una clase existente
 export async function editarClase(id,datos) {
 
     try{
@@ -91,7 +93,7 @@ export async function editarClase(id,datos) {
         throw error
     }
 }
-
+// Elimina una clase existente
 export async function eliminarClase(id) {
 
     try{

@@ -1,32 +1,31 @@
 // Vista para personal: gestión completa de clases (crear, editar, eliminar).
 // Vista para alumno: solo consulta de SUS propias clases (solo lectura).
 import { useEffect, useState } from "react";
-import ClasesTable from "../components/Clases/ClaseTable";
+import ClasesTable from "../components/clases/ClaseTable";
 import ModalClase from "../components/clases/ClaseModal";
 import EliminarClaseModal from "../components/clases/EliminarClaseModal";
 import Alert from "../components/Alert";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getClases, registrarClase, modificarClase, borrarClase } from "../Services/clasesAdminService";
 import { obtenerMisClasesPlano } from "../Services/clasesAlumnoService";
-import { getComisiones } from "../mocks/comisionesMock";
-import { usePermissions } from "../context/PermissionsContext";
-import { ACCIONES } from "../config/modulos";
-
-const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx/Certificados.jsx
+import { getComisiones } from "../api/comisiones";
+import useAuth from "../auth/hooks/useAuth";
+import { obtenerIdLegajo } from "../config/legajo";
 
 export default function GestionClases() {
-    const { usuario, hasPermission } = usePermissions();
-    const esAlumno = usuario?.usuario === "alumno";
+    const { user: usuario, hasPermission, hasRole } = useAuth();
+    const esAlumno = hasRole("Alumno");
+    const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {
-        return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
+        return <VistaAlumno idLegajo={usuario?.id_legajo} />;
     }
 
     return (
         <VistaPersonal
-            puedeCrear={hasPermission(ACCIONES.CLASES_CREAR)}
-            puedeActualizar={hasPermission(ACCIONES.CLASES_ACTUALIZAR)}
-            puedeEliminar={hasPermission(ACCIONES.CLASES_ELIMINAR)}
+            puedeCrear={hasPermission("inscripcion.clases.crear")}
+            puedeActualizar={hasPermission("inscripcion.clases.actualizar")}
+            puedeEliminar={hasPermission("inscripcion.clases.eliminar")}
         />
     );
 }
@@ -45,6 +44,11 @@ function VistaAlumno({ idLegajo }) {
     const [filtroTema, setFiltroTema] = useState("");
 
     useEffect(() => {
+        if (!idLegajo) {
+            setCargando(false);
+            setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+            return;
+        }
         async function cargar() {
             setCargando(true);
             setError(null);
@@ -305,9 +309,6 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
                     >
                         Limpiar filtros
                     </button>
-
-                    {/* Antes este botón se mostraba siempre, sin
-                        importar si el usuario podía crear clases o no. */}
                     {puedeCrear && (
                         <button
                             onClick={nuevaClase}

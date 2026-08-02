@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import ComisionCard from "../Asistencia/ComisionCard";
+import ComisionCard from "../Asistencia/ComisionCardAsistencia";
 import Alert from "../Alert";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { getComisiones } from "../../mocks/comisionesMock";
+import { getComisiones, obtenerDocenteTitular } from "../../api/comisiones";
 
+// Componente para mostrar el panel de comisiones, incluyendo la búsqueda y selección de comisiones.
 export default function PanelesComision({
     comisionSeleccionada,
     setComisionSeleccionada
 }) {
     const [comisiones, setComisiones] = useState([]);
     const [busqueda, setBusqueda] = useState("");
-    // Antes esto solo se logueaba a consola: la lista se quedaba vacía
-    // sin explicar por qué.
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -29,9 +28,8 @@ export default function PanelesComision({
         }
         cargarComisiones();
     }, []);
-
     const comisionesFiltradas = comisiones.filter((c) =>
-        `${c.materia} ${c.codigo} ${c.docente}`
+        `${c.nombre} ${c.comision.descripcion} ${obtenerDocenteTitular(c)}`
             .toLowerCase()
             .includes(busqueda.toLowerCase())
     );
@@ -63,9 +61,9 @@ export default function PanelesComision({
             <div className="space-y-3 overflow-y-auto max-h-72 lg:max-h-[600px] pr-1">
                 {comisionesFiltradas.map((comision) => (
                     <ComisionCard
-                        key={comision.id}
+                        key={comision.id_comision_asignatura}
                         comision={comision}
-                        seleccionada={comision.id === comisionSeleccionada?.id}
+                        seleccionada={comision.id_comision_asignatura === comisionSeleccionada?.id_comision_asignatura}
                         onClick={() => setComisionSeleccionada(comision)}
                     />
                 ))}

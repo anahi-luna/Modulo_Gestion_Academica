@@ -1,8 +1,8 @@
 import { getListaClases, getClasePorId, crearClase, editarClase, eliminarClase } from "../api/clasesApi";
 
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones, obtenerDocenteTitular } from "../api/comisiones";
 
-
+// Obtiene todas las clases de una comisión
 export async function getClases(idComision) {
 
     const response = await getListaClases(idComision);
@@ -12,22 +12,24 @@ export async function getClases(idComision) {
     const resultado = response.data.map((clase) => {
 
         const comision = comisiones.find(
-            c => c.id === clase.id_comision
+            c => c.id_comision_asignatura === clase.id_comision_asignatura
         );
 
         return {
 
             id: clase.id_clase,
 
-            id_comision: clase.id_comision,
+            id_comision: clase.id_comision_asignatura,
+            
+            id_comision_asignatura: clase.id_comision_asignatura,
 
             numero_clase: clase.numero_clase,
 
-            codigo: comision?.codigo ?? "-",
+            codigo: comision?.comision.descripcion ?? "-",
 
-            materia: comision?.materia ?? "-",
+            materia: comision?.nombre ?? "-",
 
-            docente: comision?.docente ?? "-",
+            docente: obtenerDocenteTitular(comision),
 
             tema: clase.tema,
 
@@ -56,22 +58,24 @@ export async function getClase(id) {
     const comisiones = (await getComisiones()).data;
 
     const comision = comisiones.find(
-        c => c.id === response.data.id_comision
+        c => c.id_comision_asignatura === response.data.id_comision_asignatura
     );
 
     return {
 
         id: response.data.id_clase,
 
-        id_comision: response.data.id_comision,
+        id_comision: response.data.id_comision_asignatura,
 
+        id_comision_asignatura: response.data.id_comision_asignatura,
+       
         numero_clase: response.data.numero_clase,
 
-        codigo: comision?.codigo ?? "-",
+        codigo: comision?.comision.descripcion ?? "-",
 
-        materia: comision?.materia ?? "-",
+        materia: comision?.nombre ?? "-",
 
-        docente: comision?.docente ?? "-",
+        docente: obtenerDocenteTitular(comision),
 
         tema: response.data.tema,
 
@@ -91,15 +95,17 @@ export async function getClase(id) {
 
 
 export async function registrarClase(datos) {
-
-    return await crearClase(datos);
-
+  return await crearClase({
+    ...datos,
+    id_comision_asignatura: datos.id_comision_asignatura ?? datos.id_comision,
+  });
 }
 
 export async function modificarClase(id, datos) {
-
-    return await editarClase(id, datos);
-
+  return await editarClase(id, {
+    ...datos,
+    id_comision_asignatura: datos.id_comision_asignatura ?? datos.id_comision,
+  });
 }
 
 export async function borrarClase(id) {

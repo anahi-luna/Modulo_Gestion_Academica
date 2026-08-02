@@ -7,7 +7,7 @@ export async function getListaEvaluaciones(idComision) {
     try{
 
         const url = idComision
-            ? `${API_URL}/evaluaciones?id_comision=${idComision}`
+            ? `${API_URL}/evaluaciones/?id_comision_asignatura=${idComision}`
             : `${API_URL}/evaluaciones/`
 
         const response = await fetch(url);
@@ -25,6 +25,7 @@ export async function getListaEvaluaciones(idComision) {
     }
 }
 
+// Evaluaciones de una inscripción puntual, en todas sus evaluaciones
 export async function getEvaluacionPorId(id) {
     try{
         const response = await fetch(`${API_URL}/evaluaciones/${id}`);
@@ -39,7 +40,8 @@ export async function getEvaluacionPorId(id) {
     }
 }
 
-export async function crearEvaluacion(datos) {
+//crea una nueva evaluación
+export async function crearEvaluacion(datos) { 
 
     try{
         const response = await fetch(
@@ -66,6 +68,7 @@ export async function crearEvaluacion(datos) {
 
 }
 
+//editar una evaluación existente
 export async function editarEvaluacion(id, datos) {
 
     try{
@@ -93,6 +96,7 @@ export async function editarEvaluacion(id, datos) {
     }
 }
 
+//elimina una evaluación existente
 export async function eliminarEvaluacion(id) {
 
     try{

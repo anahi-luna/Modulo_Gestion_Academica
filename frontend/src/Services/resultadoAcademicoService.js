@@ -1,11 +1,5 @@
-// Ya está conectado a la API real del back. Ojo con algo importante:
-// generar un resultado académico NO es una acción por alumno/materia
-// individual (como se pensó en un primer momento), sino por COMISIÓN
-// completa: se le manda solo el id_comision, y el back calcula sí solo
-// (a partir de las asistencias y calificaciones ya cargadas) el
-// promedio, el % de asistencia y el estado de CADA alumno aceptado en
-// esa comisión, todo de una. Por eso no hay más un formulario para
-// tipear a mano promedio/asistencia/estado: eso ahora lo hace el back.
+// Servicio para manejar la lógica de resultados académicos. 
+//  Se encarga de traducir entre lo que devuelve el back y lo que necesita la UI.
 import {
     generarResultadosAcademicos as generarResultadosAcademicosApi,
     getListaResultadosAcademicos,
@@ -26,7 +20,7 @@ function mapearResultado(r) {
         // El back nos devuelve la inscripción anidada (resumen), de ahí
         // saco a qué legajo y a qué comisión pertenece este resultado.
         id_legajo: r.inscripcion?.id_legajo,
-        id_comision: r.inscripcion?.id_comision,
+        id_comision_asignatura: r.inscripcion?.id_comision_asignatura,
         promedio_final: r.promedio_final,
         porcentaje_asistencia: r.porcentaje_asistencia,
         estado_academico: r.estado?.nombre ?? ESTADOS_ACADEMICOS[r.id_estado_academico] ?? "-",

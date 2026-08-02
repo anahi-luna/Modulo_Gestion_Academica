@@ -1,0 +1,38 @@
+const API_URL_PLANES = 
+    import.meta.env.VITE_API_URL_PLANES || "http://localhost:5000";
+
+//Obtener comisiones
+export async function getComisiones() {
+  const response = await fetch(`${API_URL_PLANES}/comisiones-asignaturas`);
+  const data = await response.json();
+  if (!response.ok) throw new Error("Error al obtener comisiones");
+  return data;
+}
+
+export async function getComisionesPorIdLegajo(idLegajo) {
+  const response = await fetch(
+    `${API_URL_PLANES}/comisiones-asignaturas/GetDetalleFromLegajoID?id=${idLegajo}`
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error("Error al obtener comisiones");
+  return data;
+}
+
+
+export function obtenerDocenteTitular(comisionAsignatura) {
+    const autoridades = comisionAsignatura?.autoridades ?? [];
+
+    if (autoridades.length === 0) return "-";
+
+    const titular = autoridades.find(a =>
+        a.tipo_autoridad?.descripcion?.toLowerCase().includes("titular")
+    );
+
+    const elegido = titular ?? autoridades[0];
+
+    const persona = elegido?.legajo?.persona;
+
+    if (!persona) return "-";
+
+    return `${persona.nombre} ${persona.apellido}`.trim() || "-";
+}

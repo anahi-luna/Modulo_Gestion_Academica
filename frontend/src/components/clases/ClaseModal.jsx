@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
+import { obtenerDocenteTitular } from "../../api/comisiones";
+// Componente para mostrar un modal de creación o edición de clase, con campos para seleccionar 
+// comisión, fecha, horarios, tema y estado.
 export default function ModalClase({
     abierto,
     clase,
@@ -9,7 +12,7 @@ export default function ModalClase({
 }) {
 
     const [formulario, setFormulario] = useState({
-        id_comision: "",
+        id_comision_asignatura: "",
         numero_clase: "",
         fecha: "",
         hora_inicio: "",
@@ -23,7 +26,7 @@ export default function ModalClase({
         if (clase) {
 
             setFormulario({
-                id_comision: clase.id_comision,
+                id_comision_asignatura: clase.id_comision_asignatura,
                 numero_clase: clase.numero_clase,
                 fecha: clase.fecha,
                 hora_inicio: clase.hora_inicio,
@@ -35,7 +38,7 @@ export default function ModalClase({
         } else {
 
             setFormulario({
-                id_comision: "",
+                id_comision_asignatura: "",
                 numero_clase: "",
                 fecha: "",
                 hora_inicio: "",
@@ -48,15 +51,13 @@ export default function ModalClase({
 
     }, [clase]);
 
-    // El hook se llama siempre, antes de cualquier "return" condicional
-    // (regla de los hooks de React: nunca dentro de un if).
     const modalRef = useModalAccessibility(abierto, onCerrar);
 
     if (!abierto)
         return null;
 
     const comisionSeleccionada = comisiones.find(
-        c => c.id === Number(formulario.id_comision)
+        c => c.id_comision_asignatura === Number(formulario.id_comision_asignatura)
     );
 
     return (
@@ -85,11 +86,11 @@ export default function ModalClase({
 
                         <select
                             id="clase-comision"
-                            value={formulario.id_comision}
+                            value={formulario.id_comision_asignatura}
                             onChange={(e) =>
                                 setFormulario({
                                     ...formulario,
-                                    id_comision: Number(e.target.value),
+                                    id_comision_asignatura: Number(e.target.value),
                                 })
                             }
                             className="w-full rounded-lg border border-gray-300 px-3 py-2"
@@ -102,10 +103,10 @@ export default function ModalClase({
                             {comisiones.map((comision) => (
 
                                 <option
-                                    key={comision.id}
-                                    value={comision.id}
+                                    key={comision.id_comision_asignatura}
+                                    value={comision.id_comision_asignatura}
                                 >
-                                    {comision.codigo} - {comision.materia}
+                                    {comision.comision.descripcion} - {comision.nombre}
                                 </option>
 
                             ))}
@@ -124,16 +125,15 @@ export default function ModalClase({
 
                                 <strong>Materia:</strong>{" "}
 
-                                {comisionSeleccionada.materia}
+                                {comisionSeleccionada.nombre}
 
                             </p>
 
                             <p>
-
+                                {/*Cambiar docente */}
                                 <strong>Docente:</strong>{" "}
 
-                                {comisionSeleccionada.docente}
-
+                                {obtenerDocenteTitular(comisionSeleccionada)}
                             </p>
 
                         </div>

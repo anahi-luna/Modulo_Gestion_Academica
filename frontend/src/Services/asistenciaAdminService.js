@@ -1,9 +1,6 @@
-// Servicio para manejar la lógica de asistencias.
-// legajosMock y comisionesMock se quedan porque son microservicios
-// del otro grupo que todavía no están integrados.
-
-import * as legajosMock from "../mocks/legajosMock";
-import * as comisionesMock from "../mocks/comisionesMock";
+// servicios relacionados con la asistencia de los alumnos a las clases, para el personal de gestión
+import * as legajosApi from "../api/legajosApi";
+import { getComisiones, obtenerDocenteTitular } from "../api/comisiones";
 import { getAsistenciaPorClase, actualizarAsistencia, registrarAsistencia, eliminarAsistencia } from "../api/asistenciasApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
 import { modificarClase, getClases } from "./clasesAdminService";
@@ -11,25 +8,26 @@ import { modificarClase, getClases } from "./clasesAdminService";
 // obtiene todas las asistencias de una clase con los datos del alumno resueltos
 export async function obtenerAsistenciasPorClase(idClase) {
     const response   = await getAsistenciaPorClase(idClase);
-    const comisiones = (await comisionesMock.getComisiones()).data;
+    const comisiones = (await getComisiones()).data
 
     const resultado = await Promise.all(
         response.data.map(async (asistencia) => {
             const inscripcion = (await getInscripcionPorId(asistencia.id_inscripcion)).data;
-            const legajo      = (await legajosMock.getLegajoPorId(inscripcion.id_legajo)).data;
-            const comision    = comisiones.find(c => c.id === inscripcion.id_comision);
+            const legajo      = (await legajosApi.getLegajoPorId(inscripcion.id_legajo)).data;
+            const comision    = comisiones.find(c => c.id_comision_asignatura === inscripcion.id_comision_asignatura);
 
             return {
                 id:              asistencia.id_asistencia,
                 id_legajo:       legajo.numero_legajo,
                 alumno:          `${legajo.nombre} ${legajo.apellido}`,
-                rango:           legajo.rango,
+               // rango:           legajo.rango,
                 id_inscripcion:  inscripcion.id_inscripcion,
-                id_comision:     inscripcion.id_comision,
-                codigo_comision: comision?.codigo   ?? "-",
-                materia:         comision?.materia  ?? "-",
-                docente:         comision?.docente  ?? "-",
-                horario:         comision?.horario  ?? "-",
+                id_comision_asignatura:     inscripcion.id_comision_asignatura,
+                codigo_comision: comision?.comision.descripcion   ?? "-",
+                materia:         comision?.nombre  ?? "-",
+
+                docente:         obtenerDocenteTitular(comision),
+                 horario:         comision?.modalidad  ?? "-",
                 id_estado:       asistencia.id_estado,
                 observacion:     asistencia.observacion,
             };
@@ -55,7 +53,7 @@ export async function actualizarEstadoAutomaticamente(clase) {
 
     if (clase.estado === "PROGRAMADA" && inicio <= ahora) {
         await modificarClase(clase.id, {
-            id_comision: clase.id_comision,
+            id_comision_asignatura: clase.id_comision_asignatura,
             estado: "DICTADA",
         });
         return { ...clase, estado: "DICTADA" };

@@ -3,51 +3,55 @@ import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 
 /*
  * Modal utilizado para validar una inscripción.
- * Permite modificar el estado de la inscripción y,
- * si es necesario, cambiar la comisión asignada.
+ * Permite modificar únicamente el estado de la inscripción.
+ * La comisión se muestra solo como información.
  */
 
 export default function ModalValidarInscripcion({
     abierto,
     inscripcion,
-    comisiones,
     onCerrar,
     onGuardar
 }) {
 
     const [estado, setEstado] = useState("");
-    const [comision, setComision] = useState("");
 
     // Estados disponibles para una inscripción
-    const estados = [
-        {
-            id: 1,
-            nombre: "Pendiente"
-        },
-        {
-            id: 2,
-            nombre: "Aceptada"
-        },
-        {
-            id: 3,
-            nombre: "Rechazada"
-        },
-        {
-            id: 4,
-            nombre: "Cancelada"
-        }
+    const TODOS_LOS_ESTADOS = [
+        { id: 1, nombre: "Pendiente" },
+        { id: 2, nombre: "Aceptada" },
+        { id: 3, nombre: "Rechazada" },
+        { id: 4, nombre: "Cancelada" },
+        { id: 5, nombre: "Finalizada" },
     ];
+
+    function estadosPermitidos(estadoActual) {
+        // Desde Aceptada solo se puede cancelar (y dejar Aceptada)
+        if (estadoActual === "Aceptada") {
+            return TODOS_LOS_ESTADOS.filter((e) =>
+                ["Aceptada", "Cancelada"].includes(e.nombre)
+            );
+        }
+        // Pendiente: puede ir a cualquiera de los 4
+        if (estadoActual === "Pendiente") {
+            return TODOS_LOS_ESTADOS.filter((e) =>
+                ["Pendiente", "Aceptada", "Rechazada", "Cancelada"].includes(e.nombre)
+            );
+        }
+        // Rechazada / Cancelada / Finalizado: no deberían abrir el modal;
+        // por las dudas, solo el estado actual
+        return TODOS_LOS_ESTADOS.filter((e) => e.nombre === estadoActual);
+    }
 
     /*
      * Cuando cambia la inscripción seleccionada,
      * se cargan sus datos en el formulario.
      */
-    useEffect(()=>{
-        if (inscripcion){
+    useEffect(() => {
+        if (inscripcion) {
             setEstado(inscripcion.estado);
-            setComision(inscripcion.id_comision);
         }
-    },[inscripcion]);
+    }, [inscripcion]);
 
     // El hook se llama siempre, antes de cualquier "return" condicional.
     const modalRef = useModalAccessibility(abierto, onCerrar);
@@ -90,23 +94,13 @@ export default function ModalValidarInscripcion({
                         <label htmlFor="validar-comision" className="text-sm font-medium">
                             Comisión
                         </label>
-                        <select
+
+                        <input
                             id="validar-comision"
-                            value={comision}
-                            onChange={(e) =>
-                                setComision(Number(e.target.value))
-                            }
-                            className="w-full mt-1 border rounded-lg px-3 py-2"
-                        >
-                            {comisiones.map((com) => (
-                                <option
-                                    key={com.id}
-                                    value={com.id}
-                                >
-                                    {com.codigo} - {com.materia}
-                                </option>
-                            ))}
-                        </select>
+                            disabled
+                            value={inscripcion.comision}
+                            className="w-full mt-1 border rounded-lg px-3 py-2 bg-gray-100"
+                        />
                     </div>
                     <div>
                         <label htmlFor="validar-estado" className="text-sm font-medium">
@@ -120,16 +114,13 @@ export default function ModalValidarInscripcion({
                             }
                             className="w-full mt-1 border rounded-lg px-3 py-2"
                         >
-                            {
-                                estados.map(estado => (
-                                    <option
-                                        key={estado.id}
-                                        value={estado.nombre}
-                                    >
-                                        {estado.nombre}
-                                    </option>
-                                ))
-                            }
+
+                            {estadosPermitidos(inscripcion.estado).map((e) => (
+                                <option key={e.id} value={e.nombre}>
+                                    {e.nombre}
+                                </option>
+                            ))}
+
                         </select>
                     </div>
                 </div>
@@ -144,15 +135,14 @@ export default function ModalValidarInscripcion({
                         onClick={() => {
                             // Obtiene el id correspondiente al estado seleccionado
                             const estadoSeleccionado =
-                                estados.find(
+                                TODOS_LOS_ESTADOS.find(
                                     e => e.nombre === estado
                                 );
-                            // Envía únicamente los datos que necesita el backend
+                                
+                            if (!estadoSeleccionado) return;
+
                             onGuardar({
-                                id_estado:
-                                    estadoSeleccionado.id,
-                                id_comision:
-                                    comision
+                                id_estado: estadoSeleccionado.id
                             });
                         }}
                         className="bg-red-700 text-white rounded-lg px-4 py-2"

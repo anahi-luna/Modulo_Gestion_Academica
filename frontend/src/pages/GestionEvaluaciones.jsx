@@ -6,25 +6,29 @@ import Alert from "../components/Alert";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getEvaluaciones, registrarEvaluacion, modificarEvaluacion, borrarEvaluacion } from "../Services/evaluacionesAdminService";
 import { obtenerMisEvaluacionesPlano } from "../Services/evaluacionesAlumnoService";
-import { getComisiones } from "../mocks/comisionesMock";
-import { usePermissions } from "../context/PermissionsContext";
-import { ACCIONES } from "../config/modulos";
+import { getComisiones } from "../api/comisiones";
+import useAuth from "../auth/hooks/useAuth";
+import { obtenerIdLegajo } from "../config/legajo";
+//gestión de evaluaciones: vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión
+//  en la que está inscripto.
+//vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de
+//  todos los alumnos de una clase.
 
-const ID_LEGAJO_ALUMNO_MOCK = 1;
 
 export default function GestionEvaluaciones() {
-    const { usuario, hasPermission } = usePermissions();
-    const esAlumno = usuario?.usuario === "alumno";
+    const { user: usuario, hasPermission, hasRole } = useAuth();
+    const esAlumno = hasRole("Alumno");
+    const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {
-        return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
+        return <VistaAlumno idLegajo={usuario?.id_legajo} />;
     }
 
     return (
         <VistaPersonal
-            puedeCrear={hasPermission(ACCIONES.EVALUACIONES_CREAR)}
-            puedeActualizar={hasPermission(ACCIONES.EVALUACIONES_ACTUALIZAR)}
-            puedeEliminar={hasPermission(ACCIONES.EVALUACIONES_ELIMINAR)}
+            puedeCrear={hasPermission("inscripcion.evaluaciones.crear")}
+            puedeActualizar={hasPermission("inscripcion.evaluaciones.actualizar")}
+            puedeEliminar={hasPermission("inscripcion.evaluaciones.eliminar")}
         />
     );
 }
@@ -40,6 +44,11 @@ function VistaAlumno({ idLegajo }) {
     const [filtroTipo, setFiltroTipo] = useState("");
 
     useEffect(() => {
+        if (!idLegajo) {
+            setCargando(false);
+            setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+            return;
+        }
         async function cargar() {
             setCargando(true);
             setError(null);

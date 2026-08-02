@@ -1,6 +1,5 @@
-// Esta vista solo se muestra cuando el usuario logueado es el alumno
-// de prueba (usuario.usuario === "alumno"), decidido en Home.jsx —
-// mismo criterio que ya se usa en Calificaciones.jsx y Certificados.jsx.
+// Componente para mostrar la página de inicio del alumno, con un banner, un resumen de sus inscripciones, 
+// plan, clases y asistencia, y un listado de próximas clases por comisión.
 
 import { useEffect, useState } from "react";
 import BannerAlumno from "./BannerAlumno";
@@ -13,11 +12,8 @@ import { obtenerMiPlan } from "../../Services/planesService";
 import { obtenerMisClases } from "../../Services/clasesAlumnoService";
 import { obtenerMiAsistencia } from "../../Services/asistenciaAlumnoService";
 import { obtenerMisCertificados } from "../../Services/certificadosService";
-
-const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx y Certificados.jsx
-
-// Coincide con seed/seed_estado_resultado_plan.py del back (ver
-// MiPlan.jsx, que tiene esta misma corrección).
+import { obtenerIdLegajo } from "../../config/legajo";
+ 
 const ESTILOS_ESTADO_PLAN = {
   Finalizado: "bg-green-100 text-green-700",
   "En curso": "bg-blue-100 text-blue-700",
@@ -26,29 +22,32 @@ const ESTILOS_ESTADO_PLAN = {
 };
 
 export default function HomeAlumno({ usuario }) {
+  const idLegajo = obtenerIdLegajo(usuario);
   const [inscripciones, setInscripciones] = useState([]);
   const [plan, setPlan] = useState(null);
   const [clasesInfo, setClasesInfo] = useState({ porComision: [], proximaClase: null });
   const [porcentajeAsistencia, setPorcentajeAsistencia] = useState(null);
   const [certificadosObtenidos, setCertificadosObtenidos] = useState(0);
   const [cargando, setCargando] = useState(true);
-  // Antes esto solo se logueaba a consola: el alumno se quedaba
-  // viendo "Todavía no tenés..." en todos lados sin saber que en
-  // realidad hubo un error cargando sus datos.
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);
       try {
         const [misInscripciones, miPlan, misClases, miAsistencia, misCertificados] =
           await Promise.all([
-            obtenerMisInscripciones(ID_LEGAJO_ALUMNO_MOCK),
-            obtenerMiPlan(ID_LEGAJO_ALUMNO_MOCK),
-            obtenerMisClases(ID_LEGAJO_ALUMNO_MOCK),
-            obtenerMiAsistencia(ID_LEGAJO_ALUMNO_MOCK),
-            obtenerMisCertificados(ID_LEGAJO_ALUMNO_MOCK),
+            obtenerMisInscripciones(usuario?.id_legajo),
+            obtenerMiPlan(usuario?.id_legajo),
+            obtenerMisClases(usuario?.id_legajo),
+            obtenerMiAsistencia(usuario?.id_legajo),
+            obtenerMisCertificados(usuario?.id_legajo),
           ]);
         setInscripciones(misInscripciones);
         setPlan(miPlan);
@@ -65,7 +64,7 @@ export default function HomeAlumno({ usuario }) {
       }
     }
     cargar();
-  }, []);
+  }, [usuario?.id_legajo]);
 
   const tieneInscripciones = inscripciones.length > 0;
 

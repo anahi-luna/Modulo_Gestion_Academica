@@ -10,8 +10,8 @@ import {
     getInscripcionesPorComision
 } from "../api/inscripcionesApi";
 
-import { getLegajoPorId } from "../mocks/legajosMock";
-import { getComisiones } from "../mocks/comisionesMock";
+import { getLegajoPorId } from "../api/legajosApi";
+import { getComisiones } from "../api/comisiones";
 
 // Obtiene todas las inscripciones
 export async function obtenerInscripciones() {
@@ -27,7 +27,7 @@ export async function obtenerInscripciones() {
             ).data;
 
             const comision = comisiones.find(
-                c => c.id === inscripcion.id_comision
+                c => c.id_comision_asignatura === inscripcion.id_comision_asignatura
             );
 
             return {
@@ -38,11 +38,11 @@ export async function obtenerInscripciones() {
 
                 alumno: `${legajo.nombre} ${legajo.apellido}`,
 
-                id_comision: inscripcion.id_comision,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
 
-                comision: comision?.codigo ?? "-",
+                comision: comision?.comision.descripcion ?? "-",
 
-                materia: comision?.materia ?? "-",
+                materia: comision?.nombre ?? "-",
 
                 estado: inscripcion.estado.nombre,
 
@@ -67,48 +67,30 @@ export async function obtenerInscripcion(id) {
 }
 
 export async function obtenerInscripcionesPorComision(idComision) {
+  const response = await getInscripcionesPorComision(idComision);
+  const comisiones = (await getComisiones()).data;
 
-    const response = await getInscripcionesPorComision(idComision);
+  const resultado = await Promise.all(
+    (response?.data ?? []).map(async (inscripcion) => {
+      const legajo = (await getLegajoPorId(inscripcion.id_legajo)).data;
+      const comision = comisiones.find(
+        (c) => c.id_comision_asignatura === inscripcion.id_comision_asignatura
+      );
 
-    const comisiones = (await getComisiones()).data;
+      return {
+        id_inscripcion: inscripcion.id_inscripcion,
+        id_legajo: legajo.numero_legajo,
+        alumno: `${legajo.nombre} ${legajo.apellido}`,
+        dni: legajo.dni,
+        id_comision_asignatura: inscripcion.id_comision_asignatura,
+        materia: comision?.nombre ?? "-",
+        estado: inscripcion.estado?.nombre ?? inscripcion.estado,
+      };
+    })
+  );
 
-    const resultado = await Promise.all(
-
-        response.data.map(async (inscripcion) => {
-
-            const legajo = (
-                await getLegajoPorId(inscripcion.id_legajo)
-            ).data;
-
-            const comision = comisiones.find(
-                c => c.id === inscripcion.id_comision
-            );
-
-            return {
-
-                id_inscripcion: inscripcion.id_inscripcion,
-
-                id_legajo: legajo.numero_legajo,
-
-                alumno: `${legajo.nombre} ${legajo.apellido}`,
-
-                dni: legajo.dni,
-
-                rango: legajo.rango,
-
-                id_comision: inscripcion.id_comision,
-
-                materia: comision?.materia ?? "-",
-
-                estado: inscripcion.estado.nombre,
-
-            };
-
-        })
-
-    );
-
-    return resultado;
+  // Solo Aceptada para planillas de asistencia y calificaciones
+  return resultado.filter((i) => i.estado === "Aceptada");
 }
 
 // Actualizar inscripción

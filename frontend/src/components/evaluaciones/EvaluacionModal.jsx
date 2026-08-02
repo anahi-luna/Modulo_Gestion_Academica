@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
+import { obtenerDocenteTitular } from "../../api/comisiones";
 
+// Componente para mostrar un modal de creación o edición de evaluación, con campos para seleccionar la comisión,
+//  tipo, título, fecha y puntaje máximo.
 export default function EvaluacionModal({
     abierto,
     evaluacion,
@@ -10,7 +13,7 @@ export default function EvaluacionModal({
 }) {
 
     const [formulario, setFormulario] = useState({
-        id_comision: "",
+        id_comision_asignatura: "",
         titulo: "",
         tipo: "Parcial",
         fecha: "",
@@ -22,7 +25,7 @@ export default function EvaluacionModal({
         if (evaluacion) {
 
             setFormulario({
-                id_comision: evaluacion.id_comision,
+                id_comision_asignatura: evaluacion.id_comision_asignatura,
                 titulo: evaluacion.titulo,
                 tipo: evaluacion.tipo,
                 fecha: evaluacion.fecha,
@@ -32,7 +35,7 @@ export default function EvaluacionModal({
         } else {
 
             setFormulario({
-                id_comision: "",
+                id_comision_asignatura: "",
                 titulo: "",
                 tipo: "Parcial",
                 fecha: "",
@@ -43,15 +46,13 @@ export default function EvaluacionModal({
 
     }, [evaluacion]);
 
-    // El hook se llama siempre, antes de cualquier "return" condicional.
     const modalRef = useModalAccessibility(abierto, onCerrar);
 
     if (!abierto)
         return null;
 
     const comisionSeleccionada = comisiones.find(
-        c => c.id === Number(formulario.id_comision)
-    );
+    c => c.id_comision_asignatura === Number(formulario.id_comision_asignatura));
 
     return (
 
@@ -72,19 +73,19 @@ export default function EvaluacionModal({
                         </label>
                         <select
                             id="evaluacion-comision"
-                            value={formulario.id_comision}
+                            value={formulario.id_comision_asignatura}
                             onChange={(e) =>
                                 setFormulario({
                                     ...formulario,
-                                    id_comision: Number(e.target.value),
+                                    id_comision_asignatura: Number(e.target.value),
                                 })
                             }
                             className="w-full rounded-lg border border-gray-300 px-3 py-2"
                         >
                             <option value="">Seleccione una comisión</option>
                             {comisiones.map((comision) => (
-                                <option key={comision.id} value={comision.id}>
-                                    {comision.codigo} - {comision.materia}
+                                <option key={comision.id_comision_asignatura} value={comision.id_comision_asignatura}>
+                                    {comision.comision.descripcion} - {comision.nombre}
                                 </option>
                             ))}
                         </select>
@@ -94,10 +95,11 @@ export default function EvaluacionModal({
                     {comisionSeleccionada && (
                         <div className="rounded-lg bg-gray-100 p-4 space-y-2">
                             <p>
-                                <strong>Materia:</strong> {comisionSeleccionada.materia}
+                                <strong>Materia:</strong> {comisionSeleccionada.nombre}
                             </p>
+                            {/*Cambiar docente */}
                             <p>
-                                <strong>Docente:</strong> {comisionSeleccionada.docente}
+                                <strong>Docente:</strong> {obtenerDocenteTitular(comisionSeleccionada)}
                             </p>
                         </div>
                     )}

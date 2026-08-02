@@ -1,16 +1,8 @@
-// Ya está conectado a la API real de "resultado de plan" del back.
-// Sigo usando legajosMock.js para resolver nombre/número de legajo,
-// porque Legajo es una entidad de OTRO microservicio (el de
-// legajos/personal) que todavía no está integrado; ese mock representa
-// justamente esa dependencia externa, no algo que "falte conectar" acá.
-//
-// OJO con un límite real del back: la ruta POST de resultados-planes
-// está comentada en resultado_plan_routes.py. Un resultado de plan se
-// crea/actualiza SOLO como efecto automático de generar un resultado
-// académico (ver resultadoAcademicoService.js). Por eso acá no hay
-// ninguna función para "crear" un resultado de plan a mano.
+// servicios relacionados con los planes de estudio y el resultado de plan de cada alumno 
+//  para el alumno, muestra su propio plan de estudios y materias cursadas; para el personal de gestión,
+//  muestra todos los planes de todos los alumnos.
 import { getListaResultadosPlan, actualizarEstadoResultadoPlan } from "../api/resultadoPlanApi";
-import { getLegajoPorId } from "../mocks/legajosMock";
+import { getLegajoPorId } from "../api/legajosApi";
 import { emitir } from "./certificadosService";
 import { obtenerMisCalificaciones } from "./calificacionesAlumnoService";
 import { obtenerResultadosAcademicos } from "./resultadoAcademicoService";
@@ -44,10 +36,6 @@ function mapearResultadoPlan(r) {
     };
 }
 
-// El resultado del plan de UN alumno (para "Mi plan"). Como el back no
-// tiene un filtro por id_legajo en la URL, traigo la lista completa y
-// filtro acá; con el volumen de datos de este sistema no es un
-// problema, y evita tener que tocar el back para agregar un query param.
 export async function obtenerMiPlan(idLegajo) {
     const respuesta = await getListaResultadosPlan();
     const plan = respuesta.data.find((r) => r.id_legajo === idLegajo);
@@ -102,7 +90,7 @@ export async function obtenerMisMateriasDePlan(idLegajo) {
     ]);
 
     return materias.map((materia) => {
-        const resultado = resultados.find((r) => r.id_comision === materia.id_comision);
+        const resultado = resultados.find((r) => r.id_comision_asignatura === materia.id_comision_asignatura);
 
         if (!resultado) {
             // Todavía no se generó el resultado académico: pendiente/cursando.

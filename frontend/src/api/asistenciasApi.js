@@ -1,35 +1,40 @@
 import API_URL from "./api"; //importamos la url de la api general
 
+// Asistencias de una clase puntual (para la planilla del docente)
 export async function getAsistenciaPorClase(idClase) {
-    try{
-        const response = await fetch(`${API_URL}/asistencias?id_clase=${idClase}`); //Guarda la lista en la variable response
+    try {
+        const response = await fetch(`${API_URL}/asistencias/?id_clase=${idClase}`); //Guarda la lista en la variable response
         const data = await response.json();
 
-        if(!response.ok) {
-            throw Error("Error al obtener asistencias")
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Error al obtener asistencias."
+            );
         }
+
         return data;
-    }catch(error){
+    } catch (error) {
         console.error("Error al obtener la asistencia")
         throw error
     }
 }
 
+// Asistencias de una inscripción puntual, en todas sus clases
 export async function getAsistenciaPorId(id) {
-    try{
+    try {
         const response = await fetch(`${API_URL}/asistencias/${id}`);
         const data = await response.json();
-        if(!response.ok){
+        if (!response.ok) {
             throw new Error(data.message)
         }
         return data;
-    }catch(error){
+    } catch (error) {
         console.error("Error al obtener la clase", error)
         throw error
     }
 }
 
-
+// Actualiza la asistencia de una clase puntual (para la planilla del docente)
 export async function actualizarAsistencia(idAsistencia, datos) {
 
     try {
@@ -62,38 +67,39 @@ export async function actualizarAsistencia(idAsistencia, datos) {
 
 }
 
-
+// Registra la asistencia de una clase puntual (para la planilla del docente)
 export async function registrarAsistencia(datos) {
 
-    try{
+    try {
         const response = await fetch(
-            `${API_URL}/asistencias/`, 
+            `${API_URL}/asistencias/`,
             {
                 method: "POST",
-                headers:{
-                    "Content-Type":"application/json"
+                headers: {
+                    "Content-Type": "application/json"
                 },
-                body:JSON.stringify(datos)
+                body: JSON.stringify(datos)
             }
         );
 
         const data = await response.json();
-        console.log("Respuesta backend:", data);
-        if(!response.ok){
+
+        if (!response.ok) {
             throw new Error(data.message)
         }
         return data;
-    }catch(error){
+    } catch (error) {
         console.error("Error al crear la clase", error);
         throw error
     }
-    
-} 
 
+}
+
+// Elimina una asistencia existente
 export async function eliminarAsistencia(idAsistencia) {
-    try{
+    try {
         const response = await fetch(
-            `${API_URL}/asistencias/${idAsistencia}`, 
+            `${API_URL}/asistencias/${idAsistencia}`,
             {
                 method: "DELETE",
             }
@@ -101,11 +107,14 @@ export async function eliminarAsistencia(idAsistencia) {
 
         const data = await response.json();
 
-        if(!response.ok){
-            throw new Error("Error al eliminar asistencia")
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Error al eliminar la asistencia."
+            );
         }
-        return data; 
-    }catch (error){
+
+        return data;
+    } catch (error) {
         console.error("Error al eliminar la asistencia", error);
         throw error;
     }

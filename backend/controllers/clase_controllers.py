@@ -8,8 +8,8 @@ from marshmallow import ValidationError
 #Obtiene el listado de clases
 def get_lista_de_clases():
 
-    # Obtiene el parámetro "id_comision" enviado en la URL.
-    id_comision = request.args.get("id_comision", type=int)
+    # Obtiene el parámetro "id_comision_asignatura" enviado en la URL.
+    id_comision_asignatura = request.args.get("id_comision_asignatura", type=int)
 
     # Obtiene el parámetro "estado" enviado por la URL.
     estado = request.args.get("estado")
@@ -19,7 +19,7 @@ def get_lista_de_clases():
 
     # Solicita al servicio la lista de clases aplicando los filtros.
     clases = obtener_lista_de_clases(
-        id_comision=id_comision,
+        id_comision_asignatura=id_comision_asignatura,
         estado=EstadoClase[estado] if estado else None
         # Si existe un estado, lo convierte al Enum.
         # Si no existe, envía None para no aplicar ese filtro.

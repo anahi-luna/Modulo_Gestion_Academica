@@ -1,26 +1,4 @@
-//function colorEstado(idEstado) {
-//    switch (idEstado) {
-//        case 1:
-//            return "border-green-400 bg-green-50 text-green-700";
-//
-//        case 2:
-//            return "border-red-400 bg-red-50 text-red-700";
-//
-//        case 3:
-//            return "border-blue-400 bg-blue-50 text-blue-700";
-//
-//        case 4:
-//            return "border-orange-400 bg-orange-50 text-orange-700";
-//
-//        default:
-//            return "border-gray-300 bg-white text-gray-700";
-//    }
-//}
-
-
-//${colorEstado(idEstado)} esto va dentro del className en caso de agregarlo
-
-
+// Componente para seleccionar el estado de asistencia
 export default function EstadoSelect({
     idEstado,
     onCambiarEstado,

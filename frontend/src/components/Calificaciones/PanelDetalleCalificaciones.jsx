@@ -10,6 +10,8 @@ import { getEvaluaciones } from "../../Services/evaluacionesAdminService";
 import { obtenerCalificacionesPorEvaluacion, registrarCalificacionesService, obtenerHistorialCalificacionesPorComision, eliminarCalificacionService, eliminarCalificacionesPorEvaluacion } from "../../Services/calificacionesAdminService";
 import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
 
+// Componente para mostrar el panel de detalle de calificaciones de una comisión, 
+// incluyendo selección de evaluación, tabla de calificaciones y estadísticas.
 // Le agrego soloLectura: cuando el usuario no tiene permiso para
 // cargar/actualizar calificaciones, deshabilito los inputs y escondo
 // el botón de guardar, pero sigue viendo la planilla igual.
@@ -22,11 +24,6 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
     const [modoEdicion, setModoEdicion] = useState(false);
     const [historial, setHistorial] = useState([]);
     const [calificacionesRegistradas, setCalificacionesRegistradas] = useState(false);
-    // Mismo sistema que ya usa PanelDetalleClase.jsx (Asistencia): antes
-    // acá los errores solo se logueaban a consola y el docente se
-    // quedaba sin saber si algo había fallado (por ejemplo, si
-    // "Guardar calificaciones" fallaba, la pantalla se quedaba igual y
-    // parecía que había guardado bien).
     const [alerta, setAlerta] = useState(null);
 
     const navigate = useNavigate();
@@ -34,16 +31,6 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
     useEffect(() => {
         async function cargarEvaluaciones() {
             try {
-                // OJO ACÁ: esto es lo que faltaba. Antes, si la nueva
-                // comisión no tenía evaluaciones, "resultado" quedaba
-                // vacío pero evaluacionSeleccionada (y por lo tanto las
-                // calificaciones que se ven en pantalla) seguían siendo
-                // las de la comisión anterior, porque solo se llamaba
-                // a setEvaluacionSeleccionada cuando SÍ había resultado.
-                // Por eso al cambiar de comisión se quedaba pegada la
-                // evaluación vieja. Ahora limpio todo ANTES de pedir los
-                // datos nuevos, así se ve "sin evaluación" hasta que
-                // llega la respuesta correcta de la comisión actual.
                 setEvaluacionSeleccionada(null);
                 setEvaluaciones([]);
                 setCalificaciones([]);
@@ -61,7 +48,6 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
                             ?evaluacion: null;
                     })
                 );
-
                 const evaluacionesPendientes = evaluacionesVerificadas.filter(Boolean);
 
                 setEvaluaciones(evaluacionesPendientes);
@@ -98,6 +84,9 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
         }
     }, [evaluacionSeleccionada?.id]);
 
+    // Carga las calificaciones de la evaluación seleccionada. 
+    // Si no hay calificaciones registradas, carga la lista de inscriptos y 
+    // prepara la planilla para registrar nuevas calificaciones.
     async function cargarCalificaciones() {
         try {
             const notas = await obtenerCalificacionesPorEvaluacion(evaluacionSeleccionada.id);
@@ -111,7 +100,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
                         id_legajo: i.id_legajo,
                         alumno: i.alumno,
                         id_inscripcion: i.id_inscripcion,
-                        id_comision: i.id_comision,
+                        id_comision_asignatura: i.id_comision_asignatura,
                         nota: null,
                         observacion: "",
                     }))
@@ -129,6 +118,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
         }
     }
 
+    // Cambia la nota de un alumno en la planilla de calificaciones
     function cambiarNota(idInscripcion, valor) {
         setCalificaciones(prev =>
             prev.map(c =>
@@ -139,6 +129,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
         );
     }
 
+    // Cambia la observación de un alumno en la planilla de calificaciones
     function cambiarObservacion(idInscripcion, valor) {
         setCalificaciones(prev =>
             prev.map(c =>
@@ -149,6 +140,8 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
         );
     }
 
+    // Guarda las calificaciones de la evaluación seleccionada. 
+    // Si ya había calificaciones registradas, las actualiza; si no, las crea.
     async function guardarCalificaciones() {
         const datos = {
             id_evaluacion: evaluacionSeleccionada.id,
@@ -198,6 +191,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
         cargarHistorial();
     }, [idComision]);
 
+    // Carga el historial de calificaciones de la comisión.
     async function cargarHistorial() {
         if(!idComision){
             setHistorial([]);
@@ -217,6 +211,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
 
     }
 
+    // Permite editar las calificaciones de una evaluación que ya tiene calificaciones registradas.
     async function editarDesdeHistorial(evaluacion){
         setEvaluacionSeleccionada(evaluacion);
         setModoEdicion(true);
@@ -236,6 +231,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
         });
     }
 
+    // Elimina todas las calificaciones de una evaluación, con confirmación del usuario.
     async function eliminarTodas(evaluacion) {
         const confirmar = window.confirm(`¿Querés eliminar todas las calificaciones de "${evaluacion.titulo}"?`);
 
@@ -286,6 +282,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
         }
     }
 
+    // Elimina una calificación puntual de un alumno, con confirmación del usuario.
     async function eliminarUnaCalificacion(calificacion) {
         if(!calificacion?.id) {
             console.error("La calificación no tiene un identificador válido");
@@ -442,7 +439,7 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
             
 
             {/* Aviso explícito cuando la comisión no tiene evaluaciones
-                cargadas, en vez de dejar la tabla vacía sin explicación */}
+            */}
             {!cargandoEvaluaciones && idComision && evaluaciones.length === 0 && (
                 <div className="px-4 sm:px-8 py-6 text-sm text-gray-400">
                     Esta comisión todavía no tiene evaluaciones cargadas.

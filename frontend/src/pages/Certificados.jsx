@@ -1,22 +1,10 @@
-// Vista de certificados: si el usuario es un alumno, ve solo sus
-// propios certificados; si es personal, ve la tabla con el estado del
-// plan de cada alumno y puede emitir/revocar según sus permisos.
-//
-// Cambio importante respecto de la primera versión: el certificado
-// real certifica el PLAN completo de un alumno (no una materia
-// puntual), así que la tabla de gestión ahora tiene una fila por
-// alumno, no por materia cursada.
-//
-// Acá también agregué la sección para "Generar resultados académicos"
-// de una comisión: es una acción de comisión completa (el back calcula
-// solo promedio, asistencia y estado de cada alumno aceptado), y la
-// dejé cerca de Certificados porque generar los resultados académicos
-// de las últimas comisiones es lo que después habilita que el plan de
-// cada alumno se cierre y se pueda emitir su certificado.
-
+// Página de certificados: vista para alumnos y personal, según el rol del usuario. 
+// Si es alumno, ve solo sus certificados emitidos y puede descargarlos.
+// Si es personal, ve la tabla con el estado del plan de cada alumno y puede emitir/revocar certificados
+// según sus permisos. Además, si tiene el permiso de generar resultados académicos, puede hacerlo desde
+// un botón que abre un modal para elegir la comisión.
 import { useEffect, useState } from "react";
-import { usePermissions } from "../context/PermissionsContext";
-import { ACCIONES } from "../config/modulos";
+import useAuth from "../auth/hooks/useAuth";
 import {
   obtenerFilasCertificados,
   obtenerMisCertificados,
@@ -25,23 +13,23 @@ import {
   descargarCertificado,
 } from "../Services/certificadosService";
 import { generarResultadosAcademicos } from "../Services/resultadoAcademicoService";
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones } from "../api/comisiones";
 import CertificadoCard from "../components/certificados/CertificadoCard";
 import TablaCertificadosAdmin from "../components/certificados/TablaCertificadosAdmin";
 import ModalEmitirCertificado from "../components/certificados/ModalEmitirCertificado";
+import { obtenerIdLegajo } from "../config/legajo";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; // TODO: ver Calificaciones.jsx, mismo pendiente
 
 export default function Certificados() {
-  const { usuario, hasPermission } = usePermissions();
-  const esAlumno = usuario?.usuario === "alumno";
-
-  const puedeEmitir = hasPermission(ACCIONES.CERTIFICADOS_EMITIR);
-  const puedeActualizar = hasPermission(ACCIONES.CERTIFICADOS_ACTUALIZAR);
-  const puedeGenerarResultado = hasPermission(ACCIONES.RESULTADO_ACADEMICO_GENERAR);
+  const { user: usuario, hasPermission, hasRole } = useAuth();
+  const esAlumno = hasRole("Alumno");
+  const idLegajo = obtenerIdLegajo(usuario);
+  const puedeEmitir = hasPermission("inscripcion.certificados.emitir");
+  const puedeActualizar = hasPermission("inscripcion.certificados.actualizar");
+  const puedeGenerarResultado = hasPermission("inscripcion.resultado_academico.generar");
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} usuario={usuario} />;
+    return <VistaAlumno idLegajo={usuario?.id_legajo} usuario={usuario} />;
   }
 
   return (
@@ -79,8 +67,6 @@ function GenerarResultadosAcademicos() {
           : "Todos los alumnos de esa comisión ya tenían resultado académico generado."
       );
     } catch (err) {
-      // El back explica bien el motivo: comisión con clases pendientes,
-      // sin alumnos aceptados, todos ya generados, etc.
       setError(err.message);
     } finally {
       setGenerando(false);
@@ -105,7 +91,7 @@ function GenerarResultadosAcademicos() {
         >
           <option value="">Seleccioná una comisión</option>
           {comisiones.map((c) => (
-            <option key={c.id} value={c.id}>{c.codigo} - {c.materia}</option>
+            <option key={c.id_comision_asignatura} value={c.id_comision_asignatura}>{c.comision.descripcion} - {c.nombre}</option>
           ))}
         </select>
         <button
@@ -255,6 +241,11 @@ function VistaAlumno({ idLegajo, usuario }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);
@@ -298,7 +289,7 @@ function VistaAlumno({ idLegajo, usuario }) {
 
         <div className="space-y-3">
           {certificados.map((c) => (
-            <CertificadoCard key={c.id} certificado={c} onDescargar={handleDescargar} />
+            <CertificadoCard key={c.id_comision_asignatura} certificado={c} onDescargar={handleDescargar} />
           ))}
         </div>
       </main>

@@ -4,16 +4,16 @@ import uuid
 from utils.logger import logger
 from exceptions import BusinessError
 from sqlalchemy.exc import IntegrityError
+from flask import g
 
 from models.modelo_certificado import Certificado
 from models.modelo_estado_certificado import EstadoCertificado
 
-from services.usuario_cliente import obtener_usuario
 from services.resultado_plan_service import obtener_resultado_plan_por_id
 from services.estado_certificado_service import obtener_estado_certificado_por_nombre
 from services.tipo_certificado_service import obtener_tipo_certificado_por_nombre
 
-ID_USUARIO_SIMULADO = 100
+
 
 # -------------------CONSULTAS-------------------#
 
@@ -102,7 +102,7 @@ def obtener_certificado_por_codigo(codigo_verificacion):
 # -------------------PREPARAR DATOS-------------------#
 # Prepara los datos necesarios para crear
 # un certificado.
-def preparar_datos_certificado(resultado_plan, tipo_certificado, estado_certificado):
+def preparar_datos_certificado(resultado_plan, tipo_certificado, estado_certificado,id_usuario_autenticado):
 
     ahora = datetime.now()
 
@@ -114,7 +114,7 @@ def preparar_datos_certificado(resultado_plan, tipo_certificado, estado_certific
         "fecha_vencimiento": None,
         "url_documento": None,
         "id_estado_certificado": estado_certificado.id_estado_certificado,
-        "id_usuario_creacion": ID_USUARIO_SIMULADO,
+        "id_usuario_creacion": id_usuario_autenticado,
         "id_usuario_modificacion": None,
         "ts_creacion": ahora,
         "ts_modificacion": None,
@@ -126,18 +126,15 @@ def preparar_datos_certificado(resultado_plan, tipo_certificado, estado_certific
 
 # Genera un certificado automáticamente.
 def crear_certificado(id_resultado_plan):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} generando un certificado para el"
+        f"Usuario {id_usuario_autenticado} generando un certificado para el"
         f"resultado del plan {id_resultado_plan}."
     )
 
     try:
-
-        # Verifica el usuario.
-        if not obtener_usuario(ID_USUARIO_SIMULADO):
-
-            raise BusinessError("El usuario no existe.", 404)
 
         # Obtiene el resultado del plan.
         resultado_plan = obtener_resultado_plan_por_id(id_resultado_plan)
@@ -167,7 +164,7 @@ def crear_certificado(id_resultado_plan):
             raise BusinessError("El estado del certificado no existe.", 404)
 
         # Prepara los datos.
-        datos = preparar_datos_certificado(resultado_plan, tipo, estado)
+        datos = preparar_datos_certificado(resultado_plan, tipo, estado, id_usuario_autenticado)
 
         certificado = Certificado(**datos)
 
@@ -206,9 +203,11 @@ def crear_certificado(id_resultado_plan):
 
 # Modifica un certificado.
 def modificar_certificado(id_certificado, datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} "
+        f"Usuario {id_usuario_autenticado} "
         f"modificando el certificado {id_certificado}."
     )
 
@@ -243,7 +242,7 @@ def modificar_certificado(id_certificado, datos):
 
             certificado.fecha_vencimiento = datos["fecha_vencimiento"]
 
-        certificado.id_usuario_modificacion = ID_USUARIO_SIMULADO
+        certificado.id_usuario_modificacion = id_usuario_autenticado
 
         certificado.ts_modificacion = datetime.now()
 
@@ -279,9 +278,11 @@ def modificar_certificado(id_certificado, datos):
 # Elimina un certificado.
 # Solo para desarrollo.
 def eliminar_certificado(id_certificado):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} " f"eliminando el certificado {id_certificado}."
+        f"Usuario {id_usuario_autenticado} " f"eliminando el certificado {id_certificado}."
     )
 
     certificado = obtener_certificado_por_id(id_certificado)

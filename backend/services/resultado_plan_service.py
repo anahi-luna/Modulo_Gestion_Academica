@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
-
+from flask import g, request
 from models.modelo_resultado_plan import ResultadoPlan
 from models.modelo_resultado_academico import ResultadoAcademico
 from models.modelo_inscripcion import Inscripcion
@@ -13,17 +13,12 @@ from services.estado_resultado_plan_service import (
     obtener_estado_resultado_plan_por_nombre,
     obtener_estado_resultado_plan_por_id,
 )
-from services.usuario_cliente import obtener_usuario
-from services.planes_cliente import obtener_plan
 from services.estado_inscripcion_service import obtener_estado_por_nombre
-from services.plan_asignatura_cliente import (
-    obtener_plan_asignatura,
-    obtener_planes_asignatura_por_plan,
+from clients.planes_cliente import (
+    obtener_legajo,
+    obtener_plan,
+    obtener_comisiones_asignaturas_por_plan
 )
-from services.legajo_cliente import obtener_legajo
-from services.comision_cliente import obtener_comisiones_por_plan_asignatura
-
-ID_USUARIO_SIMULADO = 100
 
 
 # -------------------CONSULTAS-------------------#
@@ -62,11 +57,11 @@ def obtener_inscripciones_plan(id_legajo, id_plan):
 
     inscripciones = []
 
-    comisiones = obtener_comisiones_plan(id_plan)
+    comisiones_asignaturas = obtener_comisiones_plan(id_plan)
 
-    for comision in comisiones:
+    for comision_asignatura in comisiones_asignaturas:
         resultado = Inscripcion.query.filter_by(
-            id_legajo=id_legajo, id_comision=comision["id_comision"]
+            id_legajo=id_legajo, id_comision_asignatura=comision_asignatura["id_comision_asignatura"]
         ).first()
 
         if resultado:
@@ -75,21 +70,11 @@ def obtener_inscripciones_plan(id_legajo, id_plan):
     return inscripciones
 
 
-# Obtiene todas las comisiones
+# Obtiene todas las comisiones asignaturas
 # correspondientes a un plan.
 def obtener_comisiones_plan(id_plan):
 
-    comisiones = []
-
-    planes = obtener_planes_asignatura_por_plan(id_plan)
-
-    for plan in planes:
-
-        comisiones.extend(
-            obtener_comisiones_por_plan_asignatura(plan["id_plan_asignatura"])
-        )
-
-    return comisiones
+    return obtener_comisiones_asignaturas_por_plan(id_plan,headers=request.headers)
 
 
 # Obtiene los resultados académicos correspondientes a un plan.
@@ -121,12 +106,12 @@ def obtener_resultado_plan(id_legajo, id_plan):
 # -------------------CÁLCULOS-------------------#
 
 
-# Calcula la cantidad total de materias del plan.
+# Calcula la cantidad total de comisiones asignaturas del plan.
 def calcular_materias_totales(id_plan):
 
-    planes = obtener_planes_asignatura_por_plan(id_plan)
+    comisiones_asignaturas = obtener_comisiones_plan(id_plan)
 
-    return len(planes)
+    return len(comisiones_asignaturas)
 
 
 # Calcula la cantidad de materias aprobadas.
@@ -189,25 +174,18 @@ def plan_finalizado(id_legajo, id_plan):
 def validar_resultado_plan(id_legajo, id_plan):
 
     # Verifica el legajo.
-    legajo = obtener_legajo(id_legajo)
+    legajo = obtener_legajo(id_legajo,headers=request.headers)
 
     if not legajo:
 
         raise BusinessError("El legajo no existe.", 404)
 
     # Verifica el plan.
-    plan = obtener_plan(id_plan)
+    plan = obtener_plan(id_plan,headers=request.headers)
 
     if not plan:
 
         raise BusinessError("El plan no existe.", 404)
-
-    # Verifica el usuario.
-    usuario = obtener_usuario(ID_USUARIO_SIMULADO)
-
-    if not usuario:
-
-        raise BusinessError("El usuario no existe.", 404)
 
     return legajo, plan
 
@@ -223,6 +201,7 @@ def preparar_datos_resultado_plan(
     materias_aprobadas,
     materias_finalizadas,
     estado,
+    id_usuario_autenticado
 ):
 
     ahora = datetime.now()
@@ -235,7 +214,7 @@ def preparar_datos_resultado_plan(
         "materias_finalizadas": materias_finalizadas,
         "id_estado_resultado_plan": estado.id_estado_resultado_plan,
         "fecha_actualizacion": ahora.date(),
-        "id_usuario_creacion": ID_USUARIO_SIMULADO,
+        "id_usuario_creacion": id_usuario_autenticado,
         "id_usuario_modificacion": None,
         "ts_creacion": ahora,
         "ts_modificacion": None,
@@ -247,6 +226,8 @@ def preparar_datos_resultado_plan(
 
 # Crea o actualiza automáticamente el resultado del plan.
 def actualizar_resultado_plan(id_legajo, id_plan):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
         f"Actualizando resultado del plan {id_plan} " f"para el legajo {id_legajo}."
@@ -280,6 +261,7 @@ def actualizar_resultado_plan(id_legajo, id_plan):
                 materias_aprobadas,
                 materias_finalizadas,
                 estado,
+                id_usuario_autenticado
             )
 
             resultado = ResultadoPlan(**datos)
@@ -330,9 +312,11 @@ def actualizar_resultado_plan(id_legajo, id_plan):
 
 # Modifica el estado de un resultado de plan.
 def modificar_resultado_plan(id_resultado_plan, datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} "
+        f"Usuario {id_usuario_autenticado} "
         f"modificando el resultado del plan {id_resultado_plan}."
     )
 
@@ -347,11 +331,6 @@ def modificar_resultado_plan(id_resultado_plan, datos):
             )
 
             return None
-
-        # Verifica el usuario.
-        if not obtener_usuario(ID_USUARIO_SIMULADO):
-
-            raise BusinessError("El usuario no existe.", 404)
 
         hubo_cambios = False
 
@@ -370,7 +349,7 @@ def modificar_resultado_plan(id_resultado_plan, datos):
                 resultado.id_estado_resultado_plan = estado.id_estado_resultado_plan
                 ahora = datetime.now()
                 resultado.fecha_actualizacion = ahora.date()
-                resultado.id_usuario_modificacion = ID_USUARIO_SIMULADO
+                resultado.id_usuario_modificacion = id_usuario_autenticado
                 resultado.ts_modificacion = ahora
 
                 hubo_cambios = True
@@ -391,7 +370,7 @@ def modificar_resultado_plan(id_resultado_plan, datos):
 
                             inscripcion.id_estado = estado_cancelada.id_estado
 
-                            inscripcion.id_usuario_modificacion = ID_USUARIO_SIMULADO
+                            inscripcion.id_usuario_modificacion = id_usuario_autenticado
 
                             inscripcion.ts_modificacion = datetime.now()
 
@@ -435,11 +414,12 @@ def modificar_resultado_plan(id_resultado_plan, datos):
 
 
 # Elimina un resultado del plan.
-# Solo para desarrollo.
 def eliminar_resultado_plan(id_resultado_plan):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} "
+        f"Usuario {id_usuario_autenticado} "
         f"eliminando el resultado del plan "
         f"{id_resultado_plan}."
     )

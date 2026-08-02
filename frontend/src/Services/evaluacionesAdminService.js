@@ -1,9 +1,5 @@
-// Ya está conectado a la API real del back. La única vuelta extra acá
-// es traducir entre lo que maneja la UI (tipo como texto: "Parcial",
-// "TP", "Final") y lo que espera/devuelve el back (id_tipo_evaluacion,
-// un número, con su nombre completo resuelto en tipo_evaluacion.nombre).
-// Así no tuve que tocar nada del formulario (EvaluacionModal.jsx) ni de
-// la tabla, todo el mapeo queda encapsulado acá.
+// servicios relacionados con las evaluaciones de los alumnos, para el personal de gestión 
+//  muestra las evaluaciones de cada comisión y permite crear/editar/borrar evaluaciones.
 import {
     getListaEvaluaciones,
     getEvaluacionPorId,
@@ -12,7 +8,7 @@ import {
     eliminarEvaluacion,
 } from "../api/evaluacionesApi";
 
-import { getComisiones } from "../mocks/comisionesMock";
+import { getComisiones, obtenerDocenteTitular } from "../api/comisiones";
 
 // Coincide con seed/seed_tipo_evaluacion.py del back.
 const TIPOS_EVALUACION = {
@@ -22,9 +18,7 @@ const TIPOS_EVALUACION = {
     4: "TP", // "Trabajo Práctico" en el back, lo dejo corto para la UI
 };
 
-// El formulario solo ofrece Parcial/TP/Final (ver EvaluacionModal.jsx),
-// así que el mapeo inverso cubre esos 3 + Recuperatorio por si se
-// necesita más adelante.
+// Coincide con seed/seed_tipo_evaluacion.py del back.
 const ID_POR_TIPO = {
     Parcial: 1,
     Recuperatorio: 2,
@@ -47,20 +41,22 @@ export async function getEvaluaciones(idComision) {
     const resultado = response.data.map((evaluacion) => {
 
         const comision = comisiones.find(
-            c => c.id === evaluacion.id_comision
+            c => c.id_comision_asignatura === evaluacion.id_comision_asignatura
         );
 
         return {
 
             id: evaluacion.id_evaluacion,
 
-            id_comision: evaluacion.id_comision,
+            id_comision: evaluacion.id_comision_asignatura,
+            
+            id_comision_asignatura: evaluacion.id_comision_asignatura,
+            
+            codigo: comision?.comision.descripcion ?? "-",
 
-            codigo: comision?.codigo ?? "-",
+            materia: comision?.nombre ?? "-",
 
-            materia: comision?.materia ?? "-",
-
-            docente: comision?.docente ?? "-",
+            docente: obtenerDocenteTitular(comision),
 
             titulo: evaluacion.titulo,
 
@@ -85,30 +81,21 @@ export async function getEvaluacion(id) {
     const comisiones = (await getComisiones()).data;
 
     const comision = comisiones.find(
-        c => c.id === response.data.id_comision
+        c => c.id_comision_asignatura === response.data.id_comision_asignatura
     );
 
     return {
-
-        id: response.data.id_evaluacion,
-
-        id_comision: response.data.id_comision,
-
-        codigo: comision?.codigo ?? "-",
-
-        materia: comision?.materia ?? "-",
-
-        docente: comision?.docente ?? "-",
-
-        titulo: response.data.titulo,
-
-        tipo: idATipo(response.data.id_tipo_evaluacion, response.data.tipo_evaluacion?.nombre),
-
-        fecha: response.data.fecha_evaluacion,
-
-        puntaje_maximo: response.data.puntaje_maximo,
-
-    };
+  id: response.data.id_evaluacion,
+  id_comision: response.data.id_comision_asignatura,
+  id_comision_asignatura: response.data.id_comision_asignatura,
+  codigo: comision?.comision.descripcion ?? "-",
+  materia: comision?.nombre ?? "-",
+  docente: obtenerDocenteTitular(comision),
+  titulo: response.data.titulo,
+  tipo: idATipo(response.data.id_tipo_evaluacion, response.data.tipo_evaluacion?.nombre),
+  fecha: response.data.fecha_evaluacion,
+  puntaje_maximo: response.data.puntaje_maximo,
+};
 
 }
 
@@ -116,13 +103,15 @@ export async function getEvaluacion(id) {
 // puntaje_maximo }. Acá lo traduzco a lo que pide el back:
 // { id_comision, id_tipo_evaluacion, titulo, fecha_evaluacion, puntaje_maximo }.
 function aPayloadBack(datos) {
-    return {
-        id_comision: datos.id_comision,
-        id_tipo_evaluacion: ID_POR_TIPO[datos.tipo] ?? 1,
-        titulo: datos.titulo,
-        fecha_evaluacion: datos.fecha,
-        puntaje_maximo: datos.puntaje_maximo,
-    };
+  return {
+    id_comision_asignatura: Number(
+      datos.id_comision_asignatura ?? datos.id_comision
+    ),
+    id_tipo_evaluacion: ID_POR_TIPO[datos.tipo] ?? 1,
+    titulo: datos.titulo,
+    fecha_evaluacion: datos.fecha, // tiene que ser YYYY-MM-DD
+    puntaje_maximo: Number(datos.puntaje_maximo),
+  };
 }
 
 export async function registrarEvaluacion(datos) {

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
-
+from flask import g,request
 from extensions import db
 from exceptions import BusinessError
 from utils.logger import logger
@@ -9,23 +9,22 @@ from utils.logger import logger
 from models.modelo_evaluacion import Evaluacion
 from models.modelo_calificacion import Calificacion
 
-from services.comision_cliente import obtener_comision
-from services.usuario_cliente import obtener_usuario
+from clients.planes_cliente import obtener_comision_asignatura_por_id
 from services.tipo_evaluacion_service import obtener_tipo_evaluacion_por_id
 
-ID_USUARIO_SIMULADO = 100
 
+# -------------------CONSULTAS-------------------#
 
 # Obtiene el listado de evaluaciones.
 # Permite filtrar por comisión o tipo de evaluación.
-def obtener_lista_de_evaluaciones(id_comision=None, id_tipo_evaluacion=None):
+def obtener_lista_de_evaluaciones(id_comision_asignatura=None, id_tipo_evaluacion=None):
 
     logger.info("Consultando listado de evaluaciones.")
 
     query = Evaluacion.query
 
-    if id_comision is not None:
-        query = query.filter_by(id_comision=id_comision)
+    if id_comision_asignatura is not None:
+        query = query.filter_by(id_comision_asignatura=id_comision_asignatura)
 
     if id_tipo_evaluacion is not None:
         query = query.filter_by(id_tipo_evaluacion=id_tipo_evaluacion)
@@ -40,33 +39,31 @@ def obtener_evaluacion_por_id(id_evaluacion):
 
     return db.session.get(Evaluacion, id_evaluacion)
 
+# Verifica si una evaluación posee calificaciones registradas.
+def existe_calificacion_evaluacion(id_evaluacion):
 
-# Prepara los datos necesarios para crear una evaluación.
-def preparar_datos_evaluacion(datos):
-    ahora = datetime.now()
-    return {
-        "id_comision": datos["id_comision"],
-        "id_tipo_evaluacion": datos["id_tipo_evaluacion"],
-        "titulo": datos["titulo"],
-        "fecha_evaluacion": datos["fecha_evaluacion"],
-        "puntaje_maximo": datos["puntaje_maximo"],
-        "id_evaluacion_origen": datos.get("id_evaluacion_origen"),
-        "id_usuario_creacion": ID_USUARIO_SIMULADO,
-        "id_usuario_modificacion": None,
-        "ts_creacion": ahora,
-        "ts_modificacion": None,
-    }
+    return (
+        Calificacion.query.filter_by(
+            id_evaluacion=id_evaluacion
+        ).first()
+        is not None
+    )
 
+
+# -------------------VALIDACIONES-------------------#
 
 # Verifica que los datos de una evaluación sean válidos.
 def validar_evaluacion(datos):
 
     # Verifica que exista la comisión.
-    comision = obtener_comision(datos["id_comision"])
+    comision = obtener_comision_asignatura_por_id(
+        datos["id_comision_asignatura"],
+        headers=request.headers
+    )
 
     if not comision:
-        logger.warning(f"La comisión {datos['id_comision']} no existe.")
-        raise BusinessError("La comisión no existe.", 404)
+        logger.warning(f"La comisión asignatura {datos['id_comision_asignatura']} no existe.")
+        raise BusinessError("La comisión asignatura  no existe.", 404)
 
     # Verifica que exista el tipo de evaluación.
     tipo = obtener_tipo_evaluacion_por_id(datos["id_tipo_evaluacion"])
@@ -94,27 +91,44 @@ def validar_evaluacion(datos):
             logger.warning("La evaluación origen no existe.")
             raise BusinessError("La evaluación origen no existe.", 404)
 
+        
+
+# -------------------PREPARACIÓN DE DATOS-------------------#        
+
+# Prepara los datos necesarios para crear una evaluación.
+def preparar_datos_evaluacion(datos,id_usuario_autenticado):
+    ahora = datetime.now()
+    return {
+        "id_comision_asignatura": datos["id_comision_asignatura"],
+        "id_tipo_evaluacion": datos["id_tipo_evaluacion"],
+        "titulo": datos["titulo"],
+        "fecha_evaluacion": datos["fecha_evaluacion"],
+        "puntaje_maximo": datos["puntaje_maximo"],
+        "id_evaluacion_origen": datos.get("id_evaluacion_origen"),
+        "id_usuario_creacion": id_usuario_autenticado,
+        "id_usuario_modificacion": None,
+        "ts_creacion": ahora,
+        "ts_modificacion": None,
+    }
+
+
+# -------------------CRUD-------------------#
 
 # Crea una nueva evaluación.
 def crear_evaluacion(datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     logger.info(
-        f"Usuario {ID_USUARIO_SIMULADO} " "inició el registro de una evaluación."
+        f"Usuario {id_usuario_autenticado} " "inició el registro de una evaluación."
     )
 
     try:
-        # Valida que exista el usuario.
-        usuario = obtener_usuario(ID_USUARIO_SIMULADO)
-
-        if not usuario:
-            logger.warning("El usuario no existe.")
-            raise BusinessError("El usuario no existe.", 404)
-
         # Valida la información recibida.
         validar_evaluacion(datos)
 
         # Prepara los datos.
-        datos_evaluacion = preparar_datos_evaluacion(datos)
+        datos_evaluacion = preparar_datos_evaluacion(datos,id_usuario_autenticado)
 
         nueva_evaluacion = Evaluacion(**datos_evaluacion)
 
@@ -149,10 +163,12 @@ def crear_evaluacion(datos):
 
 # Modifica una evaluación existente.
 def modificar_evaluacion(id_evaluacion, datos):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     try:
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} " f"modificando la evaluación {id_evaluacion}."
+            f"Usuario {id_usuario_autenticado} " f"modificando la evaluación {id_evaluacion}."
         )
 
         # Busca la evaluación.
@@ -162,23 +178,18 @@ def modificar_evaluacion(id_evaluacion, datos):
             logger.warning(f"La evaluación {id_evaluacion} no existe.")
             return None
 
-        # Verifica que exista el usuario.
-        if not obtener_usuario(ID_USUARIO_SIMULADO):
-            logger.warning("El usuario no existe.")
-            raise BusinessError("El usuario no existe.", 404)
-
         # Indica si realmente hubo modificaciones.
         hubo_cambios = False
 
         # Comisión
-        if "id_comision" in datos:
+        if "id_comision_asignatura" in datos:
 
-            if not obtener_comision(datos["id_comision"]):
-                logger.warning(f"La comisión {datos['id_comision']} no existe.")
-                raise BusinessError("La comisión no existe.", 404)
+            if not obtener_comision_asignatura_por_id(datos["id_comision_asignatura"],headers=request.headers):
+                logger.warning(f"La comisión asignatura {datos['id_comision_asignatura']} no existe.")
+                raise BusinessError("La comisión asignatura no existe.", 404)
 
-            if evaluacion.id_comision != datos["id_comision"]:
-                evaluacion.id_comision = datos["id_comision"]
+            if evaluacion.id_comision_asignatura != datos["id_comision_asignatura"]:
+                evaluacion.id_comision_asignatura = datos["id_comision_asignatura"]
                 hubo_cambios = True
 
         # Tipo de evaluación
@@ -253,7 +264,7 @@ def modificar_evaluacion(id_evaluacion, datos):
             return evaluacion
 
         # Auditoría.
-        evaluacion.id_usuario_modificacion = ID_USUARIO_SIMULADO
+        evaluacion.id_usuario_modificacion = id_usuario_autenticado
         evaluacion.ts_modificacion = datetime.now()
 
         db.session.commit()
@@ -286,10 +297,12 @@ def modificar_evaluacion(id_evaluacion, datos):
 
 # Elimina una evaluación.
 def eliminar_evaluacion(id_evaluacion):
+    # Obtiene el usuario autenticado.
+    id_usuario_autenticado = g.id_usuario
 
     try:
         logger.info(
-            f"Usuario {ID_USUARIO_SIMULADO} " f"eliminando la evaluación {id_evaluacion}."
+            f"Usuario {id_usuario_autenticado} " f"eliminando la evaluación {id_evaluacion}."
         )
 
         evaluacion = obtener_evaluacion_por_id(id_evaluacion)
@@ -342,12 +355,3 @@ def eliminar_evaluacion(id_evaluacion):
         raise BusinessError("Ocurrió un error interno del servidor.", 500)
 
 
-# Verifica si una evaluación posee calificaciones registradas.
-def existe_calificacion_evaluacion(id_evaluacion):
-
-    return (
-        Calificacion.query.filter_by(
-            id_evaluacion=id_evaluacion
-        ).first()
-        is not None
-    )

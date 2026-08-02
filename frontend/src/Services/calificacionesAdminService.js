@@ -1,22 +1,5 @@
-import * as legajosMock from "../mocks/legajosMock";
-import * as comisionesMock from "../mocks/comisionesMock";
-
-// Ya está conectado a la API real del back. Dos cosas importantes que
-// tuve que resolver acá (no en la UI) para que todo siga funcionando
-// igual que antes:
-//
-// 1. El back llama al campo de la nota "puntaje", no "nota". Toda la
-//    UI (CalificacionTabla, AlumnoNotaRow, etc.) sigue hablando de
-//    "nota" puertas para adentro; la traducción puntaje<->nota queda
-//    encapsulada acá.
-//
-// 2. El back NO permite volver a registrar una calificación que ya
-//    existe para esa (evaluación, inscripción): POST /calificaciones
-//    tira error "La calificación ya fue registrada" si ya hay una. Por
-//    eso "Guardar calificaciones" ya no manda todo el lote por POST
-//    como antes: separa las filas SIN nota previa (recién cargadas,
-//    van por POST en bloque) de las filas que YA tenían una
-//    calificación (van por PUT una por una, solo si cambiaron).
+import * as legajosApi from "../api/legajosApi";
+import { getComisiones } from "../api/comisiones";
 import { getCalificacionesPorEvaluacion, actualizarCalificacion, registrarCalificaciones, eliminarCalificacion } from "../api/calificacionesApi";
 import { getInscripcionPorId } from "../api/inscripcionesApi";
 import { getListaEvaluaciones } from "../api/evaluacionesApi";
@@ -30,8 +13,8 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
     const response =
         await getCalificacionesPorEvaluacion(idEvaluacion);
 
-    const comisiones =
-        (await comisionesMock.getComisiones()).data;
+    const comisiones = (await getComisiones()).data;
+
 
     const resultado = await Promise.all(
 
@@ -40,11 +23,11 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
             const inscripcion = (await getInscripcionPorId(calificacion.id_inscripcion)).data;
 
             const legajo = (
-                await (legajosMock.getLegajoPorId(inscripcion.id_legajo))
+            await (legajosApi.getLegajoPorId(inscripcion.id_legajo))
             ).data;
 
             const comision = comisiones.find(
-                c => c.id === inscripcion.id_comision
+                c => c.id_comision_asignatura === inscripcion.id_comision_asignatura
             );
 
             return {
@@ -58,15 +41,15 @@ export async function obtenerCalificacionesPorEvaluacion(idEvaluacion) {
 
                 alumno: `${legajo.nombre} ${legajo.apellido}`,
 
-                rango: legajo.rango,
+                //rango: legajo.rango,
 
                 id_inscripcion: inscripcion.id_inscripcion,
 
-                id_comision: inscripcion.id_comision,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
 
-                codigo_comision: comision?.codigo ?? "-",
+                codigo_comision: comision?.comision.descripcion ?? "-",
 
-                materia: comision?.materia ?? "-",
+                materia: comision?.nombre ?? "-",
 
                 nota: calificacion.puntaje,
 
@@ -174,7 +157,7 @@ export async function obtenerHistorialCalificacionesPorComision(idComision) {
 
                 return {
                     id: evaluacion.id_evaluacion,
-                    id_comision: evaluacion.id_comision,
+                    id_comision_asignatura: evaluacion.id_comision_asignatura,
                     titulo: evaluacion.titulo,
                     tipo: evaluacion.tipo_evaluacion?.nombre ?? "-",
                     fecha: evaluacion.fecha_evaluacion,

@@ -1,36 +1,27 @@
-//si el usuario es el alumno de prueba, ve SU
-// PROPIA asistencia (solo lectura, agrupada por comisión); si es
-// personal, ve la pantalla de gestión de siempre (con o sin poder
-// editar, según sus permisos).
-
+// Página de Asistencia: vista para alumnos y docentes, según el rol del usuario.
 import PanelesClase from "../components/Asistencia/PanelesClase";
 import PanelDetalleClase from "../components/Asistencia/PanelDetalleClase";
 import EstadisticaCard from "../components/Asistencia/EstadisticaCard";
 import ResumenAsistenciaComisionCard from "../components/Asistencia/ResumenAsistenciaComisionCard";
 import { useState, useEffect } from "react";
-import { usePermissions } from "../context/PermissionsContext";
-import { ACCIONES } from "../config/modulos";
+import useAuth from "../auth/hooks/useAuth";
 import { obtenerMiAsistencia } from "../Services/asistenciaAlumnoService";
+import { obtenerIdLegajo } from "../config/legajo";
 
-const ID_LEGAJO_ALUMNO_MOCK = 1; // mismo TODO que en Calificaciones.jsx
 
 export default function Asistencia() {
   const [comisionSeleccionada, setComisionSeleccionada] = useState(null);
-  const { usuario, hasAnyPermission } = usePermissions();
+  const { user: usuario, hasPermission, hasRole } = useAuth();
 
-  const esAlumno = usuario?.usuario === "alumno";
+  const esAlumno = hasRole("Alumno");
+  const idLegajo = obtenerIdLegajo(usuario);
 
-  // Puede tomar asistencia (marcar presente/ausente/etc y escribir
-  // observaciones) si tiene el permiso de crear O actualizar asistencias.
-  const puedeEditar = hasAnyPermission([
-    ACCIONES.ASISTENCIAS_CREAR,
-    ACCIONES.ASISTENCIAS_ACTUALIZAR,
-  ]);
-
-  
+// Si el usuario es un alumno, no puede editar la asistencia, solo puede verla.
+// Si el usuario es un docente o administrador, puede editar la asistencia si tiene los permisos correspondientes.
+  const puedeEditar = ["inscripcion.asistencias.crear", "inscripcion.asistencias.actualizar"].some(hasPermission);
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={ID_LEGAJO_ALUMNO_MOCK} />;
+    return <VistaAlumno idLegajo={usuario?.id_legajo} />;
   }
 
   return (
@@ -54,10 +45,12 @@ export default function Asistencia() {
         <PanelesClase
           comisionSeleccionada={comisionSeleccionada}
           setComisionSeleccionada={setComisionSeleccionada}
+          
+          
         />
 
         <PanelDetalleClase
-          idComision={comisionSeleccionada?.id}
+          idComision={comisionSeleccionada?.id_comision_asignatura}
           soloLectura={!puedeEditar}
         />
 
@@ -75,6 +68,11 @@ function VistaAlumno({ idLegajo }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!idLegajo) {
+      setCargando(false);
+      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      return;
+    }
     async function cargar() {
       setCargando(true);
       setError(null);
@@ -135,7 +133,7 @@ function VistaAlumno({ idLegajo }) {
                 </div>
               ) : (
                 datos.porComision.map((c) => (
-                  <ResumenAsistenciaComisionCard key={c.id_comision} comision={c} />
+                  <ResumenAsistenciaComisionCard key={c.id_comision_asignatura} comision={c} />
                 ))
               )}
             </div>
