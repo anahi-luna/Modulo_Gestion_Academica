@@ -100,6 +100,7 @@ function VistaAlumno({ idLegajo }) {
             ) : (
                 <ClasesTable
                     clases={clasesFiltradas}
+                    todasLasClases={clases}
 
                     filtroMateria={filtroMateria}
                     setFiltroMateria={setFiltroMateria}
@@ -326,7 +327,8 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
             {/* Tabla Clases */}
             <ClasesTable
                 clases={clasesFiltradas}
-
+                todasLasClases={clases}
+                
                 filtroMateria={filtroMateria}
                 setFiltroMateria={setFiltroMateria}
 
