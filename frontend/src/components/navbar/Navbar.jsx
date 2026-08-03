@@ -97,7 +97,7 @@ export default function Navbar({ modulo }) {
                   onClick={() => window.location.href = PORTAL_URL}
                   className={linkClass({ isActive: false })}
                 >
-                  Inicio
+                  Portal inicio
                 </a>
 
                 {esAlumno && (
@@ -163,7 +163,7 @@ export default function Navbar({ modulo }) {
       <DisclosurePanel className="lg:hidden relative z-40 bg-red-800">
         {({ close }) => (
           <div className="space-y-1 px-2 pt-2 pb-3">
-            <NavLink to="/" className={linkClassMobile} end onClick={() => close()}>Home</NavLink>
+            <a to="/" className={linkClass({ isActive: false })} end onClick={() => window.location.href = PORTAL_URL}>Portal Inicio</a>
 
             {esAlumno && (
               <NavLink to="/mi-plan" className={linkClassMobile} end onClick={() => close()}>Mi plan</NavLink>
