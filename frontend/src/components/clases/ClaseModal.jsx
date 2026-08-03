@@ -21,6 +21,8 @@ export default function ModalClase({
         estado: "PROGRAMADA",
     });
 
+    const [errorHorario, setErrorHorario] = useState("");
+
     useEffect(() => {
 
         if (clase) {
@@ -49,6 +51,8 @@ export default function ModalClase({
 
         }
 
+        setErrorHorario("");
+
     }, [clase]);
 
     const modalRef = useModalAccessibility(abierto, onCerrar);
@@ -59,6 +63,20 @@ export default function ModalClase({
     const comisionSeleccionada = comisiones.find(
         c => c.id_comision_asignatura === Number(formulario.id_comision_asignatura)
     );
+
+    function manejarGuardar() {
+
+        if (formulario.hora_inicio && formulario.hora_fin && formulario.hora_inicio >= formulario.hora_fin) {
+
+            setErrorHorario("El horario de inicio no puede ser mayor ni igual al horario de fin.");
+            return;
+
+        }
+
+        setErrorHorario("");
+        onGuardar(formulario);
+
+    }
 
     return (
 
@@ -145,7 +163,7 @@ export default function ModalClase({
 
                         <label htmlFor="clase-numero" className="block font-medium mb-2">
 
-                            Número de clase
+                            Número / identificador de la clase
 
                         </label>
 
@@ -242,6 +260,14 @@ export default function ModalClase({
 
                     </div>
 
+                    {errorHorario && (
+
+                        <p className="text-sm text-red-600 -mt-3">
+                            {errorHorario}
+                        </p>
+
+                    )}
+
                     {/* Tema */}
 
                     <div className="min-w-0">
@@ -315,7 +341,7 @@ export default function ModalClase({
                     </button>
 
                     <button
-                        onClick={() => onGuardar(formulario)}
+                        onClick={manejarGuardar}
                         className="px-4 py-2 rounded-lg bg-red-700 hover:bg-red-800 text-white"
                     >
                         {clase ? "Guardar cambios" : "Crear clase"}
