@@ -1,4 +1,5 @@
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
+import { formatearFecha } from "../../config/fecha";
 
 // Componente para mostrar un modal de confirmación para eliminar una clase, con información básica de la clase.
 export default function EliminarClaseModal({
@@ -61,7 +62,7 @@ export default function EliminarClaseModal({
 
                         <strong>Fecha:</strong>{" "}
 
-                        {new Date(clase.fecha).toLocaleDateString("es-AR")}
+                        {formatearFecha(clase.fecha)}
 
                     </p>
 

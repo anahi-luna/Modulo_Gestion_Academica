@@ -1,4 +1,5 @@
 import { PencilSquareIcon, TrashIcon, } from "@heroicons/react/24/outline";
+import { formatearFecha } from "../../config/fecha";
 
 // Componente para mostrar una fila de clase en la tabla de clases, con información básica y 
 // botones de acción para editar o eliminar la clase.
@@ -8,12 +9,6 @@ export default function ClaseRow({
     onEliminar,
     soloLectura = false,
 }) {
-
-    function formatearFecha(fecha) {
-
-        return new Date(fecha).toLocaleDateString("es-AR");
-
-    }
 
     return (
 
