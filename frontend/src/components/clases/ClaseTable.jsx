@@ -1,10 +1,14 @@
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import ClaseRow from "./ClaseRow";
-import { formatearFecha } from "../../config/fecha";
+import { formatearFecha } from "../../utils/fecha";
 
 // Componente para mostrar una tabla de clases, con filtros por materia, comisión, docente, fecha y tema.
 export default function ClasesTable({
     clases,
+    // Lista completa (sin aplicar ningún filtro), usada solo para
+    // calcular las opciones de los <select>. Si no se pasa, se cae
+    // en `clases` como antes (compatibilidad hacia atrás).
+    todasLasClases,
 
     filtroMateria,
     setFiltroMateria,
@@ -30,11 +34,19 @@ export default function ClasesTable({
     soloLectura = false,
 }) {
 
-    const materias = [...new Set(clases.map(c => c.materia))];
-    const comisiones = [...new Set(clases.map(c => c.codigo))];
-    const docentes = [...new Set(clases.map(c => c.docente))];
-    const fechas = [...new Set(clases.map(c => c.fecha))];
-    const temas = [...new Set(clases.map(c => c.tema))];
+    // IMPORTANTE: las opciones de los filtros se calculan siempre a
+    // partir de la lista COMPLETA (sin filtrar). Antes se calculaban
+    // sobre `clases` (que ya venía filtrada desde la página), por lo
+    // que al elegir un filtro las demás opciones desaparecían del
+    // desplegable, ya que se recalculaban sobre una lista cada vez
+    // más chica.
+    const clasesParaOpciones = todasLasClases ?? clases;
+
+    const materias = [...new Set(clasesParaOpciones.map(c => c.materia))];
+    const comisiones = [...new Set(clasesParaOpciones.map(c => c.codigo))];
+    const docentes = [...new Set(clasesParaOpciones.map(c => c.docente))];
+    const fechas = [...new Set(clasesParaOpciones.map(c => c.fecha))];
+    const temas = [...new Set(clasesParaOpciones.map(c => c.tema))];
 
     return (
         <div className="space-y-4">
