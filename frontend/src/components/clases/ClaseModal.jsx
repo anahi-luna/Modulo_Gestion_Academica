@@ -318,7 +318,8 @@ export default function ModalClase({
 
                                 <option value="PROGRAMADA">Programada</option>
                                 <option value="DICTADA">Dictada</option>
-                                <option value="CANCELADA">Cancelada</option>
+                                <option value="SUSPENDIDA">Suspendida</option>
+                                <option value="REPROGRAMADA">Reprogramada</option>
 
                             </select>
 
