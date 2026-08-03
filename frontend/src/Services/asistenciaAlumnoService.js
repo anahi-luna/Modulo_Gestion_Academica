@@ -12,12 +12,12 @@ const ESTADOS = {
     4: "Tarde",
 };
 
-export async function obtenerMiAsistencia(idLegajo) {
+export async function obtenerMiAsistencia() {
     // si no hay inscripciones, devuelvo estructura vacía
     let inscripciones = [];
 
     try {
-        inscripciones = await obtenerMisInscripciones(idLegajo);
+        inscripciones = await obtenerMisInscripciones();
     } catch (error) {
         console.error("No pude traer inscripciones:", error);
         return { porComision: [], resumen: { presentes: 0, ausentes: 0, justificados: 0, tarde: 0, registradas: 0, porcentaje: 0 } };
