@@ -6,7 +6,6 @@ import ResumenAsistenciaComisionCard from "../components/Asistencia/ResumenAsist
 import { useState, useEffect } from "react";
 import useAuth from "../auth/hooks/useAuth";
 import { obtenerMiAsistencia } from "../Services/asistenciaAlumnoService";
-import { obtenerIdLegajo } from "../config/legajo";
 
 
 export default function Asistencia() {
@@ -14,14 +13,13 @@ export default function Asistencia() {
   const { user: usuario, hasPermission, hasRole } = useAuth();
 
   const esAlumno = hasRole("Alumno");
-  const idLegajo = obtenerIdLegajo(usuario);
 
 // Si el usuario es un alumno, no puede editar la asistencia, solo puede verla.
 // Si el usuario es un docente o administrador, puede editar la asistencia si tiene los permisos correspondientes.
   const puedeEditar = ["inscripcion.asistencias.crear", "inscripcion.asistencias.actualizar"].some(hasPermission);
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={usuario?.id_legajo} />;
+    return <VistaAlumno />;
   }
 
   return (
@@ -62,22 +60,17 @@ export default function Asistencia() {
 
 // Vista del alumno: solo lectura, historial de su propia asistencia
 // agrupado por comisión (mismo patrón visual que "Mis calificaciones").
-function VistaAlumno({ idLegajo }) {
+function VistaAlumno() {
   const [datos, setDatos] = useState({ porComision: [], resumen: null });
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!idLegajo) {
-      setCargando(false);
-      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
-      return;
-    }
     async function cargar() {
       setCargando(true);
       setError(null);
       try {
-        setDatos(await obtenerMiAsistencia(idLegajo));
+        setDatos(await obtenerMiAsistencia());
       } catch (err) {
         setError(err.message);
       } finally {
@@ -85,7 +78,7 @@ function VistaAlumno({ idLegajo }) {
       }
     }
     cargar();
-  }, [idLegajo]);
+  }, []);
 
   const resumen = datos.resumen ?? { porcentaje: 0, presentes: 0, ausentes: 0, justificados: 0 };
 

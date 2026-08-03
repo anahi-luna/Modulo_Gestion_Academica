@@ -43,11 +43,11 @@ export default function HomeAlumno({ usuario }) {
       try {
         const [misInscripciones, miPlan, misClases, miAsistencia, misCertificados] =
           await Promise.all([
-            obtenerMisInscripciones(usuario?.id_legajo),
-            obtenerMiPlan(usuario?.id_legajo),
+            obtenerMisInscripciones(),
+            obtenerMiPlan(),
             obtenerMisClases(usuario?.id_legajo),
-            obtenerMiAsistencia(usuario?.id_legajo),
-            obtenerMisCertificados(usuario?.id_legajo),
+            obtenerMiAsistencia(),
+            obtenerMisCertificados(),
           ]);
         setInscripciones(misInscripciones);
         setPlan(miPlan);
