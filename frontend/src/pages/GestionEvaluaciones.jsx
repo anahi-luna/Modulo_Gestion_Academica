@@ -98,6 +98,7 @@ function VistaAlumno({ idLegajo }) {
             ) : (
                 <EvaluacionesTable
                     evaluaciones={evaluacionesFiltradas}
+                    todasLasEvaluaciones={evaluaciones}
 
                     filtroMateria={filtroMateria}
                     setFiltroMateria={setFiltroMateria}
@@ -296,6 +297,7 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
 
             <EvaluacionesTable
                 evaluaciones={evaluacionesFiltradas}
+                todasLasEvaluaciones={evaluaciones}
 
                 filtroMateria={filtroMateria}
                 setFiltroMateria={setFiltroMateria}
