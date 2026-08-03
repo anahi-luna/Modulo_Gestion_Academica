@@ -4,6 +4,7 @@ from exceptions import BusinessError
 from sqlalchemy.exc import IntegrityError
 from utils.logger import logger
 from flask import g, request
+from sqlalchemy import func
 
 from clients.planes_cliente import (
     obtener_comision_asignatura_por_id,
@@ -46,6 +47,36 @@ def obtener_inscripcion_por_id(id_inscripcion):
     logger.info(f"Consultando inscripción {id_inscripcion}.")
 
     return db.session.get(Inscripcion, id_inscripcion)
+
+def obtener_conteo_comisiones():
+
+    estado_aceptada = obtener_estado_por_nombre("Aceptada")
+    estado_finalizada = obtener_estado_por_nombre("Finalizada")
+
+    conteo = (
+        db.session.query(
+            Inscripcion.id_comision_asignatura,
+            func.count(Inscripcion.id_inscripcion).label("inscriptos")
+        )
+        .filter(
+            Inscripcion.id_estado.in_([
+                estado_aceptada.id_estado,
+                estado_finalizada.id_estado
+            ])
+        )
+        .group_by(
+            Inscripcion.id_comision_asignatura
+        )
+        .all()
+    )
+
+    return [
+        {
+            "id_comision_asignatura": fila.id_comision_asignatura,
+            "inscriptos": fila.inscriptos
+        }
+        for fila in conteo
+    ]
 
 
 # -------------------VALIDACIONES-------------------#

@@ -1,10 +1,13 @@
-from flask import request
+from flask import request,g
 from marshmallow import ValidationError
 
 from exceptions import BusinessError
 from services.asistencia_service import *
 
 from schemas.asistencia_schema import *
+
+from models.modelo_asistencia import Asistencia
+from models.modelo_inscripcion import Inscripcion
 
 from utils.response import success_response, error_response
 
@@ -41,6 +44,41 @@ def get_asistencia(id_asistencia):
 
     return success_response(data=resultado, message="Asistencia encontrada.")
 
+
+def obtener_mi_asistencia(id_clase):
+
+    try:
+
+        asistencia = (
+            Asistencia.query
+            .join(Inscripcion)
+            .filter(
+                Asistencia.id_clase == id_clase,
+                Inscripcion.id_legajo == g.id_legajo
+            )
+            .first()
+        )
+
+        if not asistencia:
+
+            return success_response(
+                data=None,
+                message="Sin asistencia registrada."
+            )
+
+        resultado = asistencia_schema.dump(asistencia)
+
+        return success_response(
+            data=resultado,
+            message="Asistencia encontrada."
+        )
+
+    except BusinessError as e:
+
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )
 
 # Registra las asistencias de una clase.
 def agregar_asistencias():

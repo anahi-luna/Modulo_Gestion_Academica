@@ -1,10 +1,11 @@
-from flask import request
+from flask import request,g
 from marshmallow import ValidationError
 from services.certificado_service import *
 from schemas.certificado_schema import *
 from utils.response import success_response, error_response
 from exceptions import BusinessError
-
+from models.modelo_certificado import Certificado
+from models.modelo_resultado_plan import ResultadoPlan
 
 # Obtiene el listado de certificados.
 def get_lista_certificados():
@@ -31,6 +32,33 @@ def get_certificado(id_certificado):
 
     return success_response(data=datos, message="Certificado encontrado.")
 
+def obtener_mis_certificados():
+
+    try:
+
+        certificados = (
+            Certificado.query
+            .join(ResultadoPlan)
+            .filter(
+                ResultadoPlan.id_legajo == g.id_legajo
+            )
+            .all()
+        )
+
+        datos = certificados_schema.dump(certificados)
+
+        return success_response(
+            data=datos,
+            total=len(datos),
+            message="Listado de mis certificados."
+        )
+
+    except BusinessError as e:
+
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )
 
 # Genera un certificado.
 def agregar_certificado():

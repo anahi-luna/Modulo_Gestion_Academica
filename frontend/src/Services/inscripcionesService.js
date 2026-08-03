@@ -76,6 +76,19 @@ async function contarInscriptosPorComision() {
 
   return conteo;
 }
+/*
+async function contarInscriptosPorComision() {
+
+    const response = await getConteoComisiones();
+
+    const conteo = {};
+
+    response.data.forEach(item => {
+        conteo[item.id_comision_asignatura] = item.inscriptos;
+    });
+
+    return conteo;
+}*/
 
 function enriquecerComisionConCupo(comision, conteo) {
   const cupo_maximo = comision.cupo_maximo ?? 0;

@@ -1,9 +1,10 @@
-from flask import request
+from flask import request, g
 from services.inscripcion_service import *
 from utils.response import success_response,error_response
 from exceptions import BusinessError
 from schemas.inscripcion_schema import *
 from marshmallow import ValidationError
+#from clients.planes_cliente import obte
 
 def get_lista_de_inscripciones():
 
@@ -39,6 +40,45 @@ def get_inscripcion(id_inscripcion):
         data=resultado,
         message="Inscripción encontrada."
     )
+
+def obtener_mis_inscripciones():
+    try:
+        id_legajo = g.id_legajo
+
+        mis_inscripciones= obtener_lista_de_inscripciones(id_legajo=id_legajo)
+        
+        resultado = inscripciones_schema.dump(mis_inscripciones)
+
+        return success_response(
+            data=resultado,
+            total=len(resultado),
+            message="Listado de mis inscripciones."
+        )
+
+    except BusinessError as e:
+        
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )
+
+def get_conteo_comisiones():
+    try:
+
+        resultado = obtener_conteo_comisiones()
+
+        return success_response(
+            data=resultado,
+            total=len(resultado),
+            message="Conteo de inscriptos por comisión."
+        )
+
+    except BusinessError as e:
+
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )  
 
 def agregar_inscripcion():
     try:

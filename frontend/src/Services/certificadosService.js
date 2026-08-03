@@ -74,7 +74,12 @@ export async function obtenerMisCertificados(idLegajo) {
         })
         .filter(Boolean);
 }
-
+/*
+export async function obtenerMisCertificados() {
+    const response = await getMisCertificados();
+    return response.data.map(mapearCertificado);
+}
+*/
 export async function emitir(idResultadoPlan) {
     const response = await crearCertificado(idResultadoPlan);
     return mapearCertificado(response.data);
