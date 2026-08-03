@@ -62,6 +62,8 @@ export default function Navbar({ modulo }) {
 
   return (
     <Disclosure as="nav" className="bg-red-800 shadow-md sticky top-0 z-40">
+      {({ open }) => (
+        <>
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
 
@@ -74,7 +76,7 @@ export default function Navbar({ modulo }) {
             </DisclosureButton>
           </div>
 
-          <div className="flex flex-1 items-center justify-center lg:items-stretch lg:justify-start">
+          <div className="flex flex-1 items-center justify-center px-10 lg:px-0 lg:items-stretch lg:justify-start">
             <Link to="/" className="flex shrink-0 items-center gap-3">
               <img
                 src={logo}
@@ -90,6 +92,7 @@ export default function Navbar({ modulo }) {
             <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <div className="flex space-x-1 xl:space-x-2">
                 <a
+
                   type="button"
                   onClick={() => window.location.href = PORTAL_URL}
                   className={linkClass({ isActive: false })}
@@ -118,7 +121,6 @@ export default function Navbar({ modulo }) {
               </span>
             )}
 
-
             <Menu as="div" className="relative ml-1 sm:ml-2">
               <MenuButton className="relative flex rounded-full">
                 <span className="absolute -inset-1.5" />
@@ -134,6 +136,7 @@ export default function Navbar({ modulo }) {
                 transition
                 className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-gray-800 py-1 outline -outline-offset-1 outline-white/10 transition data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-leave:duration-75"
               >
+                
                 <MenuItem>
                   <button
                     onClick={handleLogout}
@@ -150,23 +153,32 @@ export default function Navbar({ modulo }) {
         </div>
       </div>
 
-      <DisclosurePanel className="lg:hidden">
-  {({ close }) => (
-    <div className="space-y-1 px-2 pt-2 pb-3">
-      <NavLink to="/" className={linkClassMobile} end onClick={() => close()}>Home</NavLink>
-
-      {esAlumno && (
-        <NavLink to="/mi-plan" className={linkClassMobile} end onClick={() => close()}>Mi plan</NavLink>
+      {open && (
+        <div
+          className="fixed inset-0 top-16 bg-black/50 z-30 lg:hidden"
+          aria-hidden="true"
+        />
       )}
 
-      {links.filter(debeMostrarse).map((link) => (
-        <NavLink key={link.to} to={link.to} className={linkClassMobile} end onClick={() => close()}>
-          {link.label}
-        </NavLink>
-      ))}
-    </div>
-  )}
-</DisclosurePanel>
+      <DisclosurePanel className="lg:hidden relative z-40 bg-red-800">
+        {({ close }) => (
+          <div className="space-y-1 px-2 pt-2 pb-3">
+            <NavLink to="/" className={linkClassMobile} end onClick={() => close()}>Home</NavLink>
+
+            {esAlumno && (
+              <NavLink to="/mi-plan" className={linkClassMobile} end onClick={() => close()}>Mi plan</NavLink>
+            )}
+
+            {links.filter(debeMostrarse).map((link) => (
+              <NavLink key={link.to} to={link.to} className={linkClassMobile} end onClick={() => close()}>
+                {link.label}
+              </NavLink>
+            ))}
+          </div>
+        )}
+      </DisclosurePanel>
+        </>
+      )}
     </Disclosure>
   );
 }
