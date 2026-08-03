@@ -31,19 +31,41 @@ export async function obtenerComisionesPorIdLegajo(idLegajo) {
     return response.data;
 }
 
-async function obtenerMateriasAprobadas(idLegajo) {
-  const resultados = await obtenerResultadosAcademicos(idLegajo);
-  const comisiones = await obtenerComisiones();
-
+function obtenerMateriasAprobadasDeResultados(resultados, todasLasComisiones) {
   return resultados
     .filter((r) => r.estado_academico === "Aprobado")
     .map(
       (r) =>
-        comisiones.find(
+        todasLasComisiones.find(
           (c) => c.id_comision_asignatura === r.id_comision_asignatura
         )?.plan_asignaturas?.asignatura_id
     )
     .filter(Boolean);
+}
+
+function construirMapaNombresDeAsignatura(todasLasComisiones) {
+  const mapa = {};
+  for (const c of todasLasComisiones) {
+    const idAsignatura = c.plan_asignaturas?.asignatura_id;
+    if (idAsignatura != null && mapa[idAsignatura] == null) {
+      mapa[idAsignatura] = c.nombre;
+    }
+  }
+  return mapa;
+}
+
+function enriquecerComisionConPlanYCorrelativas(comision, mapaNombresAsignatura) {
+  const correlativas = comision.plan_asignaturas?.correlativas ?? [];
+
+  return {
+    ...comision,
+    id_plan: comision.plan_asignaturas?.plan_id ?? null,
+    correlativas_nombres: correlativas.map(
+      (correlativa) =>
+        mapaNombresAsignatura[correlativa.asignatura_id] ??
+        `Asignatura #${correlativa.asignatura_id}`
+    ),
+  };
 }
 
 // Estados que YA NO ocupan lugar en el cupo
@@ -94,14 +116,19 @@ function enriquecerComisionConCupo(comision, conteo) {
 export async function obtenerComisionesDisponibles(numeroLegajo) {
   const legajo = await buscarLegajo(numeroLegajo);
 
-  const [comisiones, materiasAprobadas, conteo] = await Promise.all([
+  const [comisiones, todasLasComisiones, resultados, conteo] = await Promise.all([
     obtenerComisionesPorIdLegajo(legajo.id_legajo),
-    obtenerMateriasAprobadas(legajo.id_legajo),
+    obtenerComisiones(),
+    obtenerResultadosAcademicos(legajo.id_legajo),
     contarInscriptosPorComision(),
   ]);
 
+  const materiasAprobadas = obtenerMateriasAprobadasDeResultados(resultados, todasLasComisiones);
+  const mapaNombresAsignatura = construirMapaNombresDeAsignatura(todasLasComisiones);
+
   return comisiones
     .map((c) => enriquecerComisionConCupo(c, conteo))
+    .map((c) => enriquecerComisionConPlanYCorrelativas(c, mapaNombresAsignatura))
     .filter((comision) => {
       // 1. Correlativas (seguro si falta plan_asignaturas)
       const correlativas = comision.plan_asignaturas?.correlativas ?? [];
