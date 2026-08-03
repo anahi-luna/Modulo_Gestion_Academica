@@ -17,6 +17,24 @@ export async function getListaCertificados() {
         throw error;
     }
 }
+// Obtiene solo los certificados del alumno autenticado
+// (el back identifica al alumno por el token, no hace falta mandar el legajo).
+export async function getMisCertificados() {
+    try {
+        const response = await fetch(`${API_URL}/certificados/mis-certificados`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error al obtener mis certificados", error);
+        throw error;
+    }
+}
+
 // Obtiene un certificado por su id
 export async function getCertificadoPorId(id) {
     try {
