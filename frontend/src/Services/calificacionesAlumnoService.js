@@ -8,12 +8,12 @@ import { getCalificacionesPorInscripcion } from "../api/calificacionesApi";
 
 const NOTA_APROBACION = 6;
 
-export async function obtenerMisCalificaciones(idLegajo) {
+export async function obtenerMisCalificaciones() {
     // si no hay inscripciones, la vista muestra estado vacío
     let inscripciones = [];
 
     try {
-        inscripciones = await obtenerMisInscripciones(idLegajo);
+        inscripciones = await obtenerMisInscripciones();
     } catch (error) {
         console.error("No pude traer inscripciones:", error);
         return [];
