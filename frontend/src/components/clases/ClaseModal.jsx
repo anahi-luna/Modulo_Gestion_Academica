@@ -21,6 +21,8 @@ export default function ModalClase({
         estado: "PROGRAMADA",
     });
 
+    const [errorHorario, setErrorHorario] = useState("");
+
     useEffect(() => {
 
         if (clase) {
@@ -49,6 +51,8 @@ export default function ModalClase({
 
         }
 
+        setErrorHorario("");
+
     }, [clase]);
 
     const modalRef = useModalAccessibility(abierto, onCerrar);
@@ -60,11 +64,25 @@ export default function ModalClase({
         c => c.id_comision_asignatura === Number(formulario.id_comision_asignatura)
     );
 
+    function manejarGuardar() {
+
+        if (formulario.hora_inicio && formulario.hora_fin && formulario.hora_inicio >= formulario.hora_fin) {
+
+            setErrorHorario("El horario de inicio no puede ser mayor ni igual al horario de fin.");
+            return;
+
+        }
+
+        setErrorHorario("");
+        onGuardar(formulario);
+
+    }
+
     return (
 
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
 
-            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6">
+            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-xl min-w-0 max-h-[90vh] overflow-y-auto p-6">
 
                 <h2 className="text-2xl font-bold text-red-700 mb-6">
 
@@ -76,7 +94,7 @@ export default function ModalClase({
 
                     {/* Comisión */}
 
-                    <div>
+                    <div className="min-w-0">
 
                         <label htmlFor="clase-comision" className="block font-medium mb-2">
 
@@ -93,7 +111,7 @@ export default function ModalClase({
                                     id_comision_asignatura: Number(e.target.value),
                                 })
                             }
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                            className="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2"
                         >
 
                             <option value="">
@@ -119,9 +137,9 @@ export default function ModalClase({
 
                     {comisionSeleccionada && (
 
-                        <div className="rounded-lg bg-gray-100 p-4 space-y-2">
+                        <div className="rounded-lg bg-gray-100 p-4 space-y-2 min-w-0">
 
-                            <p>
+                            <p className="break-words">
 
                                 <strong>Materia:</strong>{" "}
 
@@ -129,7 +147,7 @@ export default function ModalClase({
 
                             </p>
 
-                            <p>
+                            <p className="break-words">
                                 {/*Cambiar docente */}
                                 <strong>Docente:</strong>{" "}
 
@@ -145,7 +163,7 @@ export default function ModalClase({
 
                         <label htmlFor="clase-numero" className="block font-medium mb-2">
 
-                            Número de clase
+                            Número / identificador de la clase
 
                         </label>
 
@@ -192,9 +210,9 @@ export default function ModalClase({
 
                     {/* Horarios */}
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 min-w-0">
 
-                        <div>
+                        <div className="min-w-0">
 
                             <label htmlFor="clase-hora-inicio" className="block font-medium mb-2">
 
@@ -212,12 +230,12 @@ export default function ModalClase({
                                         hora_inicio: e.target.value,
                                     })
                                 }
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                className="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2"
                             />
 
                         </div>
 
-                        <div>
+                        <div className="min-w-0">
 
                             <label htmlFor="clase-hora-fin" className="block font-medium mb-2">
 
@@ -235,16 +253,24 @@ export default function ModalClase({
                                         hora_fin: e.target.value,
                                     })
                                 }
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                                className="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2"
                             />
 
                         </div>
 
                     </div>
 
+                    {errorHorario && (
+
+                        <p className="text-sm text-red-600 -mt-3">
+                            {errorHorario}
+                        </p>
+
+                    )}
+
                     {/* Tema */}
 
-                    <div>
+                    <div className="min-w-0">
 
                         <label htmlFor="clase-tema" className="block font-medium mb-2">
 
@@ -263,7 +289,7 @@ export default function ModalClase({
                                     tema: e.target.value,
                                 })
                             }
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                            className="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2"
                         />
 
                     </div>
@@ -315,7 +341,7 @@ export default function ModalClase({
                     </button>
 
                     <button
-                        onClick={() => onGuardar(formulario)}
+                        onClick={manejarGuardar}
                         className="px-4 py-2 rounded-lg bg-red-700 hover:bg-red-800 text-white"
                     >
                         {clase ? "Guardar cambios" : "Crear clase"}

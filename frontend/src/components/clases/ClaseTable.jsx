@@ -1,5 +1,6 @@
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import ClaseRow from "./ClaseRow";
+import { formatearFecha } from "../../config/fecha";
 
 // Componente para mostrar una tabla de clases, con filtros por materia, comisión, docente, fecha y tema.
 export default function ClasesTable({
@@ -34,10 +35,6 @@ export default function ClasesTable({
     const docentes = [...new Set(clases.map(c => c.docente))];
     const fechas = [...new Set(clases.map(c => c.fecha))];
     const temas = [...new Set(clases.map(c => c.tema))];
-
-    function formatearFecha(fecha) {
-        return new Date(fecha).toLocaleDateString("es-AR");
-    }
 
     return (
         <div className="space-y-4">

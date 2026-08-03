@@ -17,19 +17,21 @@ export default function Calificaciones() {
   const esAlumno = hasRole("Alumno");
 // Si el usuario es un alumno, no puede editar la calificación, solo puede verla.
 // Si el usuario es un docente o administrador, puede editar la calificación si tiene los permisos correspondientes.
-  const puedeEditar = ["inscripcion.calificaciones.crear", "inscripcion.calificaciones.actualizar"].some(hasPermission);
+  const puedeEditar = hasPermission("inscripcion.calificaciones.actualizar");
+  const puedeCrear = hasPermission("inscripcion.calificaciones.crear");
+  const puedeEliminar = hasPermission("inscripcion.calificaciones.eliminar");
   const idLegajo = obtenerIdLegajo(usuario)
 
   if (esAlumno) {
     return <VistaAlumno idLegajo={usuario?.id_legajo} />;
   }
   
-  return <VistaComisiones puedeEditar={puedeEditar} />;
+  return <VistaComisiones puedeEditar={puedeEditar} puedeCrear={puedeCrear} puedeEliminar={puedeEliminar} />;
 }
 
 // Vista para el personal (admin, profesor, etc): elijo una comisión y
 // veo/cargo las notas de todos los alumnos de una evaluación.
-function VistaComisiones({ puedeEditar }) {
+function VistaComisiones({ puedeEditar, puedeCrear, puedeEliminar }) {
   const [comisionSeleccionada, setComisionSeleccionada] = useState(null);
 
   return (
@@ -57,7 +59,10 @@ function VistaComisiones({ puedeEditar }) {
 
         <PanelDetalleCalificaciones
           idComision={comisionSeleccionada?.id_comision_asignatura}
-          soloLectura={!puedeEditar}
+          puedeCrear={puedeCrear}
+          puedeEditar={puedeEditar}
+          puedeEliminar={puedeEliminar}
+
         />
 
       </div>

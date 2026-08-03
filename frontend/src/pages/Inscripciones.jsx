@@ -4,6 +4,7 @@
 
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     buscarLegajo,
     obtenerComisionesDisponibles,
@@ -28,6 +29,7 @@ export default function Inscripciones() {
     const [cargando, setCargando]               = useState(false);
     const [error, setError]                     = useState(null);
     const [enviando, setEnviando]               = useState(false);
+    const navigate = useNavigate();
 
     async function handleBuscarLegajo(e) {
         e.preventDefault();
@@ -78,6 +80,12 @@ export default function Inscripciones() {
         setError(null);
     }
 
+    // "Cerrar" en el modal de resultado va al home. "Nueva inscripción"
+    // (handleNueva) es la que reinicia el flujo para cargar otro legajo.
+    function handleCerrar() {
+        navigate("/");
+    }
+
     return (
         <div className="min-h-screen bg-gray-100">
             <main className="max-w-5xl mx-auto px-4 py-6">
@@ -114,7 +122,7 @@ export default function Inscripciones() {
                     <ResultadoInscripcion
                         resultado={resultado}
                         onNueva={handleNueva}
-                        onCerrar={handleNueva}
+                        onCerrar={handleCerrar}
                     />
                 )}
 

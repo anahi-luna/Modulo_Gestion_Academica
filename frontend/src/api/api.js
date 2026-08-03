@@ -1,3 +1,5 @@
+import { LOGIN_ROUTE } from "../auth/config";
+
 const API_URL = 
     import.meta.env.VITE_API_URL || "http://localhost:5000"; //se declara la url de la api general
 
@@ -16,7 +18,7 @@ const STORAGE_KEY = "auth"; // mismo valor que auth/config.js
 
 const fetchOriginal = window.fetch;
 
-window.fetch = (url, options = {}) => {
+window.fetch = async (url, options = {}) => {
     const esNuestraApi = typeof url === "string" && [
             API_URL,
             API_PLANES,
@@ -42,5 +44,12 @@ window.fetch = (url, options = {}) => {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
 
-    return fetchOriginal(url, { ...options, headers });
+    const response = await fetchOriginal(url, { ...options, headers });
+
+    if(response.status === 401) {
+        sessionStorage.removeItem(STORAGE_KEY);
+        window.location.replace(LOGIN_ROUTE );
+    }
+
+    return response;
 };

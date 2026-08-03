@@ -9,6 +9,8 @@ export default function HistorialCalificaciones({
     onEditar,
     onEliminar,
     evaluacionEditandoId = null,
+    puedeEditar = false,
+    puedeEliminar = false,
 }) {
     return (
         <section className="border-t border-gray-200 bg-gray-50 px-4 py-6 sm:px-8">
@@ -68,30 +70,36 @@ export default function HistorialCalificaciones({
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-2 sm:flex">
-                                        <button
-                                            type="button"
-                                            disabled={editando}
-                                            onClick={() =>
-                                                onEditar(evaluacion)
-                                            }
-                                            className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                        >
-                                            <PencilSquareIcon className="h-5 w-5" />
-                                            {editando
-                                                ? "Editando"
-                                                : "Editar"}
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                onEliminar(evaluacion)
-                                            }
-                                            className="flex items-center justify-center gap-2 rounded-lg bg-red-700 px-3 py-2 text-sm font-medium text-white hover:bg-red-800"
-                                        >
-                                            <TrashIcon className="h-5 w-5" />
-                                            Eliminar todas
-                                        </button>
+                                        
+                                        {puedeEditar && (
+                                            <button
+                                                type="button"
+                                                disabled={editando}
+                                                onClick={() =>
+                                                    onEditar(evaluacion)
+                                                }
+                                                className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                <PencilSquareIcon className="h-5 w-5" />
+                                                {editando
+                                                    ? "Editando"
+                                                    : "Editar"}
+                                            </button>
+                                        )}
+                                        
+                                        {puedeEliminar && (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    onEliminar(evaluacion)
+                                                }
+                                                className="flex items-center justify-center gap-2 rounded-lg bg-red-700 px-3 py-2 text-sm font-medium text-white hover:bg-red-800"
+                                            >
+                                                <TrashIcon className="h-5 w-5" />
+                                                Eliminar todas
+                                            </button>
+                                        )}            
+                                        
                                     </div>
                                 </div>
                             </article>
