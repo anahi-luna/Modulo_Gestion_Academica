@@ -56,9 +56,9 @@ export default function EvaluacionModal({
 
     return (
 
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto">
 
-            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-xl p-6">
+            <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-xl min-w-0 max-h-[90vh] overflow-y-auto p-6">
 
                 <h2 className="text-2xl font-bold text-red-700 mb-6">
                     {evaluacion ? "Editar Evaluación" : "Nueva Evaluación"}
@@ -67,7 +67,7 @@ export default function EvaluacionModal({
                 <div className="space-y-5">
 
                     {/* Comisión */}
-                    <div>
+                    <div className="min-w-0">
                         <label htmlFor="evaluacion-comision" className="block font-medium mb-2">
                             Comisión
                         </label>
@@ -80,7 +80,7 @@ export default function EvaluacionModal({
                                     id_comision_asignatura: Number(e.target.value),
                                 })
                             }
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                            className="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2"
                         >
                             <option value="">Seleccione una comisión</option>
                             {comisiones.map((comision) => (
@@ -93,12 +93,12 @@ export default function EvaluacionModal({
 
                     {/* Información de la comisión */}
                     {comisionSeleccionada && (
-                        <div className="rounded-lg bg-gray-100 p-4 space-y-2">
-                            <p>
+                        <div className="rounded-lg bg-gray-100 p-4 space-y-2 min-w-0">
+                            <p className="break-words">
                                 <strong>Materia:</strong> {comisionSeleccionada.nombre}
                             </p>
                             {/*Cambiar docente */}
-                            <p>
+                            <p className="break-words">
                                 <strong>Docente:</strong> {obtenerDocenteTitular(comisionSeleccionada)}
                             </p>
                         </div>
