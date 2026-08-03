@@ -1,7 +1,7 @@
 import AlumnoNotaRow from "./AlumnoNotaRow";
 
 // Componente para mostrar una tabla de calificaciones de alumnos,
-export default function CalificacionTabla({ calificaciones, onCambiarNota, onCambiarObservacion, soloLectura = false, onEliminarCalificacion }) {
+export default function CalificacionTabla({ calificaciones, onCambiarNota, onCambiarObservacion, soloLectura = false, onEliminarCalificacion, puedeEliminar = false, }) {
     return (
         <div className="px-4 sm:px-6 pb-6">
             {/* overflow-x-auto: mismo criterio que AsistenciaTabla */}
@@ -26,6 +26,7 @@ export default function CalificacionTabla({ calificaciones, onCambiarNota, onCam
                                 onCambiarObservacion={onCambiarObservacion}
                                 onEliminarCalificacion={onEliminarCalificacion}
                                 soloLectura={soloLectura}
+                                puedeEliminar={puedeEliminar}
                             />
                         ))}
                     </tbody>

@@ -8,6 +8,7 @@ export default function AlumnoNotaRow({
     onCambiarObservacion,
     onEliminarCalificacion,
     soloLectura = false,
+    puedeEliminar = false,
 }) {
 
     const estado = calificacion.nota === null || calificacion.nota === undefined || calificacion.nota === ""
@@ -66,7 +67,7 @@ export default function AlumnoNotaRow({
             </td>
 
             <td className="pl-2">
-                {!soloLectura && calificacion.id &&(
+                {puedeEliminar && calificacion.id &&(
                     <button
                         type="button"
                         onClick={() => onEliminarCalificacion(calificacion)}
