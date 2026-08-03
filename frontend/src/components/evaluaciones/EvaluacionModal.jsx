@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 import { obtenerDocenteTitular } from "../../api/comisiones";
+import Alert from "../Alert";
 
 // Componente para mostrar un modal de creación o edición de evaluación, con campos para seleccionar la comisión,
 //  tipo, título, fecha y puntaje máximo.
@@ -11,7 +12,7 @@ export default function EvaluacionModal({
     onCerrar,
     onGuardar,
 }) {
-
+    const [alerta, setAlerta] = useState(null);
     const [formulario, setFormulario] = useState({
         id_comision_asignatura: "",
         titulo: "",
@@ -64,6 +65,14 @@ export default function EvaluacionModal({
                     {evaluacion ? "Editar Evaluación" : "Nueva Evaluación"}
                 </h2>
 
+                {alerta && (
+                    <Alert
+                        tipo={alerta.tipo}
+                        titulo={alerta.titulo}
+                        mensaje={alerta.mensaje}
+                        onCerrar={() => setAlerta(null)}
+                    />
+                )}
                 <div className="space-y-5">
 
                     {/* Comisión */}
@@ -173,7 +182,8 @@ export default function EvaluacionModal({
                         <input
                             id="evaluacion-puntaje"
                             type="number"
-                            min="1"
+                            min="0"
+                            max="100"
                             value={formulario.puntaje_maximo}
                             onChange={(e) =>
                                 setFormulario({
@@ -197,7 +207,50 @@ export default function EvaluacionModal({
                     </button>
 
                     <button
-                        onClick={() => onGuardar(formulario)}
+                        onClick={() => {
+                            if(!formulario.id_comision_asignatura){
+                                setAlerta({
+                                    tipo: "warning",
+                                    titulo: "Campo Obligatorio",
+                                    mensaje: "Debe seleccionar una comisión"
+                                });
+                                return;
+                            }
+                            if(!formulario.titulo.trim()){
+                                setAlerta({
+                                    tipo: "warning",
+                                    titulo: "Campo Obligatorio",
+                                    mensaje: "Debe ingresar un título"
+                                });
+                                return;
+                            }
+                            if(!formulario.fecha){
+                                setAlerta({
+                                    tipo: "warning",
+                                    titulo: "Campo Obligatorio",
+                                    mensaje: "Debe seleccionar una fecha"
+                                });
+                                return;
+                            }
+                            if(!formulario.puntaje_maximo){
+                                setAlerta({
+                                    tipo: "warning",
+                                    titulo: "Campo Obligatorio",
+                                    mensaje: "Debe ingresar un puntaje máximo"
+                                });
+                                return;
+                            }
+                            if(formulario.puntaje_maximo > 100){
+                                setAlerta({
+                                    tipo: "warning",
+                                    titulo: "Puntaje invalido",
+                                    mensaje: "El puntaje maximo no puede superar los 100"
+                                });
+                                return;
+                            }
+                            setAlerta(null);
+                            onGuardar(formulario);
+                        }}
                         className="px-4 py-2 rounded-lg bg-red-700 hover:bg-red-800 text-white"
                     >
                         {evaluacion ? "Guardar cambios" : "Crear evaluación"}
