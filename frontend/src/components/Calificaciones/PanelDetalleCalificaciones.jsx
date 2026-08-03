@@ -15,7 +15,7 @@ import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdm
 // Le agrego soloLectura: cuando el usuario no tiene permiso para
 // cargar/actualizar calificaciones, deshabilito los inputs y escondo
 // el botón de guardar, pero sigue viendo la planilla igual.
-export default function PanelDetalleCalificaciones({ idComision, soloLectura = false }) {
+export default function PanelDetalleCalificaciones({ idComision, puedeCrear = false, puedeEditar = false, puedeEliminar = false }) {
     const [evaluacionSeleccionada, setEvaluacionSeleccionada] = useState(null);
     const [evaluaciones, setEvaluaciones] = useState([]);
     const [calificaciones, setCalificaciones] = useState([]);
@@ -27,6 +27,9 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
     const [alerta, setAlerta] = useState(null);
 
     const navigate = useNavigate();
+    const soloLectura = modoEdicion
+        ? !puedeEditar
+        : !puedeCrear;
 
     useEffect(() => {
         async function cargarEvaluaciones() {
@@ -213,6 +216,10 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
 
     // Permite editar las calificaciones de una evaluación que ya tiene calificaciones registradas.
     async function editarDesdeHistorial(evaluacion){
+        if(!puedeEditar){
+            return;
+        }
+
         setEvaluacionSeleccionada(evaluacion);
         setModoEdicion(true);
 
@@ -489,6 +496,8 @@ export default function PanelDetalleCalificaciones({ idComision, soloLectura = f
                     modoEdicion
                         ?evaluacionSeleccionada?.id: null
                 }
+                puedeEditar={puedeEditar }
+                puedeEliminar={puedeEliminar}
             />
 
         </div>
