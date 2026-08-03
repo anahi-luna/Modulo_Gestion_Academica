@@ -19,6 +19,27 @@ export async function getAsistenciaPorClase(idClase) {
     }
 }
 
+//Obtiene las asistencias de ese legajo.
+export async function getMisAsistencias(idClase) {
+    try{
+        const response = await fetch(`${API_URL}/asistencias/mi-asistencia/?id_clase=${idClase}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Error al obtener tus asistencias."
+            );
+        }
+
+        return data;
+
+    }catch(error){
+        console.error("Error al obtener tus asistencias");
+        throw error
+    }
+    
+    
+}
 // Asistencias de una inscripción puntual, en todas sus clases
 export async function getAsistenciaPorId(id) {
     try {
