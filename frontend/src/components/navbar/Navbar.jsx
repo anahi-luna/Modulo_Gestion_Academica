@@ -62,7 +62,7 @@ export default function Navbar({ modulo }) {
 
   return (
     <Disclosure as="nav" className="bg-red-800 shadow-md sticky top-0 z-40">
-      {({ open }) => (
+      {({ open, close }) => (
         <>
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
@@ -91,7 +91,7 @@ export default function Navbar({ modulo }) {
 
             <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <div className="flex space-x-1 xl:space-x-2">
-                <a
+                
 
                   type="button"
                   onClick={() => window.location.href = PORTAL_URL}
@@ -157,25 +157,24 @@ export default function Navbar({ modulo }) {
         <div
           className="fixed inset-0 top-16 bg-black/50 z-30 lg:hidden"
           aria-hidden="true"
+          onClick={close}
         />
       )}
 
-      <DisclosurePanel className="lg:hidden relative z-40 bg-red-800">
-        {({ close }) => (
-          <div className="space-y-1 px-2 pt-2 pb-3">
-            <a to="/" className={linkClass({ isActive: false })} end onClick={() => window.location.href = PORTAL_URL}>Portal Inicio</a>
+      <DisclosurePanel className="lg:hidden fixed inset-x-0 top-16 z-40 max-h-[calc(100vh-4rem)] overflow-y-auto bg-red-800 shadow-lg">
+        <div className="space-y-1 px-2 pt-2 pb-3">
+          <a to="/" className={linkClass({ isActive: false })} end onClick={() => window.location.href = PORTAL_URL}>Portal Inicio</a>
 
-            {esAlumno && (
-              <NavLink to="/mi-plan" className={linkClassMobile} end onClick={() => close()}>Mi plan</NavLink>
-            )}
+          {esAlumno && (
+            <NavLink to="/mi-plan" className={linkClassMobile} end onClick={() => close()}>Mi plan</NavLink>
+          )}
 
-            {links.filter(debeMostrarse).map((link) => (
-              <NavLink key={link.to} to={link.to} className={linkClassMobile} end onClick={() => close()}>
-                {link.label}
-              </NavLink>
-            ))}
-          </div>
-        )}
+          {links.filter(debeMostrarse).map((link) => (
+            <NavLink key={link.to} to={link.to} className={linkClassMobile} end onClick={() => close()}>
+              {link.label}
+            </NavLink>
+          ))}
+        </div>
       </DisclosurePanel>
         </>
       )}
