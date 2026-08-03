@@ -2,8 +2,7 @@
 //  muestra su propia asistencia en cada comisión en la que está inscripto.
 import { obtenerMisInscripciones } from "./inscripcionesService";
 import { getClases } from "./clasesAdminService";
-import { obtenerAsistenciasPorClase } from "./asistenciaAdminService";
-import { getLegajoPorId } from "../api/legajosApi";
+import { getMisAsistencias } from "../api/asistenciasApi";
 
 // mismo mapeo que usa EstadoSelect.jsx en la vista de gestión
 const ESTADOS = {
@@ -34,8 +33,7 @@ export async function obtenerMiAsistencia(idLegajo) {
     // necesito el número de legajo (string) para encontrarme entre
     // todos los integrantes de cada clase, que es lo que devuelve
     // obtenerAsistenciasPorClase en el campo id_legajo
-    const legajoRes = await getLegajoPorId(idLegajo);
-    const numeroLegajo = legajoRes.data.numero_legajo;
+
 
     const porComision = await Promise.all(
         inscripciones.map(async (inscripcion) => {
@@ -43,15 +41,14 @@ export async function obtenerMiAsistencia(idLegajo) {
 
             const detalle = await Promise.all(
                 clases.map(async (clase) => {
-                    const asistenciasClase = await obtenerAsistenciasPorClase(clase.id);
-                    const mia = asistenciasClase.find((a) => a.id_legajo === numeroLegajo);
+                    const mia = await getMisAsistencias(clase.id);
 
                     return {
                         id_clase: clase.id,
                         fecha: clase.fecha,
                         tema: clase.tema,
-                        estado: mia ? ESTADOS[mia.id_estado] ?? "Sin registrar" : "Sin registrar",
-                        observacion: mia?.observacion || "-",
+                        estado: mia.data ? ESTADOS[mia.data.id_estado] ?? "Sin registrar" : "Sin registrar",
+                        observacion: mia.data ?.observacion || "-",
                     };
                 })
             );
