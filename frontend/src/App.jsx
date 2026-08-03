@@ -25,12 +25,23 @@ export default function App() {
 
                         {/* Home: uno solo para todos, arma las cards de
                             módulos según los permisos del usuario */}
-                        <Route path="/" element={<Home />} />
+                        <Route path="/" element={
+                                <ProtectedRoute>
+                                    <Home />
+                                </ProtectedRoute>
+                                
+                            } />
 
                         {/* Pedir una inscripción: no depende de un permiso
                             del microservicio, cualquiera autenticado
                             puede solicitarla */}
-                        <Route path="/inscripciones" element={<Inscripciones />} />
+                        <Route path="/inscripciones" element={
+                                <ProtectedRoute>
+                                    <Inscripciones />
+                                </ProtectedRoute>
+                                
+                            
+                            } />
 
                         {/* Gestión de inscripciones: requiere poder leerlas
                             como personal de gestión */}

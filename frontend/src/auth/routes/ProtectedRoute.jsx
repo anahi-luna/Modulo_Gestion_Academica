@@ -22,9 +22,14 @@ export default function ProtectedRoute({
       </div>
     );
   }
+  console.log("loading:", loading);
+  console.log("isAuthenticated:", isAuthenticated);
+  console.log("LOGIN_ROUTE:", LOGIN_ROUTE);
 
   if (!isAuthenticated) {
-    return <Navigate to = {LOGIN_ROUTE}  replace />;
+    console.log("Redirigiendo...");
+    window.location.replace(LOGIN_ROUTE);
+    return null;
   }
 
   if (
