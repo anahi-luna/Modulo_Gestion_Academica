@@ -1,6 +1,6 @@
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import EvaluacionRow from "./EvaluacionRow";
-import { formatearFecha } from "../../utils/fecha";
+import { formatearFecha } from "../../config/fecha";
 
 // Componente para mostrar una tabla de evaluaciones, con filtros por materia, comisión, docente y tipo.
 export default function EvaluacionesTable({
