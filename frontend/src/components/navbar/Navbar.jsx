@@ -61,7 +61,7 @@ export default function Navbar({ modulo }) {
   const esAlumno = hasRole("Alumno");
 
   return (
-    <Disclosure as="nav" className="bg-red-800 shadow-md sticky top-0 z-40">
+    <Disclosure as="nav" className="relative bg-red-800 shadow-md sticky top-0 z-40">
       {({ open, close }) => (
         <>
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -133,13 +133,13 @@ export default function Navbar({ modulo }) {
 
               <MenuItems
                 transition
-                className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-gray-800 py-1 outline -outline-offset-1 outline-white/10 transition data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-leave:duration-75"
+                className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-leave:duration-75"
               >
 
                 <MenuItem>
                   <button
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-2 text-left px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5"
+                    className="flex w-full items-center gap-2 text-left px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100"
                   >
                     <ArrowRightStartOnRectangleIcon className="size-4" />
                     Cerrar sesión
@@ -152,15 +152,7 @@ export default function Navbar({ modulo }) {
         </div>
       </div>
 
-      {open && (
-        <div
-          className="fixed inset-0 top-16 bg-black/50 z-30 lg:hidden"
-          aria-hidden="true"
-          onClick={close}
-        />
-      )}
-
-      <DisclosurePanel className="lg:hidden fixed inset-x-0 top-16 z-40 max-h-[calc(100vh-4rem)] overflow-y-auto bg-red-800 shadow-lg">
+      <DisclosurePanel className="lg:hidden absolute inset-x-0 top-full z-40 max-h-[calc(100vh-4rem)] overflow-y-auto bg-red-800 shadow-lg">
         <div className="space-y-1 px-2 pt-2 pb-3">
           <a
             className={linkClassMobile({ isActive: false })}
