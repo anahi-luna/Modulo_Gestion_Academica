@@ -91,9 +91,8 @@ export default function Navbar({ modulo }) {
 
             <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <div className="flex space-x-1 xl:space-x-2">
-                
 
-                  type="button"
+                <a
                   onClick={() => window.location.href = PORTAL_URL}
                   className={linkClass({ isActive: false })}
                 >
@@ -136,7 +135,7 @@ export default function Navbar({ modulo }) {
                 transition
                 className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-gray-800 py-1 outline -outline-offset-1 outline-white/10 transition data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-leave:duration-75"
               >
-                
+
                 <MenuItem>
                   <button
                     onClick={handleLogout}
@@ -163,7 +162,15 @@ export default function Navbar({ modulo }) {
 
       <DisclosurePanel className="lg:hidden fixed inset-x-0 top-16 z-40 max-h-[calc(100vh-4rem)] overflow-y-auto bg-red-800 shadow-lg">
         <div className="space-y-1 px-2 pt-2 pb-3">
-          <a to="/" className={linkClass({ isActive: false })} end onClick={() => window.location.href = PORTAL_URL}>Portal Inicio</a>
+          <a
+            className={linkClassMobile({ isActive: false })}
+            onClick={() => {
+              close();
+              window.location.href = PORTAL_URL;
+            }}
+          >
+            Portal Inicio
+          </a>
 
           {esAlumno && (
             <NavLink to="/mi-plan" className={linkClassMobile} end onClick={() => close()}>Mi plan</NavLink>
