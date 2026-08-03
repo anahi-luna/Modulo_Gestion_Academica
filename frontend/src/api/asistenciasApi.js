@@ -22,7 +22,7 @@ export async function getAsistenciaPorClase(idClase) {
 //Obtiene las asistencias de ese legajo.
 export async function getMisAsistencias(idClase) {
     try{
-        const response = await fetch(`${API_URL}/asistencias/mi-asistencia/?id_clase=${idClase}`);
+        const response = await fetch(`${API_URL}/asistencias/mi-asistencia/${idClase}`);
         const data = await response.json();
 
         if (!response.ok) {

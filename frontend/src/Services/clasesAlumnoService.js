@@ -2,14 +2,14 @@
 // y para cada una traigo las clases de esa comisión.
 // Armo: 1) la lista agrupada por comisión, y 2) cuál es mi próxima clase.
 
-import { obtenerMisInscripciones } from "./inscripcionesService";
+import { getMisInscripciones } from "../api/inscripcionesApi";
 import { getClases } from "./clasesAdminService";
 
-export async function obtenerMisClases(idLegajo) {
+export async function obtenerMisClases() {
     let inscripciones = [];
 
     try {
-        inscripciones = await obtenerMisInscripciones(idLegajo);
+        inscripciones = await getMisInscripciones();
     } catch (error) {
         console.error("No pude traer inscripciones:", error);
         return { porComision: [], proximaClase: null };

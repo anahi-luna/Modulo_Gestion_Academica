@@ -44,7 +44,7 @@ export async function generarResultadosAcademicos(idComision) {
 // finalizadas). El back identifica al alumno por el token, así que
 // idLegajo ya no hace falta mandarlo, pero se mantiene el parámetro
 // para no romper a quienes llaman a esta función.
-export async function obtenerResultadosAcademicos(idLegajo) {
+export async function obtenerResultadosAcademicos() {
     const response = await getMisResultadosAcademicos();
     return response.data.map(mapearResultado);
 }

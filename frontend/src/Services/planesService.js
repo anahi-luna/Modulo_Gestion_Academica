@@ -38,7 +38,9 @@ function mapearResultadoPlan(r) {
 
 export async function obtenerMiPlan() {
     const respuesta = await getMiResultadoPlan();
-    return plan ? mapearResultadoPlan(respuesta.data) : null;
+    return respuesta.data
+        ? mapearResultadoPlan(respuesta.data)
+        : null;
 }
 
 // Todos los resultados de plan, con nombre y número de legajo ya
