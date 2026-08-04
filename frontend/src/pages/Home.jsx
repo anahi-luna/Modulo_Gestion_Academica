@@ -9,10 +9,11 @@ import { useState, useEffect } from "react";
 import ModuloCard from "../components/ModuloCard";
 import HomeAlumno from "../components/home/HomeAlumno";
 import Alert from "../components/Alert";
-import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { obtenerInscripciones } from "../Services/inscripcionesAdminService";
 import useAuth from "../auth/hooks/useAuth";
 import { MODULOS } from "../config/modulos";
+import { ClipboardDocumentListIcon, BookOpenIcon } from "@heroicons/react/24/outline";
+import pdfManual from "../docs/manualUsuario.pdf"; 
 
 export default function Home() {
   const { user: usuario, hasPermission, hasRole } = useAuth();
@@ -64,10 +65,25 @@ export default function Home() {
 
       <div className="bg-red-800 text-white px-6 py-8">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold">Hola, {usuario.nombre}</h1>
-          <p className="text-red-200 text-sm mt-1">
-            {usuario.cargo} — Instituto de Formación de Bomberos
-          </p>
+          
+          {/* Contenedor flexible para alinear el saludo y el botón del manual */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold">Hola, {usuario.nombre}</h1>
+              <p className="text-red-200 text-sm mt-1">
+                {usuario.cargo} — Instituto de Formación de Bomberos
+              </p>
+            </div>
+
+            <a
+              href={pdfManual}
+              download="Manual_de_Usuario_Bomberos.pdf"
+              className="bg-red-700 hover:bg-red-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow border border-red-600 transition-colors duration-200 flex items-center gap-2"
+            >
+              <BookOpenIcon className="h-5 w-5 text-red-200" />
+              Manual de Usuario
+            </a>
+          </div>
 
           {hasPermission("inscripcion.inscripciones.leer") && (
             <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
