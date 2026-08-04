@@ -1,5 +1,5 @@
 // Servicio de Inscripciones
-import { getLegajoPorNumero } from "../api/legajosApi";
+import { getLegajoPorNumero, getLegajoPorId } from "../api/legajosApi";
 import { getComisiones, getComisionesPorIdLegajo } from "../api/comisiones";
 import { obtenerResultadosAcademicos } from "./resultadoAcademicoService";
 import {
@@ -9,12 +9,27 @@ import {
 } from "../api/inscripcionesApi";
 
 
-// Buscar un legajo
+// Buscar un legajo por su número (lo sigue usando, por ejemplo, la
+// gestión de inscripciones del admin, que busca por número de legajo).
 export async function buscarLegajo(numeroLegajo) {
   const response = await getLegajoPorNumero(numeroLegajo);
   const legajo = response.data;
   // Validación local para evitar continuar
   // con el flujo si el legajo está inactivo.
+  if (!legajo.activo) {
+    throw new Error(
+      "El legajo se encuentra inactivo y no puede realizar inscripciones."
+    );
+  }
+  return legajo;
+}
+
+// Buscar un legajo por su id. La usa el flujo de "Inscribirme" del
+// alumno autenticado: ya sabemos su id_legajo por la sesión, no hace
+// falta pedirle que lo tipee.
+export async function buscarLegajoPorId(idLegajo) {
+  const response = await getLegajoPorId(idLegajo);
+  const legajo = response.data;
   if (!legajo.activo) {
     throw new Error(
       "El legajo se encuentra inactivo y no puede realizar inscripciones."
@@ -111,8 +126,8 @@ function enriquecerComisionConCupo(comision, conteo) {
 }
 
 // Comisiones que el alumno puede cursar (correlativas + cupo real)
-export async function obtenerComisionesDisponibles(numeroLegajo) {
-  const legajo = await buscarLegajo(numeroLegajo);
+export async function obtenerComisionesDisponibles(idLegajo) {
+  const legajo = await buscarLegajoPorId(idLegajo);
 
   const [comisiones, todasLasComisiones, resultados, conteo] = await Promise.all([
     obtenerComisionesPorIdLegajo(legajo.id_legajo),
@@ -149,14 +164,14 @@ export async function obtenerComisionesDisponibles(numeroLegajo) {
 
 
 // Carga toda la información necesaria para iniciar
-// el proceso de inscripción.
+// el proceso de inscripción del alumno autenticado.
 // La vista solamente consume este método.
-export async function cargarDatosInscripcion(numeroLegajo) {
+export async function cargarDatosInscripcion(idLegajo) {
 
-  const legajo = await buscarLegajo(numeroLegajo);
+  const legajo = await buscarLegajoPorId(idLegajo);
 
   const comisiones =
-    await obtenerComisionesDisponibles(numeroLegajo);
+    await obtenerComisionesDisponibles(idLegajo);
 
   return {
     legajo,
@@ -166,11 +181,11 @@ export async function cargarDatosInscripcion(numeroLegajo) {
 
 // Crear una solicitud de inscripción
 export async function crearSolicitudInscripcion(
-  numeroLegajo,
+  idLegajo,
   idComision
 ) {
 
-  const legajo = await buscarLegajo(numeroLegajo);
+  const legajo = await buscarLegajoPorId(idLegajo);
 
   const comisiones = await obtenerComisiones();
   const comision = comisiones.find(
@@ -233,7 +248,7 @@ export async function obtenerMisInscripciones() {
     return {
       id: ins.id_inscripcion,
       id_comision: ins.id_comision_asignatura,
-      id_comision_asignatura: ins.id_comision_asignatura, // ← agregar
+      id_comision_asignatura: ins.id_comision_asignatura, 
       materia: com?.nombre ?? "-",
       comision: com?.comision.descripcion ?? "-",
       horario: com?.modalidad ?? "-",

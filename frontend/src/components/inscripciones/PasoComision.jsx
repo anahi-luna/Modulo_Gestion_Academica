@@ -14,13 +14,12 @@ export default function PasoComision({
     onToggleHistorial,
     error,
     enviando,
-    onConfirmar,
-    onCambiarLegajo
+    onConfirmar
 }) {
     return (
         <div className="space-y-6">
 
-            {/* Tarjeta del legajo encontrado */}
+            {/* Tarjeta del legajo del alumno autenticado */}
             <div className="bg-white rounded-2xl shadow p-4 flex flex-col sm:flex-row
                             sm:items-center justify-between gap-3">
                 <div>
@@ -32,12 +31,6 @@ export default function PasoComision({
                     </p>
                     {/*<p className="text-sm text-gray-500">{legajoData.rango}</p>*/}
                 </div>
-                <button
-                    onClick={onCambiarLegajo}
-                    className="text-xs text-gray-400 hover:text-gray-600 underline"
-                >
-                    Cambiar legajo
-                </button>
             </div>
 
             {/* Historial (solo si tiene) */}
@@ -92,7 +85,7 @@ export default function PasoComision({
                     </div>
                 )}
 
-                {/* Panel de confirmación IMPORTANTE CHEQUEAR SI FUNCIONA, SINO CAMBIAR DAtOS */}
+                {/* Panel de confirmación*/}
                 {comisionElegida && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-4
                                     flex flex-col sm:flex-row items-start sm:items-center
