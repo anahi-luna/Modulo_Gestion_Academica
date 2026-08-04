@@ -5,11 +5,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 
-import StatsAdminCards          from "../components/inscripciones/StatsAdminCards";
-import FiltrosInscripciones     from "../components/inscripciones/FiltrosInscripciones";
-import SeccionTabla             from "../components/inscripciones/SeccionTabla";
+import StatsAdminCards from "../components/inscripciones/StatsAdminCards";
+import FiltrosInscripciones from "../components/inscripciones/FiltrosInscripciones";
+import SeccionTabla from "../components/inscripciones/SeccionTabla";
 import ModalEliminarInscripcion from "../components/inscripciones/ModalEliminarInscripcion";
-import ModalValidarInscripcion  from "../components/inscripciones/ModalValidarInscripcion";
+import ModalValidarInscripcion from "../components/inscripciones/ModalValidarInscripcion";
 
 import {
     obtenerInscripciones,
@@ -23,51 +23,51 @@ import {
 // Si el back devuelve otro estado que no esté acá, cae en el default.
 const CONFIG_ESTADOS = {
     "Aceptada": {
-        titulo:     "Inscripciones aceptadas",
-        icono:      "✓",
+        titulo: "Inscripciones aceptadas",
+        icono: "✓",
         colorBadge: "bg-green-500",
-        orden:      1,
+        orden: 1,
     },
     "Pendiente": {
-        titulo:     "Inscripciones pendientes de validar",
-        icono:      "⊙",
+        titulo: "Inscripciones pendientes de validar",
+        icono: "⊙",
         colorBadge: "bg-yellow-500",
-        orden:      2,
+        orden: 2,
     },
     "Pendiente de validación": {
-        titulo:     "Inscripciones pendientes de validar",
-        icono:      "⊙",
+        titulo: "Inscripciones pendientes de validar",
+        icono: "⊙",
         colorBadge: "bg-yellow-500",
-        orden:      2,
+        orden: 2,
     },
     "Rechazada": {
-        titulo:     "Inscripciones rechazadas",
-        icono:      "✕",
+        titulo: "Inscripciones rechazadas",
+        icono: "✕",
         colorBadge: "bg-red-500",
-        orden:      3,
+        orden: 3,
     },
 };
 
 function configDeEstado(estado) {
     return CONFIG_ESTADOS[estado] ?? {
-        titulo:     `Estado: ${estado}`,
+        titulo: `Estado: ${estado}`,
         colorBadge: "bg-gray-400",
-        orden:      99,
+        orden: 99,
     };
 }
 
 export default function InscripcionesAdmin() {
 
-    const [inscripciones, setInscripciones]               = useState([]);
-    const [comisiones, setComisiones]                     = useState([]);
-    const [error, setError]                               = useState(null);
-    const [busqueda, setBusqueda]                         = useState("");
-    const [filtroComision, setFiltroComision]             = useState("");
-    const [filtroEstado, setFiltroEstado]                 = useState("");
-    const [modalValidar, setModalValidar]                 = useState(false);
-    const [modalEliminar, setModalEliminar]               = useState(false);
+    const [inscripciones, setInscripciones] = useState([]);
+    const [comisiones, setComisiones] = useState([]);
+    const [error, setError] = useState(null);
+    const [busqueda, setBusqueda] = useState("");
+    const [filtroComision, setFiltroComision] = useState("");
+    const [filtroEstado, setFiltroEstado] = useState("");
+    const [modalValidar, setModalValidar] = useState(false);
+    const [modalEliminar, setModalEliminar] = useState(false);
     const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState(null);
-    const [cargando, setCargando]                         = useState(true);
+    const [cargando, setCargando] = useState(true);
 
     useEffect(() => { cargarDatos(); }, []);
 
@@ -84,11 +84,17 @@ export default function InscripcionesAdmin() {
     }
 
     const filtradas = useMemo(() => inscripciones.filter(ins => {
+        const termino = busqueda.trim().toUpperCase();
+
+        const idBusqueda = termino.startsWith("INS-")
+            ? termino.replace("INS-", "")
+            : termino;
+
         const matchBusqueda =
-            busqueda === "" ||
-            ins.alumno?.toLowerCase().includes(busqueda.toLowerCase()) ||
-            String(ins.id_legajo).includes(busqueda) ||
-            String(ins.id).includes(busqueda);
+            termino === "" ||
+            ins.alumno?.toLowerCase().includes(termino.toLowerCase()) ||
+            String(ins.id_legajo).includes(idBusqueda) ||
+            String(ins.id).includes(idBusqueda);
 
         const matchComision =
             filtroComision === "" ||
@@ -117,10 +123,10 @@ export default function InscripcionesAdmin() {
         });
     }, [filtradas]);
 
-    function abrirModalValidar(ins)  { setInscripcionSeleccionada(ins); setModalValidar(true);  }
+    function abrirModalValidar(ins) { setInscripcionSeleccionada(ins); setModalValidar(true); }
     function abrirModalEliminar(ins) { setInscripcionSeleccionada(ins); setModalEliminar(true); }
-    function cerrarModalValidar()    { setModalValidar(false);  setInscripcionSeleccionada(null); }
-    function cerrarModalEliminar()   { setModalEliminar(false); setInscripcionSeleccionada(null); }
+    function cerrarModalValidar() { setModalValidar(false); setInscripcionSeleccionada(null); }
+    function cerrarModalEliminar() { setModalEliminar(false); setInscripcionSeleccionada(null); }
 
     async function guardarCambios(datos) {
         try {

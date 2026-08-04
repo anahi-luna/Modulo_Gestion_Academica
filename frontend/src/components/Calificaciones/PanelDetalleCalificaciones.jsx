@@ -40,15 +40,15 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
                 setCargandoEvaluaciones(true);
 
                 const resultado = await getEvaluaciones(idComision);
-               
+
                 //Elimina del select las evaluaciones registradas y las pasa al historial.
                 //Deja las que todavia tienen pendiente de cargar.
                 const evaluacionesVerificadas = await Promise.all(
-                    resultado.map(async(evaluacion) => {
+                    resultado.map(async (evaluacion) => {
                         const calificacionesExistentes = await obtenerCalificacionesPorEvaluacion(evaluacion.id);
 
                         return calificacionesExistentes.length === 0
-                            ?evaluacion: null;
+                            ? evaluacion : null;
                     })
                 );
                 const evaluacionesPendientes = evaluacionesVerificadas.filter(Boolean);
@@ -146,6 +146,22 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
     // Guarda las calificaciones de la evaluación seleccionada. 
     // Si ya había calificaciones registradas, las actualiza; si no, las crea.
     async function guardarCalificaciones() {
+        const observacionInvalida = calificaciones.some(c => {
+            const obs = (c.observacion ?? "").trim();
+
+            // Si escribió algo, debe contener al menos una letra
+            return obs !== "" && !/[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(obs);
+        });
+
+        if (observacionInvalida) {
+            setAlerta({
+                tipo: "error",
+                titulo: "Observación inválida",
+                mensaje: "La observación debe contener al menos una letra.",
+            });
+            return;
+        }
+
         const datos = {
             id_evaluacion: evaluacionSeleccionada.id,
             calificaciones: calificaciones.map(c => ({
@@ -169,7 +185,7 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
                 mensaje: "Las calificaciones se registraron con éxito.",
             });
 
-            if(!modoEdicion){
+            if (!modoEdicion) {
                 setEvaluaciones((evaluacionesActuales) => evaluacionesActuales.filter(
                     (evaluacion) => evaluacion.id !== evaluacionSeleccionada.id
                 ))
@@ -196,17 +212,17 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
 
     // Carga el historial de calificaciones de la comisión.
     async function cargarHistorial() {
-        if(!idComision){
+        if (!idComision) {
             setHistorial([]);
             return;
         }
 
-        try{
-                const resultado = await obtenerHistorialCalificacionesPorComision(idComision);
+        try {
+            const resultado = await obtenerHistorialCalificacionesPorComision(idComision);
 
-                setHistorial(resultado);
+            setHistorial(resultado);
 
-        }catch(error){
+        } catch (error) {
             console.error("Error al cargar el historial de calificaciones", error)
 
             setHistorial([]);
@@ -215,20 +231,20 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
     }
 
     // Permite editar las calificaciones de una evaluación que ya tiene calificaciones registradas.
-    async function editarDesdeHistorial(evaluacion){
-        if(!puedeEditar){
+    async function editarDesdeHistorial(evaluacion) {
+        if (!puedeEditar) {
             return;
         }
 
         setEvaluacionSeleccionada(evaluacion);
         setModoEdicion(true);
 
-        try{
+        try {
             const resultado = await obtenerCalificacionesPorEvaluacion(evaluacion.id);
 
             setCalificaciones(resultado);
             setCalificacionesRegistradas(true);
-        }catch(error){
+        } catch (error) {
             console.error("Error al cargar las calificaciones para editar", error);
         }
 
@@ -242,22 +258,22 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
     async function eliminarTodas(evaluacion) {
         const confirmar = window.confirm(`¿Querés eliminar todas las calificaciones de "${evaluacion.titulo}"?`);
 
-        if(!confirmar){
+        if (!confirmar) {
             return;
         }
 
-        try{
+        try {
             //Llama al metodo para eliminar del service
             await eliminarCalificacionesPorEvaluacion(evaluacion.id);
             //Vuelve a cargar las evaluaciones en el select cuando se eliminan, para volver a registrar en caso de ser necesario.
             setEvaluaciones((evaluacionesActuales) => {
                 const yaExiste = evaluacionesActuales.some((item) => item.id === evaluacion.id);
 
-                if(yaExiste){
+                if (yaExiste) {
                     return evaluacionesActuales;
                 }
 
-                return[
+                return [
                     ...evaluacionesActuales,
                     evaluacion
                 ]
@@ -266,7 +282,7 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
             await cargarHistorial();
 
             //En caso de justo estar editando esa evaluacion, limpia la pantalla
-            if(evaluacionSeleccionada?.id === evaluacion.id){
+            if (evaluacionSeleccionada?.id === evaluacion.id) {
                 setEvaluacionSeleccionada(null);
                 setCalificaciones([]);
                 setModoEdicion(false);
@@ -278,7 +294,7 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
                 titulo: "Calificaciones eliminadas",
                 mensaje: "Se eliminaron todas las calificaciones de la evaluación",
             })
-        }catch(error){
+        } catch (error) {
             console.error(error);
 
             setAlerta({
@@ -291,19 +307,19 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
 
     // Elimina una calificación puntual de un alumno, con confirmación del usuario.
     async function eliminarUnaCalificacion(calificacion) {
-        if(!calificacion?.id) {
+        if (!calificacion?.id) {
             console.error("La calificación no tiene un identificador válido");
             return;
         }
-        
+
 
         const confirmar = window.confirm(`¿Queres eliminar la calificacion de ${calificacion.alumno}`);
 
-        if(!confirmar){
+        if (!confirmar) {
             return;
         }
 
-        try{
+        try {
             await eliminarCalificacionService(calificacion.id);
 
             const calificacionesRestantes = calificaciones.filter((item) => item.id !== calificacion.id);
@@ -314,15 +330,15 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
 
             //Al eliminar la ultima calificacion, la evaluacion vuelve al select.
 
-            if(calificacionesRestantes.length === 0 && evaluacionSeleccionada){
-                setEvaluaciones((evaluacionesActuales) =>{
+            if (calificacionesRestantes.length === 0 && evaluacionSeleccionada) {
+                setEvaluaciones((evaluacionesActuales) => {
                     const yaExiste = evaluacionesActuales.some((evaluacion) => evaluacion.id === evaluacionSeleccionada.id);
 
-                    if(yaExiste){
+                    if (yaExiste) {
                         return evaluacionesActuales;
                     }
 
-                    return[
+                    return [
                         ...evaluacionesActuales,
                         evaluacionSeleccionada,
                     ];
@@ -339,8 +355,8 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
                 mensaje: `Se eliminó la calificación de ${calificacion.alumno}`,
             })
 
-        }catch(error){
-            console.error("Error al eliminar la calificación" ,error);
+        } catch (error) {
+            console.error("Error al eliminar la calificación", error);
             setAlerta({
                 tipo: "error",
                 titulo: "Error",
@@ -405,7 +421,7 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
 
                 </div>
             </div>
-            {modoEdicion && evaluacionSeleccionada &&(
+            {modoEdicion && evaluacionSeleccionada && (
                 <div className="mx-4 mb-4 rounded-xl border border-blue-300 bg-blue-50 p-4 sm:mx-8">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -419,7 +435,7 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
                             </p>
                         </div>
 
-                        <button 
+                        <button
                             type="button"
                             onClick={() => {
                                 setModoEdicion(false);
@@ -442,8 +458,8 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
                     evaluacionSeleccionada={evaluacionSeleccionada}
                     setEvaluacionSeleccionada={setEvaluacionSeleccionada}
                 />
-            )}        
-            
+            )}
+
 
             {/* Aviso explícito cuando la comisión no tiene evaluaciones
             */}
@@ -477,9 +493,9 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
                                 disabled={guardando || !evaluacionSeleccionada}
                                 className="w-full sm:w-auto bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white rounded-lg px-5 py-2 font-medium"
                             >
-                                {guardando 
-                                    ? "Guardando..." 
-                                    :modoEdicion
+                                {guardando
+                                    ? "Guardando..."
+                                    : modoEdicion
                                         ? "Guardar cambios"
                                         : "Guardar calificaciones"}
                             </button>
@@ -494,9 +510,9 @@ export default function PanelDetalleCalificaciones({ idComision, puedeCrear = fa
                 onEliminar={eliminarTodas}
                 evaluacionEditandoId={
                     modoEdicion
-                        ?evaluacionSeleccionada?.id: null
+                        ? evaluacionSeleccionada?.id : null
                 }
-                puedeEditar={puedeEditar }
+                puedeEditar={puedeEditar}
                 puedeEliminar={puedeEliminar}
             />
 

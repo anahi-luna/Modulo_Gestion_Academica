@@ -32,7 +32,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                 setClaseSeleccionada(null);
                 setClases([]);
                 setAsistencias([]);
-                
+
                 const resultado = await getClases(idComision);
                 const clasesActualizadas = await Promise.all(
                     resultado.map(actualizarEstadoAutomaticamente)
@@ -43,20 +43,20 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                         ? clasesActualizadas.find(
                             (clase) =>
                                 clase.id === Number(idClaseInicial)
-                          )
+                        )
                         : null;
 
                     setClaseSeleccionada(
                         claseInicial ?? null
                     );
                 }
-                
+
                 const clasesSinAsistencia = []
 
-                for(const clase of clasesActualizadas){
+                for (const clase of clasesActualizadas) {
                     const asistenciasClase = await obtenerAsistenciasPorClase(clase.id);
 
-                    if(asistenciasClase.length === 0) {
+                    if (asistenciasClase.length === 0) {
                         clasesSinAsistencia.push(clase);
                     }
                 }
@@ -82,8 +82,8 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
 
 
-// Carga las asistencias de la clase seleccionada. Si no hay asistencias registradas,
-//  carga los inscriptos de la comisión para poder registrar la asistencia.
+    // Carga las asistencias de la clase seleccionada. Si no hay asistencias registradas,
+    //  carga los inscriptos de la comisión para poder registrar la asistencia.
     async function cargarAsistencias() {
         try {
             const asistenciasObtenidas = await obtenerAsistenciasPorClase(claseSeleccionada.id);
@@ -133,22 +133,37 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
     async function guardarAsistencias() {
 
-        if(!claseSeleccionada?.id){
+        if (!claseSeleccionada?.id) {
             console.error("No hay una clase seleccionada")
             return;
         }
-        
 
-        try{
+        const observacionInvalida = asistencias.some(a => {
+            const obs = (a.observacion ?? "").trim();
+
+            // Si escribió algo, debe contener al menos una letra
+            return obs !== "" && !/[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(obs);
+        });
+
+        if (observacionInvalida) {
+            setAlerta({
+                tipo: "error",
+                titulo: "Observación inválida",
+                mensaje: "La observación debe contener al menos una letra.",
+            });
+            return;
+        }
+
+        try {
             const asistenciasExistentes = asistencias.filter((a) => a.id);
 
             const asistenciasNuevas = asistencias.filter((a) => !a.id);
-            
 
-            if(asistenciasExistentes.length > 0){
+
+            if (asistenciasExistentes.length > 0) {
                 await Promise.all(
                     asistenciasExistentes.map((a) =>
-                        modificarAsistencia(a.id,{
+                        modificarAsistencia(a.id, {
                             id_estado: a.id_estado,
                             observacion: a.observacion ?? "",
                         })
@@ -156,7 +171,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                 )
             }
 
-            if(asistenciasNuevas.length > 0) {
+            if (asistenciasNuevas.length > 0) {
                 const datos = {
                     id_clase: claseSeleccionada.id,
                     asistencias:
@@ -184,24 +199,24 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
 
             await cargarHistorial();
-            
+
             setAlerta({
                 tipo: "success",
                 titulo: "Asistencia registrada",
-                mensaje: "La asistencia se registró con éxito", 
+                mensaje: "La asistencia se registró con éxito",
             });
 
-            
-        }catch(error){
+
+        } catch (error) {
             setAlerta({
                 tipo: "error",
                 titulo: "Error",
-                mensaje: "Ocurrió un error al guardar la asistencia", 
+                mensaje: "Ocurrió un error al guardar la asistencia",
             });
             console.error("Error al guardar", error)
 
         }
-        
+
     }
 
     function seleccionarClaseNormal(clase) {
@@ -216,7 +231,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
 
     async function cargarHistorial() {
-        if (!idComision) {  
+        if (!idComision) {
             setHistorial([]);
             return;
         }
@@ -239,12 +254,12 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
         setClaseSeleccionada(clase);
         setModoEdicion(true);
 
-        try{
+        try {
             const resultado = await obtenerAsistenciasPorClase(clase.id);
 
             setAsistencias(resultado)
             setAsistenciaRegistrada(true);
-        }catch(error){
+        } catch (error) {
             console.error("Error al cargar la asistencia para editar", error)
         }
 
@@ -254,7 +269,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
         })
     }
 
-    async function eliminarUnaAsistencia(asistencia){
+    async function eliminarUnaAsistencia(asistencia) {
         if (!asistencia?.id) {
             console.error(
                 "La asistencia no tiene un identificador válido"
@@ -329,20 +344,20 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
     async function eliminarDesdeHistorial(clase) {
         const confirmar = window.confirm(`¿Querés eliminar todas las asistencias de ${clase.tema}`)
 
-        if(!confirmar){
+        if (!confirmar) {
             return;
         }
 
-        try{
+        try {
             await eliminarAsistenciasPorClase(clase.id);
 
-            setHistorial((historialActual) => 
+            setHistorial((historialActual) =>
                 historialActual.filter(
                     (item) => item.id !== clase.id
                 )
             );
 
-            if(claseSeleccionada?.id === clase.id){
+            if (claseSeleccionada?.id === clase.id) {
                 setAsistencias([]);
                 setModoEdicion(false);
             }
@@ -350,15 +365,15 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
             setAlerta({
                 tipo: "success",
                 titulo: "Asistencia eliminada",
-                mensaje: "La asistencia se eliminó con éxito", 
+                mensaje: "La asistencia se eliminó con éxito",
             });
-        }catch(error){
+        } catch (error) {
             console.error("Error al eliminar las asistencias", error)
 
             setAlerta({
                 tipo: "error",
                 titulo: "Error",
-                mensaje: "Error al eliminar la asistencia", 
+                mensaje: "Error al eliminar la asistencia",
             });
         }
 
@@ -373,11 +388,11 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
     return (
         <div className="lg:col-span-9 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
 
-            {alerta &&(
+            {alerta && (
                 <div className="p-4 pb-0 sm:p-8 sm:pb-0">
                     <Alert
                         tipo={alerta.tipo}
-                        titulo = {alerta.titulo}
+                        titulo={alerta.titulo}
                         mensaje={alerta.mensaje}
                         onCerrar={() => setAlerta(null)}
                     />
@@ -428,9 +443,9 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
                 </div>
             </div>
-            
+
             {/*Si estas editando una clase te especifica que estas en el modo de edicion */}
-            {modoEdicion && claseSeleccionada &&(
+            {modoEdicion && claseSeleccionada && (
                 <div className="mx-4 mb-4 rounded-xl border border-blue-300 bg-blue-50 p-4 sm:mx-8">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -444,7 +459,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                             </p>
                         </div>
 
-                        <button 
+                        <button
                             type="button"
                             onClick={() => setModoEdicion(false)}
                             className="self-start rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 sm:self-auto"
@@ -454,7 +469,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                     </div>
                 </div>
             )}
-            {!modoEdicion &&(
+            {!modoEdicion && (
                 <ClaseSelect
                     clases={clases}
                     claseSeleccionada={claseSeleccionada}
@@ -462,7 +477,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
 
                 />
             )}
-            
+
 
             {claseSeleccionada && (
                 <>
@@ -492,7 +507,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                         onCambiarEstado={cambiarEstado}
                         onCambiarObservacion={cambiarObservacion}
                         onEliminarAsistencia={eliminarUnaAsistencia}
-                        soloLectura={ asistenciaRegistrada && !modoEdicion}
+                        soloLectura={asistenciaRegistrada && !modoEdicion}
 
                     />
 
@@ -515,7 +530,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                     )}
                 </>
             )}
-            
+
 
             <HistorialAsistencias
                 historial={historial}
