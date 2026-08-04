@@ -1,7 +1,7 @@
 // servicios relacionados con los planes de estudio y el resultado de plan de cada alumno 
 //  para el alumno, muestra su propio plan de estudios y materias cursadas; para el personal de gestión,
 //  muestra todos los planes de todos los alumnos.
-import { getListaResultadosPlan, actualizarEstadoResultadoPlan } from "../api/resultadoPlanApi";
+import { getListaResultadosPlan, actualizarEstadoResultadoPlan, getMiResultadoPlan } from "../api/resultadoPlanApi";
 import { getLegajoPorId } from "../api/legajosApi";
 import { emitir } from "./certificadosService";
 import { obtenerMisCalificaciones } from "./calificacionesAlumnoService";
@@ -36,10 +36,11 @@ function mapearResultadoPlan(r) {
     };
 }
 
-export async function obtenerMiPlan(idLegajo) {
-    const respuesta = await getListaResultadosPlan();
-    const plan = respuesta.data.find((r) => r.id_legajo === idLegajo);
-    return plan ? mapearResultadoPlan(plan) : null;
+export async function obtenerMiPlan() {
+    const respuesta = await getMiResultadoPlan();
+    return respuesta.data
+        ? mapearResultadoPlan(respuesta.data)
+        : null;
 }
 
 // Todos los resultados de plan, con nombre y número de legajo ya
@@ -83,10 +84,10 @@ export async function generarCertificadoDePlan(plan) {
 // ese cierre (calculado por el back); si no existe todavía, está
 // PENDIENTE (cursando) y muestro las evaluaciones cargadas hasta
 // ahora, igual que en Mis Calificaciones.
-export async function obtenerMisMateriasDePlan(idLegajo) {
+export async function obtenerMisMateriasDePlan() {
     const [materias, resultados] = await Promise.all([
-        obtenerMisCalificaciones(idLegajo),
-        obtenerResultadosAcademicos(idLegajo),
+        obtenerMisCalificaciones(),
+        obtenerResultadosAcademicos(),
     ]);
 
     return materias.map((materia) => {

@@ -14,6 +14,11 @@ asistencia_bp.route("/", methods=["GET"])(
     requires_permission("inscripcion.asistencias.leer")(get_lista_de_asistencias)
 )
 
+# Obtener la asistencia del alumno autenticado para una clase
+asistencia_bp.route("/mi-asistencia/<int:id_clase>", methods=["GET"])(
+    requires_permission("inscripcion.asistencias.leer")(obtener_mi_asistencia)
+)
+
 # Obtener una asistencia
 asistencia_bp.route("/<int:id_asistencia>", methods=["GET"])(
     requires_permission("inscripcion.asistencias.leer")(get_asistencia)
@@ -26,5 +31,7 @@ asistencia_bp.route("/<int:id_asistencia>", methods=["PUT"])(
 
 # Solo por desarrollo eliminar asistencia
 asistencia_bp.route("/<int:id_asistencia>", methods=["DELETE"])(
-    requires_permission("inscripcion.asistencias.eliminar")(eliminar_asistencia_controller)
+    requires_permission("inscripcion.asistencias.eliminar")(
+        eliminar_asistencia_controller
+    )
 )

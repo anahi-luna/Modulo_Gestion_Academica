@@ -3,6 +3,7 @@
 import {
     generarResultadosAcademicos as generarResultadosAcademicosApi,
     getListaResultadosAcademicos,
+    getMisResultadosAcademicos,
 } from "../api/resultadoAcademicoApi";
 
 // Coincide con seed/seed_estado_academico.py del back.
@@ -38,13 +39,14 @@ export async function generarResultadosAcademicos(idComision) {
     return response.data.map(mapearResultado);
 }
 
-// Todos los resultados académicos ya generados para UN alumno (los
-// uso en "Mi plan" para saber qué materias están finalizadas)
-export async function obtenerResultadosAcademicos(idLegajo) {
-    const response = await getListaResultadosAcademicos();
-    return response.data
-        .filter((r) => r.inscripcion?.id_legajo === idLegajo)
-        .map(mapearResultado);
+// Todos los resultados académicos ya generados para el alumno
+// autenticado (los uso en "Mi plan" para saber qué materias están
+// finalizadas). El back identifica al alumno por el token, así que
+// idLegajo ya no hace falta mandarlo, pero se mantiene el parámetro
+// para no romper a quienes llaman a esta función.
+export async function obtenerResultadosAcademicos() {
+    const response = await getMisResultadosAcademicos();
+    return response.data.map(mapearResultado);
 }
 
 // Todos los resultados académicos generados hasta ahora (para la

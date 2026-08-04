@@ -1,9 +1,14 @@
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import EvaluacionRow from "./EvaluacionRow";
+import { formatearFecha } from "../../config/fecha";
 
 // Componente para mostrar una tabla de evaluaciones, con filtros por materia, comisión, docente y tipo.
 export default function EvaluacionesTable({
     evaluaciones,
+    // Lista completa (sin aplicar ningún filtro), usada solo para
+    // calcular las opciones de los <select>. Si no se pasa, se cae
+    // en `evaluaciones` como antes (compatibilidad hacia atrás).
+    todasLasEvaluaciones,
 
     filtroMateria,
     setFiltroMateria,
@@ -22,14 +27,18 @@ export default function EvaluacionesTable({
     soloLectura = false,
 }) {
 
-    const materias = [...new Set(evaluaciones.map(e => e.materia))];
-    const comisiones = [...new Set(evaluaciones.map(e => e.codigo))];
-    const docentes = [...new Set(evaluaciones.map(e => e.docente))];
-    const tipos = [...new Set(evaluaciones.map(e => e.tipo))];
+    // IMPORTANTE: las opciones de los filtros se calculan siempre a
+    // partir de la lista COMPLETA (sin filtrar), no de `evaluaciones`
+    // (que ya viene filtrada desde la página). De lo contrario, al
+    // elegir un filtro las demás opciones desaparecían del
+    // desplegable, porque se recalculaban sobre una lista cada vez
+    // más chica.
+    const evaluacionesParaOpciones = todasLasEvaluaciones ?? evaluaciones;
 
-    function formatearFecha(fecha) {
-        return new Date(fecha).toLocaleDateString("es-AR");
-    }
+    const materias = [...new Set(evaluacionesParaOpciones.map(e => e.materia))];
+    const comisiones = [...new Set(evaluacionesParaOpciones.map(e => e.codigo))];
+    const docentes = [...new Set(evaluacionesParaOpciones.map(e => e.docente))];
+    const tipos = [...new Set(evaluacionesParaOpciones.map(e => e.tipo))];
 
     const colorTipo = {
         Parcial: "bg-blue-100 text-blue-700",

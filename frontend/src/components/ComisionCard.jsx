@@ -10,7 +10,13 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
   const porcentaje = cupo > 0 ? Math.round((inscriptos / cupo) * 100) : 0;
   const sinCupo = cupoLibre <= 0;
 
-  const correlativas = comision.plan_asignaturas?.correlativas ?? [];
+  // correlativas_nombres e id_plan vienen ya resueltos desde
+  // inscripcionesService.js (obtenerComisionesDisponibles). Si por
+  // algún motivo no vienen (ej: se usa este componente con datos
+  // crudos de otro lado), caemos en los ids como estaba antes.
+  const correlativas = comision.correlativas_nombres
+    ?? (comision.plan_asignaturas?.correlativas ?? []).map(c => `Asignatura #${c.asignatura_id}`);
+  const idPlan = comision.id_plan ?? comision.plan_asignaturas?.plan_id ?? null;
 
   const colorBarra =
     porcentaje >= 100
@@ -57,8 +63,13 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
       <div className="space-y-1 mb-3">
         <p className="text-xs text-gray-500">{obtenerDocenteTitular(comision)}</p>
         <p className="text-xs text-gray-500">{comision.modalidad ?? "-"}</p>
+        {idPlan != null && (
+          <p className="text-xs text-gray-500">Plan de estudios Nº {idPlan}</p>
+        )}
         {correlativas.length > 0 && (
-          <p className="text-xs text-blue-600">Requiere correlativas</p>
+          <p className="text-xs text-blue-600">
+            Requiere: {correlativas.join(", ")}
+          </p>
         )}
       </div>
 

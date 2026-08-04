@@ -1,11 +1,12 @@
-from flask import request
+from flask import request, g
 from marshmallow import ValidationError
 
 from services.resultado_academico_service import *
-
 from schemas.resultado_academico_schema import *
 
 from utils.response import success_response, error_response
+from models.modelo_resultado_academico import ResultadoAcademico
+from models.modelo_inscripcion import Inscripcion
 
 from exceptions import BusinessError
 
@@ -37,6 +38,34 @@ def get_resultado_academico(id_resultado_academico):
 
     return success_response(data=datos, message="Resultado académico encontrado.")
 
+
+def obtener_mis_resultados_academicos():
+
+    try:
+
+        resultados = (
+            ResultadoAcademico.query
+            .join(Inscripcion)
+            .filter(
+                Inscripcion.id_legajo == g.id_legajo
+            )
+            .all()
+        )
+
+        datos = resultados_academicos_schema.dump(resultados)
+
+        return success_response(
+            data=datos,
+            total=len(datos),
+            message="Listado de mis resultados académicos."
+        )
+
+    except BusinessError as e:
+
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )
 
 # Genera los resultados académicos de una comisión finalizada.
 def agregar_resultado_academico():

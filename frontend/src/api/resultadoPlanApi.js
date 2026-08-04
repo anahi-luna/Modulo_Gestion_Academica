@@ -33,7 +33,23 @@ export async function getResultadoPlanPorId(id) {
         throw error;
     }
 }
+//Devuelve solamente el resultado plan del alumno autenticado
 
+export async function getMiResultadoPlan() {
+    try {
+        const response = await fetch(`${API_URL}/resultados-planes/mi-resultado-plan`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error al obtener el resultado de plan", error);
+        throw error;
+    }
+}
 // Cambia el estado del resultado del plan (por ejemplo, a "Abandonado").
 // datos: { id_estado_resultado_plan }
 export async function actualizarEstadoResultadoPlan(id, datos) {

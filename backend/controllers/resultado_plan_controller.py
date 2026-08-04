@@ -1,8 +1,8 @@
-from flask import request
+from flask import request, g
 from marshmallow import ValidationError
 
 from services.resultado_plan_service import *
-
+from models.modelo_resultado_plan import ResultadoPlan
 from schemas.resultado_plan_schema import *
 
 from utils.response import success_response, error_response
@@ -45,6 +45,34 @@ def get_resultado_plan(id_resultado_plan):
         message="Resultado del plan encontrado."
     )
 
+def obtener_mi_resultado_plan():
+
+    try:
+
+        resultado = ResultadoPlan.query.filter_by(
+            id_legajo=g.id_legajo
+        ).first()
+
+        if not resultado:
+
+            return error_response(
+                "Resultado del plan no encontrado.",
+                status_code=404
+            )
+
+        datos = resultado_plan_schema.dump(resultado)
+
+        return success_response(
+            data=datos,
+            message="Resultado del plan del alumno."
+        )
+
+    except BusinessError as e:
+
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )
 
 # Genera o actualiza un resultado de plan.
 def agregar_resultado_plan():

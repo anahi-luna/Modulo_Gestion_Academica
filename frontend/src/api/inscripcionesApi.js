@@ -142,3 +142,41 @@ export async function eliminarInscripcion(id) {
     }
 
 }
+
+// Obtiene únicamente las inscripciones del alumno autenticado
+export async function getMisInscripciones() {
+    try {
+        const response = await fetch(`${API_URL}/inscripciones/mis-inscripciones`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "No se pudieron obtener las inscripciones."
+            );
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error al obtener mis inscripciones", error);
+        throw error;
+    }
+}
+
+// Devuelve la cantidad de inscriptos por comisión
+export async function getConteoComisiones() {
+    try {
+        const response = await fetch(`${API_URL}/inscripciones/conteo-comisiones`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "No se pudo obtener el conteo de comisiones."
+            );
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error al obtener el conteo", error);
+        throw error;
+    }
+}

@@ -9,6 +9,13 @@ resultado_academico_bp.route("/", methods=["POST"])(
     requires_permission("inscripcion.resultado_academico.generar")(agregar_resultado_academico)
 )
 
+# Obtener los resultados académicos del alumno autenticado
+resultado_academico_bp.route("/mis-resultados-academicos", methods=["GET"])(
+    requires_permission("inscripcion.resultado_academico.leer")(
+        obtener_mis_resultados_academicos
+    )
+)
+
 # Obtener todos los resultados académicos
 resultado_academico_bp.route("/", methods=["GET"])(
     requires_permission("inscripcion.resultado_academico.leer")(get_lista_resultados_academicos)

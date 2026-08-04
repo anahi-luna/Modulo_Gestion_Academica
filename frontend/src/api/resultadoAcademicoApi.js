@@ -42,6 +42,24 @@ export async function getListaResultadosAcademicos() {
     }
 }
 
+// Obtiene solo los resultados académicos del alumno autenticado
+// (el back identifica al alumno por el token, no hace falta mandar el legajo).
+export async function getMisResultadosAcademicos() {
+    try {
+        const response = await fetch(`${API_URL}/resultados-academicos/mis-resultados-academicos`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error al obtener mis resultados académicos", error);
+        throw error;
+    }
+}
+
 // Obtiene un resultado académico por su id
 export async function getResultadoAcademicoPorId(id) {
     try {
@@ -59,7 +77,6 @@ export async function getResultadoAcademicoPorId(id) {
     }
 }
 
-// Solo para desarrollo, según el comentario del back en la ruta.
 export async function eliminarResultadoAcademico(id) {
     try {
         const response = await fetch(`${API_URL}/resultados-academicos/${id}`, {

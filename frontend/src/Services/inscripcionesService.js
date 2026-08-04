@@ -1,50 +1,91 @@
 // Servicio de Inscripciones
-import { getLegajoPorNumero } from "../api/legajosApi";
+import { getLegajoPorNumero, getLegajoPorId } from "../api/legajosApi";
 import { getComisiones, getComisionesPorIdLegajo } from "../api/comisiones";
-import { crearInscripcion } from "../api/inscripcionesApi";
-import { getListaDeInscripciones } from "../api/inscripcionesApi";
 import { obtenerResultadosAcademicos } from "./resultadoAcademicoService";
+import {
+  crearInscripcion,
+  getMisInscripciones,
+  getConteoComisiones
+} from "../api/inscripcionesApi";
 
 
-// Buscar un legajo
+// Buscar un legajo por su número (lo sigue usando, por ejemplo, la
+// gestión de inscripciones del admin, que busca por número de legajo).
 export async function buscarLegajo(numeroLegajo) {
-    const response = await getLegajoPorNumero(numeroLegajo);
-    const legajo = response.data;
-    // Validación local para evitar continuar
-    // con el flujo si el legajo está inactivo.
-    if (!legajo.activo) {
-        throw new Error(
-            "El legajo se encuentra inactivo y no puede realizar inscripciones."
-        );
-    }
-    return legajo;
+  const response = await getLegajoPorNumero(numeroLegajo);
+  const legajo = response.data;
+  // Validación local para evitar continuar
+  // con el flujo si el legajo está inactivo.
+  if (!legajo.activo) {
+    throw new Error(
+      "El legajo se encuentra inactivo y no puede realizar inscripciones."
+    );
+  }
+  return legajo;
+}
+
+// Buscar un legajo por su id. La usa el flujo de "Inscribirme" del
+// alumno autenticado: ya sabemos su id_legajo por la sesión, no hace
+// falta pedirle que lo tipee.
+export async function buscarLegajoPorId(idLegajo) {
+  const response = await getLegajoPorId(idLegajo);
+  const legajo = response.data;
+  if (!legajo.activo) {
+    throw new Error(
+      "El legajo se encuentra inactivo y no puede realizar inscripciones."
+    );
+  }
+  return legajo;
 }
 
 // Obtener todas las comisiones
 export async function obtenerComisiones() {
-    const response = await getComisiones();
-    return response.data;
+  const response = await getComisiones();
+  return response.data;
 }
 
 export async function obtenerComisionesPorIdLegajo(idLegajo) {
-    const response = await getComisionesPorIdLegajo(idLegajo);
-    return response.data;
+  const response = await getComisionesPorIdLegajo(idLegajo);
+  return response.data;
 }
 
-async function obtenerMateriasAprobadas(idLegajo) {
-  const resultados = await obtenerResultadosAcademicos(idLegajo);
-  const comisiones = await obtenerComisiones();
-
+function obtenerMateriasAprobadasDeResultados(resultados, todasLasComisiones) {
   return resultados
     .filter((r) => r.estado_academico === "Aprobado")
     .map(
       (r) =>
-        comisiones.find(
+        todasLasComisiones.find(
           (c) => c.id_comision_asignatura === r.id_comision_asignatura
         )?.plan_asignaturas?.asignatura_id
     )
     .filter(Boolean);
 }
+
+function construirMapaNombresDeAsignatura(todasLasComisiones) {
+  const mapa = {};
+  for (const c of todasLasComisiones) {
+    const idAsignatura = c.plan_asignaturas?.asignatura_id;
+    if (idAsignatura != null && mapa[idAsignatura] == null) {
+      mapa[idAsignatura] = c.nombre;
+    }
+  }
+  return mapa;
+}
+
+function enriquecerComisionConPlanYCorrelativas(comision, mapaNombresAsignatura) {
+  const correlativas = comision.plan_asignaturas?.correlativas ?? [];
+
+  return {
+    ...comision,
+    id_plan: comision.plan_asignaturas?.plan_id ?? null,
+    correlativas_nombres: correlativas.map(
+      (correlativa) =>
+        mapaNombresAsignatura[correlativa.asignatura_id] ??
+        `Asignatura #${correlativa.asignatura_id}`
+    ),
+  };
+}
+
 
 // Estados que YA NO ocupan lugar en el cupo
 const ESTADOS_NO_OCUPAN_CUPO = new Set([
@@ -59,20 +100,14 @@ const ESTADOS_NO_OCUPAN_CUPO = new Set([
  * Ocupan cupo todas excepto rechazadas/canceladas/anuladas/baja.
  */
 async function contarInscriptosPorComision() {
-  const response = await getListaDeInscripciones();
-  const lista = response?.data ?? [];
+
+  const response = await getConteoComisiones();
 
   const conteo = {};
 
-  for (const ins of lista) {
-    const id = ins.id_comision_asignatura;
-    if (id == null) continue;
-
-    const nombreEstado = ins.estado?.nombre ?? "";
-    if (ESTADOS_NO_OCUPAN_CUPO.has(nombreEstado)) continue;
-
-    conteo[id] = (conteo[id] ?? 0) + 1;
-  }
+  (response.data ?? []).forEach(item => {
+    conteo[item.id_comision_asignatura] = item.inscriptos;
+  });
 
   return conteo;
 }
@@ -91,17 +126,22 @@ function enriquecerComisionConCupo(comision, conteo) {
 }
 
 // Comisiones que el alumno puede cursar (correlativas + cupo real)
-export async function obtenerComisionesDisponibles(numeroLegajo) {
-  const legajo = await buscarLegajo(numeroLegajo);
+export async function obtenerComisionesDisponibles(idLegajo) {
+  const legajo = await buscarLegajoPorId(idLegajo);
 
-  const [comisiones, materiasAprobadas, conteo] = await Promise.all([
+  const [comisiones, todasLasComisiones, resultados, conteo] = await Promise.all([
     obtenerComisionesPorIdLegajo(legajo.id_legajo),
-    obtenerMateriasAprobadas(legajo.id_legajo),
+    obtenerComisiones(),
+    obtenerResultadosAcademicos(legajo.id_legajo),
     contarInscriptosPorComision(),
   ]);
 
+  const materiasAprobadas = obtenerMateriasAprobadasDeResultados(resultados, todasLasComisiones);
+  const mapaNombresAsignatura = construirMapaNombresDeAsignatura(todasLasComisiones);
+
   return comisiones
     .map((c) => enriquecerComisionConCupo(c, conteo))
+    .map((c) => enriquecerComisionConPlanYCorrelativas(c, mapaNombresAsignatura))
     .filter((comision) => {
       // 1. Correlativas (seguro si falta plan_asignaturas)
       const correlativas = comision.plan_asignaturas?.correlativas ?? [];
@@ -124,99 +164,96 @@ export async function obtenerComisionesDisponibles(numeroLegajo) {
 
 
 // Carga toda la información necesaria para iniciar
-// el proceso de inscripción.
+// el proceso de inscripción del alumno autenticado.
 // La vista solamente consume este método.
-export async function cargarDatosInscripcion(numeroLegajo) {
+export async function cargarDatosInscripcion(idLegajo) {
 
-    const legajo = await buscarLegajo(numeroLegajo);
+  const legajo = await buscarLegajoPorId(idLegajo);
 
-    const comisiones =
-        await obtenerComisionesDisponibles(numeroLegajo);
+  const comisiones =
+    await obtenerComisionesDisponibles(idLegajo);
 
-    return {
-        legajo,
-        comisiones
-    };
+  return {
+    legajo,
+    comisiones
+  };
 }
 
 // Crear una solicitud de inscripción
 export async function crearSolicitudInscripcion(
-    numeroLegajo,
-    idComision
+  idLegajo,
+  idComision
 ) {
 
-    const legajo = await buscarLegajo(numeroLegajo);
+  const legajo = await buscarLegajoPorId(idLegajo);
 
-    const comisiones = await obtenerComisiones();
-    const comision = comisiones.find(
-        c => c.id_comision_asignatura === idComision
-    )
+  const comisiones = await obtenerComisiones();
+  const comision = comisiones.find(
+    c => c.id_comision_asignatura === idComision
+  )
 
-    // Enviamos la solicitud al backend por POST
-    const response = await crearInscripcion({
+  // Enviamos la solicitud al backend por POST
+  const response = await crearInscripcion({
     id_legajo: legajo.id_legajo,
     id_comision_asignatura: idComision
-});
+  });
 
-    // Si el backend rechazó la inscripción,
-    // propagamos el mensaje hacia la vista.
-    if (response.status !== "success") {
-        throw new Error(response.message);
+  // Si el backend rechazó la inscripción,
+  // propagamos el mensaje hacia la vista.
+  if (response.status !== "success") {
+    throw new Error(response.message);
+  }
+
+  const data = response.data;
+
+  // Adaptamos la respuesta para la vista
+  return {
+
+    status: response.status,
+    message: response.message,
+
+    data: {
+
+      id: data.id_inscripcion,
+
+      id_legajo: legajo.numero_legajo,
+
+      alumno: `${legajo.nombre} ${legajo.apellido}`,
+
+      comision: comision?.comision.descripcion ?? "-",
+
+      materia: comision?.nombre ?? "-",
+
+      estado: data.estado.nombre,
+
+      fecha_inscripcion: data.fecha_inscripcion,
+
+      motivo: null
+
     }
 
-    const data = response.data;
-
-    // Adaptamos la respuesta para la vista
-    return {
-
-        status: response.status,
-        message: response.message,
-
-        data: {
-
-            id: data.id_inscripcion,
-
-            id_legajo: legajo.numero_legajo,
-
-            alumno: `${legajo.nombre} ${legajo.apellido}`,
-
-            comision: comision?.comision.descripcion ?? "-",
-
-            materia: comision?.nombre ?? "-",
-
-            estado: data.estado.nombre,
-
-            fecha_inscripcion: data.fecha_inscripcion,
-
-            motivo: null
-
-        }
-
-    };
+  };
 
 }
 
 // Obtiene las inscripciones del legajo del alumno logueado.
-export async function obtenerMisInscripciones(idLegajo) {
+export async function obtenerMisInscripciones() {
 
-    const response = await getListaDeInscripciones();
-    const comisiones = await obtenerComisiones();
+  const response = await getMisInscripciones();
+  const comisiones = await obtenerComisiones();
 
-    const mias = response.data.filter(
-        ins => ins.id_legajo === idLegajo
-    );
-    //(Modificar horario cuando este)
-    return mias.map(ins => {
-        const com = comisiones.find(c => c.id_comision_asignatura === ins.id_comision_asignatura);
-        return {
-            id: ins.id_inscripcion,
-            id_comision: ins.id_comision_asignatura,
-            id_comision_asignatura: ins.id_comision_asignatura, // ← agregar
-            materia: com?.nombre ?? "-",
-            comision: com?.comision.descripcion ?? "-",
-            horario: com?.modalidad ?? "-",
-            estado: ins.estado.nombre,
-            fecha_inscripcion: ins.fecha_inscripcion,
-        };
-    });
+  //(Modificar horario cuando este)
+  return response.data.map(ins => {
+    const com = comisiones.find(c => c.id_comision_asignatura === ins.id_comision_asignatura);
+    return {
+      id: ins.id_inscripcion,
+      id_comision: ins.id_comision_asignatura,
+      id_comision_asignatura: ins.id_comision_asignatura, 
+      materia: com?.nombre ?? "-",
+      comision: com?.comision.descripcion ?? "-",
+      horario: com?.modalidad ?? "-",
+      estado: ins.estado.nombre,
+      fecha_inscripcion: ins.fecha_inscripcion,
+    };
+  });
 }

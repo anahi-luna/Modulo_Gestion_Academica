@@ -4,6 +4,7 @@
 
 import {
     getListaCertificados,
+    getMisCertificados,
     crearCertificado,
     editarCertificado,
 } from "../api/certificadosApi";
@@ -56,23 +57,24 @@ export async function obtenerFilasCertificados() {
     });
 }
 
-// certificados de UN alumno (para "Mis certificados")
+// certificados del alumno autenticado (para "Mis certificados"). El
+// back ya filtra por el alumno logueado; acá solo cruzamos cada
+// certificado con su resultado de plan para pegarle el id_plan.
+// idLegajo ya no hace falta mandarlo, pero se mantiene el parámetro
+// para no romper a quienes llaman a esta función.
+// eslint-disable-next-line no-unused-vars
 export async function obtenerMisCertificados(idLegajo) {
     const [planes, certificadosRes] = await Promise.all([
         obtenerTodosLosPlanes(),
-        getListaCertificados(),
+        getMisCertificados(),
     ]);
 
-    const certificados    = certificadosRes.data.map(mapearCertificado);
-    const planesDelAlumno = planes.filter((p) => p.id_legajo === idLegajo);
+    const certificados = certificadosRes.data.map(mapearCertificado);
 
-    return planesDelAlumno
-        .map((plan) => {
-            const certificado = certificados.find((c) => c.id_resultado_plan === plan.id);
-            if (!certificado) return null;
-            return { ...certificado, id_plan: plan.id_plan };
-        })
-        .filter(Boolean);
+    return certificados.map((certificado) => {
+        const plan = planes.find((p) => p.id === certificado.id_resultado_plan);
+        return { ...certificado, id_plan: plan?.id_plan };
+    });
 }
 
 export async function emitir(idResultadoPlan) {

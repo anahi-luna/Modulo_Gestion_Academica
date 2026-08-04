@@ -88,7 +88,7 @@ function VistaAlumno({ idLegajo }) {
       setCargando(true);
       setError(null);
       try {
-        const data = await obtenerMisCalificaciones(idLegajo);
+        const data = await obtenerMisCalificaciones();
         setComisiones(data);
       } catch (err) {
         setError(err.message);
