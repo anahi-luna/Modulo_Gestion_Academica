@@ -5,6 +5,7 @@ export default function EstadoBadge({ estado }) {
     Pendiente: "bg-yellow-100 text-yellow-800 border border-yellow-300",
     Aceptada:  "bg-green-100  text-green-800  border border-green-300",
     Rechazada: "bg-red-100    text-red-800    border border-red-300",
+    Cancelada: "bg-orange-100    text-orange-800    border border-orange-300",
   };
 
   const clase = estilos[estado] || "bg-gray-100 text-gray-600 border border-gray-300";

@@ -49,6 +49,7 @@ export default function FiltrosInscripciones({
                     <option value="Pendiente">Pendiente</option>
                     <option value="Aceptada">Aceptada</option>
                     <option value="Rechazada">Rechazada</option>
+                    <option value="Cancelada">Cancelada</option>
                 </select>
                 <button
                     onClick={onLimpiar}

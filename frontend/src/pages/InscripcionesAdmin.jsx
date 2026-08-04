@@ -92,7 +92,7 @@ export default function InscripcionesAdmin() {
 
         const matchComision =
             filtroComision === "" ||
-            ins.id_comision === parseInt(filtroComision);
+            ins.id_comision_asignatura === parseInt(filtroComision);
 
         const matchEstado =
             filtroEstado === "" ||
