@@ -2,111 +2,203 @@ servicio: inscripcion
 
 acciones:
 
-  # INSCRIPCIONES
-  - nombre: inscripciones.crear
-    descripcion: Registrar una inscripción a una comisión.
-    activo: true
-  - nombre: inscripciones.leer
-    descripcion: Consultar inscripciones.
-    activo: true
-  - nombre: inscripciones.actualizar
-    descripcion: Modificar una inscripción.
-    activo: true
-  - nombre: inscripciones.eliminar
-    descripcion: Eliminar una inscripción.
-    activo: true
+# INSCRIPCIONES
 
-  # CLASES
-  - nombre: clases.crear
-    descripcion: Crear clases.
-    activo: true
-  - nombre: clases.leer
-    descripcion: Consultar clases.
-    activo: true
-  - nombre: clases.actualizar
-    descripcion: Modificar clases.
-    activo: true
-  - nombre: clases.eliminar
-    descripcion: Eliminar clases.
-    activo: true
+- nombre: inscripciones.crear
+  descripcion: Registrar una inscripción a una comisión.
+  activo: true
 
-  # ASISTENCIAS
-  - nombre: asistencias.crear
-    descripcion: Registrar asistencias.
-    activo: true
-  - nombre: asistencias.leer
-    descripcion: Consultar asistencias.
-    activo: true
-  - nombre: asistencias.actualizar
-    descripcion: Modificar asistencias.
-    activo: true
-  - nombre: asistencias.eliminar
-    descripcion: Eliminar asistencias.
-    activo: true
+- nombre: inscripciones.leer
+  descripcion: Consultar todas las inscripciones.
+  activo: true
 
-  # EVALUACIONES
-  - nombre: evaluaciones.crear
-    descripcion: Crear evaluaciones.
-    activo: true
-  - nombre: evaluaciones.leer
-    descripcion: Consultar evaluaciones.
-    activo: true
-  - nombre: evaluaciones.actualizar
-    descripcion: Modificar evaluaciones.
-    activo: true
-  - nombre: evaluaciones.eliminar
-    descripcion: Eliminar evaluaciones.
-    activo: true
+- nombre: inscripciones.leer_propio
+  descripcion: Consultar las propias inscripciones.
+  activo: true
 
-  # CALIFICACIONES
-  - nombre: calificaciones.crear
-    descripcion: Registrar calificaciones.
-    activo: true
-  - nombre: calificaciones.leer
-    descripcion: Consultar calificaciones.
-    activo: true
-  - nombre: calificaciones.actualizar
-    descripcion: Modificar calificaciones.
-    activo: true
-  - nombre: calificaciones.eliminar
-    descripcion: Eliminar calificaciones.
-    activo: true
+- nombre: inscripciones.actualizar
+  descripcion: Modificar una inscripción.
+  activo: true
 
-  # RESULTADO ACADÉMICO
-  - nombre: resultado_academico.generar
-    descripcion: Generar resultados académicos.
-    activo: true
-  - nombre: resultado_academico.leer
-    descripcion: Consultar resultados académicos.
-    activo: true
-  - nombre: resultado_academico.eliminar
-    descripcion: Eliminar resultados académicos.
-    activo: true
+- nombre: inscripciones.eliminar
+  descripcion: Eliminar una inscripción.
+  activo: true
 
-  # RESULTADO DE PLAN
-  - nombre: resultado_plan.leer
-    descripcion: Consultar resultados de plan.
-    activo: true
-  - nombre: resultado_plan.actualizar
-    descripcion: Actualizar el estado del resultado de un plan.
-    activo: true
-  - nombre: resultado_plan.eliminar
-    descripcion: Eliminar resultados de plan.
-    activo: true
+# CLASES
 
-  # CERTIFICADOS
-  - nombre: certificados.emitir
-    descripcion: Emitir certificados.
-    activo: true
-  - nombre: certificados.leer
-    descripcion: Consultar certificados.
-    activo: true
-  - nombre: certificados.actualizar
-    descripcion: Revocar o actualizar certificados.
-    activo: true
-  - nombre: certificados.eliminar
-    descripcion: Eliminar certificados.
-    activo: true
+- nombre: clases.crear
+  descripcion: Crear clases.
+  activo: true
+
+- nombre: clases.leer
+  descripcion: Consultar todas las clases.
+  activo: true
+
+- nombre: clases.leer_propio
+  descripcion: Consultar las clases del alumno.
+  activo: true
+
+- nombre: clases.actualizar
+  descripcion: Modificar clases.
+  activo: true
+
+- nombre: clases.eliminar
+  descripcion: Eliminar clases.
+  activo: true
+
+# ASISTENCIAS
+
+- nombre: asistencias.crear
+  descripcion: Registrar asistencias.
+  activo: true
+
+- nombre: asistencias.leer
+  descripcion: Consultar todas las asistencias.
+  activo: true
+
+- nombre: asistencias.leer_propio
+  descripcion: Consultar las propias asistencias.
+  activo: true
+
+- nombre: asistencias.actualizar
+  descripcion: Modificar asistencias.
+  activo: true
+
+- nombre: asistencias.eliminar
+  descripcion: Eliminar asistencias.
+  activo: true
+
+# EVALUACIONES
+
+- nombre: evaluaciones.crear
+  descripcion: Crear evaluaciones.
+  activo: true
+
+- nombre: evaluaciones.leer
+  descripcion: Consultar todas las evaluaciones.
+  activo: true
+
+- nombre: evaluaciones.leer_propio
+  descripcion: Consultar las evaluaciones propias.
+  activo: true
+
+- nombre: evaluaciones.actualizar
+  descripcion: Modificar evaluaciones.
+  activo: true
+
+- nombre: evaluaciones.eliminar
+  descripcion: Eliminar evaluaciones.
+  activo: true
+
+# CALIFICACIONES
+
+- nombre: calificaciones.crear
+  descripcion: Registrar calificaciones.
+  activo: true
+
+- nombre: calificaciones.leer
+  descripcion: Consultar todas las calificaciones.
+  activo: true
+
+- nombre: calificaciones.leer_propio
+  descripcion: Consultar las propias calificaciones.
+  activo: true
+
+- nombre: calificaciones.actualizar
+  descripcion: Modificar calificaciones.
+  activo: true
+
+- nombre: calificaciones.eliminar
+  descripcion: Eliminar calificaciones.
+  activo: true
+
+# RESULTADO ACADÉMICO
+
+- nombre: resultado_academico.generar
+  descripcion: Generar resultados académicos.
+  activo: true
+
+- nombre: resultado_academico.leer
+  descripcion: Consultar todos los resultados académicos.
+  activo: true
+
+- nombre: resultado_academico.leer_propio
+  descripcion: Consultar el propio resultado académico.
+  activo: true
+
+- nombre: resultado_academico.eliminar
+  descripcion: Eliminar resultados académicos.
+  activo: true
+
+# RESULTADO DE PLAN
+
+- nombre: resultado_plan.leer
+  descripcion: Consultar todos los resultados de plan.
+  activo: true
+
+- nombre: resultado_plan.leer_propio
+  descripcion: Consultar el propio resultado de plan.
+  activo: true
+
+- nombre: resultado_plan.actualizar
+  descripcion: Actualizar el estado del resultado de un plan.
+  activo: true
+
+- nombre: resultado_plan.eliminar
+  descripcion: Eliminar resultados de plan.
+  activo: true
+
+# CERTIFICADOS
+
+- nombre: certificados.emitir
+  descripcion: Emitir certificados.
+  activo: true
+
+- nombre: certificados.leer
+  descripcion: Consultar todos los certificados.
+  activo: true
+
+- nombre: certificados.leer_propio
+  descripcion: Consultar los propios certificados.
+  activo: true
+
+- nombre: certificados.actualizar
+  descripcion: Revocar o actualizar certificados.
+  activo: true
+
+- nombre: certificados.eliminar
+  descripcion: Eliminar certificados.
+  activo: true
+
+# CATÁLOGOS
+
+- nombre: estados_inscripcion.leer
+  descripcion: Consultar los estados de inscripción.
+  activo: true
+
+- nombre: estados_asistencia.leer
+  descripcion: Consultar los estados de asistencia.
+  activo: true
+
+- nombre: estados_academicos.leer
+  descripcion: Consultar los estados académicos.
+  activo: true
+
+- nombre: estados_resultado_plan.leer
+  descripcion: Consultar los estados de resultado de plan.
+  activo: true
+
+- nombre: estados_certificado.leer
+  descripcion: Consultar los estados de certificado.
+  activo: true
+
+- nombre: tipos_evaluacion.leer
+  descripcion: Consultar los tipos de evaluación.
+  activo: true
+
+- nombre: tipos_certificado.leer
+  descripcion: Consultar los tipos de certificado.
+  activo: true
 
 roles:
 
@@ -161,6 +253,14 @@ rol_accion:
       - certificados.actualizar
       - certificados.eliminar
 
+      - estados_inscripcion.leer
+      - estados_asistencia.leer
+      - estados_academicos.leer
+      - estados_resultado_plan.leer
+      - estados_certificado.leer
+      - tipos_evaluacion.leer
+      - tipos_certificado.leer
+
   - rol: Docencia
     acciones:
       - clases.leer
@@ -178,19 +278,33 @@ rol_accion:
       - calificaciones.leer
       - calificaciones.actualizar
 
+      - estados_inscripcion.leer
+      - estados_asistencia.leer
+      - estados_academicos.leer
+      - estados_resultado_plan.leer
+      - estados_certificado.leer
+      - tipos_evaluacion.leer
+      - tipos_certificado.leer
+
   - rol: Alumno
     acciones:
+
       - inscripciones.crear
-      - inscripciones.leer
+      - inscripciones.leer_propio
+      - clases.leer_propio
+      - asistencias.leer_propio
+      - evaluaciones.leer_propio
+      - calificaciones.leer_propio
+      - resultado_academico.leer_propio
+      - resultado_plan.leer_propio
+      - certificados.leer_propio
 
-      - clases.leer
+      # Catálogos
 
-      - asistencias.leer
-
-      - calificaciones.leer
-
-      - resultado_academico.leer
-
-      - resultado_plan.leer
-
-      - certificados.leer
+      - estados_inscripcion.leer
+      - estados_asistencia.leer
+      - estados_academicos.leer
+      - estados_resultado_plan.leer
+      - estados_certificado.leer
+      - tipos_evaluacion.leer
+      - tipos_certificado.leer

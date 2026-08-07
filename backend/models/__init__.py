@@ -13,3 +13,4 @@ from .modelo_resultado_plan import ResultadoPlan
 from .modelo_estado_certificado import EstadoCertificado
 from .modelo_tipo_certificado import TipoCertificado
 from .modelo_certificado import Certificado
+from .modelo_log_auditoria import LogAuditoria

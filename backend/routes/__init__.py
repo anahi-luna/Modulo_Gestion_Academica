@@ -6,3 +6,4 @@ from .calificacion_routes import calificacion_bp
 from .resultado_academico_routes import resultado_academico_bp
 from .resultado_plan_routes import resultado_plan_bp
 from .certificado_routes import certificado_bp
+from .catalogo_routes import catalogo_bp

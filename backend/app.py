@@ -26,8 +26,36 @@ def create_app():
 
     jwt_manager = JWTManager(app)
 
+    def guardar_log(evento):
+        """
+        Callback que auth_common invoca desde su hook after_request (o
+        teardown_request, para excepciones no controladas) con el
+        evento ya armado y sanitizado. Inserta en la tabla
+        logs_auditoria propia de Inscripción, usando el mismo
+        db.session que el resto de la app.
+        """
+        log = LogAuditoria(
+            request_id=evento["request_id"],
+            metodo_http=evento["metodo_http"],
+            endpoint=evento["endpoint"],
+            path=evento["path"],
+            query_params=evento["query_params"],
+            request_body=evento["request_body"],
+            response_body=evento["response_body"],
+            status_code=evento["status_code"],
+            duracion_ms=evento["duracion_ms"],
+            ip_origen=evento["ip_origen"],
+            user_agent=evento["user_agent"],
+            id_usuario=evento["id_usuario"],
+            roles=evento["roles"],
+            error_type=evento["error_type"],
+            error_message=evento["error_message"],
+        )
+        db.session.add(log)
+        db.session.commit()
+
     # Inicializar Auth Common
-    AuthCommon(app)
+    AuthCommon(app, guardar_log=guardar_log)
 
 
     app.register_blueprint(inscripcion_bp, url_prefix="/inscripciones")
@@ -38,6 +66,7 @@ def create_app():
     app.register_blueprint(resultado_academico_bp,url_prefix ="/resultados-academicos")
     app.register_blueprint(resultado_plan_bp, url_prefix ="/resultados-planes")
     app.register_blueprint(certificado_bp, url_prefix ="/certificados")
+    app.register_blueprint(catalogo_bp, url_prefix="/catalogos")
     
     # Ruta de prueba
     @app.route("/status")
