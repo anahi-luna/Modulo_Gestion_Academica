@@ -4,6 +4,14 @@ import TablaAsistencia from "./AsistenciaTabla";
 import HistorialAsistencias from "./HistorialAsistencias";
 
 import { useNavigate } from "react-router-dom";
+import { CalendarDaysIcon, ClockIcon, FlagIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { useState, useEffect, use } from "react";
+import ClaseSelect from "./ClaseSelect";
+import EstadisticaCard from "./EstadisticaCard";
+import TablaAsistencia from "./AsistenciaTabla";
+import HistorialAsistencias from "./HistorialAsistencias";
+
+import { useNavigate } from "react-router-dom";
 import {
     CalendarDaysIcon,
     ClockIcon,
@@ -37,6 +45,7 @@ import {
 } from "../../api/catalogosApi";
 
 import Alert from "../Alert";
+import ModalConfirmacion from "../ConfirmModal"
 
 
 // Componente principal para mostrar el panel de detalle de una clase,
@@ -65,6 +74,14 @@ export default function PanelDetalleClase({
     const [estadosAsistencia, setEstadosAsistencia] = useState([]);
 
     const navigate = useNavigate();
+
+    const [modalEliminarAsistencia, setModalEliminarAsistencia] = useState(false);
+
+    const [asistenciaAEliminar, setAsistenciaAEliminar] = useState(null);
+
+    const [modalEliminarTodasAsist, setModalEliminarTodasAsist] = useState(false);
+
+    const [todasAEliminar, setTodasAEliminar] = useState(null);
 
 
     // ============================================================
@@ -548,7 +565,7 @@ export default function PanelDetalleClase({
     // ELIMINAR UNA ASISTENCIA
     // ============================================================
 
-    async function eliminarUnaAsistencia(asistencia) {
+    function eliminarUnaAsistencia(asistencia) {
 
         if (!asistencia?.id) {
 
@@ -560,14 +577,20 @@ export default function PanelDetalleClase({
 
         }
 
-
-        const confirmar =
-            window.confirm(
-                `¿Querés eliminar la asistencia de ${asistencia.alumno}?`
-            );
+        setAsistenciaAEliminar(asistencia);
+        setModalEliminarAsistencia(true);
 
 
-        if (!confirmar) {
+        
+
+    }
+
+    // ============================================================
+    // CONFIRMAR ELIMINAR UNA ASISTENCIA
+    // ============================================================
+
+    async function confirmarEliminarAsistencia() {
+        if(!asistenciaAEliminar){
             return;
         }
 
@@ -575,14 +598,14 @@ export default function PanelDetalleClase({
         try {
 
             await eliminarAsistenciaService(
-                asistencia.id
+                asistenciaAEliminar.id
             );
 
 
             const asistenciasRestantes =
                 asistencias.filter(
                     (item) =>
-                        item.id !== asistencia.id
+                        item.id !== asistenciaAEliminar.id
                 );
 
 
@@ -641,7 +664,7 @@ export default function PanelDetalleClase({
                 titulo: "Asistencia eliminada",
 
                 mensaje:
-                    `Se eliminó la asistencia de ${asistencia.alumno}.`,
+                    `Se eliminó la asistencia de ${asistenciaAEliminar.alumno}.`,
 
             });
 
@@ -665,8 +688,10 @@ export default function PanelDetalleClase({
 
             });
 
+        } finally {
+            setModalEliminarAsistencia(false);
+            setAsistenciaAEliminar(null);
         }
-
     }
 
 
@@ -674,15 +699,24 @@ export default function PanelDetalleClase({
     // ELIMINAR ASISTENCIAS DE UNA CLASE
     // ============================================================
 
-    async function eliminarDesdeHistorial(clase) {
+    function eliminarDesdeHistorial(clase) {
 
-        const confirmar =
-            window.confirm(
-                `¿Querés eliminar todas las asistencias de ${clase.tema}`
-            );
+        if(!clase?.id){
+            console.error("La clase no tiene un id válido");
+            return;
+        }
 
+        setTodasAEliminar(clase);
+        setModalEliminarTodasAsist(true);
 
-        if (!confirmar) {
+    }
+
+    // ============================================================
+    // CONFRIMAR ELIMINAR ASISTENCIAS DE UNA CLASE
+    // ============================================================
+
+    async function confirmarEliminarTodasAsistencias() {
+        if(!todasAEliminar){
             return;
         }
 
@@ -690,7 +724,7 @@ export default function PanelDetalleClase({
         try {
 
             await eliminarAsistenciasPorClase(
-                clase.id
+                todasAEliminar.id
             );
 
 
@@ -698,13 +732,13 @@ export default function PanelDetalleClase({
                 (historialActual) =>
                     historialActual.filter(
                         (item) =>
-                            item.id !== clase.id
+                            item.id !== todasAEliminar.id
                     )
             );
 
 
             if (
-                claseSeleccionada?.id === clase.id
+                claseSeleccionada?.id === todasAEliminar.id
             ) {
 
                 setAsistencias([]);
@@ -745,8 +779,10 @@ export default function PanelDetalleClase({
 
             });
 
+        } finally {
+            setModalEliminarTodasAsist(false);
+            setTodasAEliminar(null);
         }
-
     }
 
 
@@ -1029,6 +1065,32 @@ export default function PanelDetalleClase({
                         ? claseSeleccionada?.id
                         : null
                 }
+            />
+
+            <ModalConfirmacion
+                abierto={modalEliminarAsistencia}
+                titulo="Eliminar asistencia"
+                mensaje={`¿Querés eliminar la asistencia de ${asistenciaAEliminar?.alumno}?`}
+                textoConfirmar="Eliminar"
+                textoCancelar="Cancelar"
+                onConfirmar={confirmarEliminarAsistencia}
+                onCancelar={() => {
+                    setModalEliminarAsistencia(false);
+                    setAsistenciaAEliminar(null);
+                }}
+            />
+
+            <ModalConfirmacion
+                abierto={modalEliminarTodasAsist}
+                titulo="Eliminar asistencias"
+                mensaje={`¿Querés eliminar todas las asistencias de "${todasAEliminar?.tema}"?`}
+                textoConfirmar="Eliminar"
+                textoCancelar="Cancelar"
+                onConfirmar={confirmarEliminarTodasAsistencias}
+                onCancelar={() => {
+                    setModalEliminarTodasAsist(false);
+                    setTodasAEliminar(null);
+                }}
             />
         </div>
     );
