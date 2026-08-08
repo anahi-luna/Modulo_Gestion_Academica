@@ -3,7 +3,7 @@ import EstadoCertificadoBadge from "./EstadoCertificadoBadge";
 
 // Componente para mostrar una tabla de certificados en la vista del Administrador, 
 // con acciones según el estado del certificado y del plan.
-export default function TablaCertificadosAdmin({ filas, onEmitir, onRevocar, onDescargar }) {
+export default function TablaCertificadosAdmin({ filas, onEmitir, onRevocar, onDescargar, onAdjuntar }) {
   if (filas.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow px-6 py-10 text-center text-sm text-gray-400">
@@ -32,6 +32,14 @@ export default function TablaCertificadosAdmin({ filas, onEmitir, onRevocar, onD
             >
               Descargar
             </button>
+            {onAdjuntar && (
+              <button
+                onClick={() => onAdjuntar(f.certificado)}
+                className="px-2 py-1 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium whitespace-nowrap"
+              >
+                {f.certificado.url_documento ? "Reemplazar archivo" : "Adjuntar archivo"}
+              </button>
+            )}
             {onRevocar && (
               <button
                 onClick={() => onRevocar(f.certificado)}

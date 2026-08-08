@@ -18,6 +18,22 @@ export default function Navbar({ modulo }) {
     window.location.href = LOGIN_ROUTE;
   }
 
+  // El objeto user de este microservicio solo trae id, id_legajo y
+  // email (no nombre/apellido, ver auth_routes.py). Se arma igual con
+  // una cadena de fallback, igual que en el navbar de auth, para que
+  // si en algún momento el backend empieza a mandar nombre/apellido,
+  // se muestre solo con este cambio.
+  const nombreUsuario =
+    user?.nombre && user?.apellido
+      ? `${user.nombre} ${user.apellido}`
+      : user?.persona?.nombre && user?.persona?.apellido
+      ? `${user.persona.nombre} ${user.persona.apellido}`
+      : user?.nombre ||
+        user?.persona?.nombre ||
+        user?.email ||
+        user?.persona?.email ||
+        "Usuario";
+
   const linkClass = ({ isActive }) =>
     `px-3 py-2 rounded-md text-sm font-medium transition-colors
      ${isActive
@@ -135,6 +151,9 @@ export default function Navbar({ modulo }) {
                 transition
                 className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-leave:duration-75"
               >
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <p className="text-sm font-semibold text-gray-800 truncate">{nombreUsuario}</p>
+                </div>
 
                 <MenuItem>
                   <button
@@ -153,6 +172,9 @@ export default function Navbar({ modulo }) {
       </div>
 
       <DisclosurePanel className="lg:hidden absolute inset-x-0 top-full z-40 max-h-[calc(100vh-4rem)] overflow-y-auto bg-red-800 shadow-lg">
+        <div className="px-4 pt-3 pb-2 border-b border-red-700">
+          <p className="text-sm font-semibold text-white truncate">{nombreUsuario}</p>
+        </div>
         <div className="space-y-1 px-2 pt-2 pb-3">
           <a
             className={linkClassMobile({ isActive: false })}

@@ -7,8 +7,10 @@ import {
     getMisCertificados,
     crearCertificado,
     editarCertificado,
+    subirArchivoCertificado,
 } from "../api/certificadosApi";
 import { obtenerTodosLosPlanes } from "./planesService";
+import API_URL from "../api/api";
 
 // coincide con seed/seed_estado_certificado.py del back
 const ID_ESTADO_REVOCADO = 2;
@@ -22,6 +24,7 @@ function mapearCertificado(c) {
         codigo_verificacion: c.codigo_verificacion,
         fecha_emision:       c.fecha_emision,
         fecha_vencimiento:   c.fecha_vencimiento,
+        url_documento:       c.url_documento,
     };
 }
 
@@ -89,28 +92,42 @@ export async function revocar(idCertificado) {
     return mapearCertificado(response.data);
 }
 
-// cuando el back tenga url_documento real, esto se reemplaza por abrir esa URL
-export function descargarCertificado(cert, alumnoNombre) {
-    const contenido =
-        `INSTITUTO DE BOMBEROS - CERTIFICADO
-=====================================
-Tipo: ${cert.tipo}
-Alumno: ${alumnoNombre}
-Plan Nº: ${cert.id_plan ?? "-"}
-Código de verificación: ${cert.codigo_verificacion}
-Fecha de emisión: ${cert.fecha_emision}
-=====================================
-Documento simulado generado por el frontend.
-Cuando el back genere el PDF real (campo url_documento),
-este botón va a descargar ese archivo en vez de este texto.`;
+// Adjunta (o reemplaza) el PDF de un certificado ya emitido.
+export async function subirArchivo(idCertificado, archivo) {
+    const response = await subirArchivoCertificado(idCertificado, archivo);
+    return mapearCertificado(response.data);
+}
 
-    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href     = url;
-    a.download = `${cert.codigo_verificacion || "certificado"}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+// Abre/descarga el PDF real subido para el certificado. Se pide con
+// fetch (no con window.open) porque la ruta requiere el token de
+// autenticación, que window.fetch ya agrega automáticamente para
+// las llamadas a nuestra API (ver api/api.js); una navegación directa
+// del navegador no lo incluiría. Si todavía no tiene archivo
+// adjunto, avisa en vez de intentar abrir algo vacío.
+export async function descargarCertificado(cert) {
+    if (!cert.url_documento) {
+        alert("Este certificado todavía no tiene un archivo adjunto.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}${cert.url_documento}`);
+
+        if (!response.ok) {
+            throw new Error("No se pudo descargar el archivo del certificado.");
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${cert.codigo_verificacion || "certificado"}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Error al descargar el certificado", error);
+        alert(error.message);
+    }
 }
