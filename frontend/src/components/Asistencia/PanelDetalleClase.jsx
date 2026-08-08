@@ -4,13 +4,14 @@ import TablaAsistencia from "./AsistenciaTabla";
 import HistorialAsistencias from "./HistorialAsistencias";
 import { useNavigate } from "react-router-dom";
 import { CalendarDaysIcon, ClockIcon, FlagIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { getClase, getClases } from "../../Services/clasesAdminService";
 import { obtenerAsistenciasPorClase, modificarAsistencia, registrarAsistenciaService, actualizarEstadoAutomaticamente, eliminarAsistenciasPorClase, obtenerHistorialPorComision, eliminarAsistenciaService } from "../../Services/asistenciaAdminService";
 import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
 import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
 import { getComisiones } from "../../api/comisiones";
 import Alert from "../Alert";
+import ModalConfirmacion from "../ConfirmModal";
 
 // Componente principal para mostrar el panel de detalle de una clase,
 //  incluyendo la selección de clase, estadísticas, tabla de asistencias y historial.
@@ -22,6 +23,10 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
     const [historial, setHistorial] = useState([]);
     const [asistenciaRegistrada, setAsistenciaRegistrada] = useState(false);
     const [alerta, setAlerta] = useState(null);
+    const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false);
+    const [asistenciaAEliminar, setAsistenciaAEliminar] = useState(null);
+    const [modalEliminarTodasAist, setModalEliminarTodasAsist] = useState(false);
+    const [asistsAEliminar, setAsistsAEliminar] = useState(null);
 
     const navigate = useNavigate();
 
@@ -269,7 +274,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
         })
     }
 
-    async function eliminarUnaAsistencia(asistencia) {
+    function eliminarUnaAsistencia(asistencia) {
         if (!asistencia?.id) {
             console.error(
                 "La asistencia no tiene un identificador válido"
@@ -277,21 +282,20 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
             return;
         }
 
-        const confirmar = window.confirm(
-            `¿Querés eliminar la asistencia de ${asistencia.alumno}?`
-        );
+        setAsistenciaAEliminar(asistencia);
+        setModalEliminarAbierto(true)
 
-        if (!confirmar) {
-            return;
-        }
+    }
+
+    async function confirmarEliminarAsistencia() {
+        if (!asistenciaAEliminar) return;
 
         try {
-            await eliminarAsistenciaService(asistencia.id);
-            //Busca las asistenicas y las carga
-            setAsistencias((asistenciasRestantes) =>
-                asistenciasRestantes.filter(
-                    (item) => item.id !== asistencia.id
-                )
+
+            await eliminarAsistenciaService(asistenciaAEliminar.id);
+
+            const asistenciasRestantes = asistencias.filter(
+                    (item) => item.id !== asistenciaAEliminar.id
             );
 
             setAsistencias(asistenciasRestantes);
@@ -325,7 +329,7 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
             setAlerta({
                 tipo: "success",
                 titulo: "Asistencia eliminada",
-                mensaje: `Se eliminó la asistencia de ${asistencia.alumno}.`,
+                mensaje: `Se eliminó la asistencia de ${asistenciaAEliminar.alumno}.`,
             });
         } catch (error) {
             console.error(
@@ -338,6 +342,12 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                 titulo: "Error",
                 mensaje: "No se pudo eliminar la asistencia.",
             });
+
+
+
+        } finally {
+            setModalEliminarAsistencia(false);
+            setAsistenciaAEliminar(null);
         }
     }
 
@@ -540,6 +550,19 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                     modoEdicion
                         ? claseSeleccionada?.id : null
                 }
+            />
+
+            <ModalConfirmacion
+                abierto={modalEliminarAsistencia}
+                titulo="Eliminar asistencia"
+                mensaje={`¿Querés eliminar la asistencia de ${asistenciaAEliminar?.alumno}?`}
+                textoConfirmar="Eliminar"
+                textoCancelar="Cancelar"
+                onConfirmar={confirmarEliminarAsistencia}
+                onCancelar={() => {
+                    setModalEliminarAsistencia(false);
+                    setAsistenciaAEliminar(null);
+                }}
             />
 
         </div>
