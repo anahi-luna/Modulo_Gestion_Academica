@@ -6,7 +6,7 @@ import EstadoSelect from "./EstadoSelect";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
 // observación, pero sigo mostrando todo igual para que pueda consultar.
-export default function IntegranteRow({ asistencia, onCambiarEstado, onCambiarObservacion, soloLectura = false, onEliminarAsistencia }) {
+export default function IntegranteRow({ asistencia, estados,onCambiarEstado, onCambiarObservacion, soloLectura = false, onEliminarAsistencia }) {
 
   const estadoActivo = "ring-2 ring-offset-1 ring-gray-500";
 
@@ -20,6 +20,7 @@ export default function IntegranteRow({ asistencia, onCambiarEstado, onCambiarOb
         <div className="flex flex-wrap gap-2 py-2">
           <EstadoSelect
             idEstado={asistencia.id_estado}
+            estados={estados}
             soloLectura={soloLectura}
             onCambiarEstado={(nuevoEstado) =>
               onCambiarEstado(
