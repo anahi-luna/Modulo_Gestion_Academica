@@ -5,45 +5,144 @@ import HistorialAsistencias from "./HistorialAsistencias";
 import { useNavigate } from "react-router-dom";
 import { CalendarDaysIcon, ClockIcon, FlagIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect, use } from "react";
-import { getClase, getClases } from "../../Services/clasesAdminService";
-import { obtenerAsistenciasPorClase, modificarAsistencia, registrarAsistenciaService, actualizarEstadoAutomaticamente, eliminarAsistenciasPorClase, obtenerHistorialPorComision, eliminarAsistenciaService } from "../../Services/asistenciaAdminService";
-import { obtenerInscripcionesPorComision } from "../../Services/inscripcionesAdminService";
-import { cargarDatosInscripcion } from "../../Services/inscripcionesService";
+import ClaseSelect from "./ClaseSelect";
+import EstadisticaCard from "./EstadisticaCard";
+import TablaAsistencia from "./AsistenciaTabla";
+import HistorialAsistencias from "./HistorialAsistencias";
+
+import { useNavigate } from "react-router-dom";
+import {
+    CalendarDaysIcon,
+    ClockIcon,
+    PencilSquareIcon
+} from "@heroicons/react/24/outline";
+
+import { useState, useEffect } from "react";
+
+import {
+    getClases
+} from "../../Services/clasesAdminService";
+
+import {
+    obtenerAsistenciasPorClase,
+    modificarAsistencia,
+    registrarAsistenciaService,
+    actualizarEstadoAutomaticamente,
+    eliminarAsistenciasPorClase,
+    obtenerHistorialPorComision,
+    eliminarAsistenciaService
+} from "../../Services/asistenciaAdminService";
+
+import {
+    obtenerInscripcionesPorComision
+} from "../../Services/inscripcionesAdminService";
+
 import { getComisiones } from "../../api/comisiones";
+
+import {
+    getEstadosAsistencia
+} from "../../api/catalogosApi";
+
 import Alert from "../Alert";
-import ModalConfirmacion from "../ConfirmModal";
+import ModalConfirmacion from "../ConfirmModal"
+
 
 // Componente principal para mostrar el panel de detalle de una clase,
-//  incluyendo la selección de clase, estadísticas, tabla de asistencias y historial.
-export default function PanelDetalleClase({ idComision, idClaseInicial = null, }) {
+// incluyendo la selección de clase, estadísticas, tabla de asistencias y
+// historial.
+export default function PanelDetalleClase({
+    idComision,
+    idClaseInicial = null,
+}) {
+
     const [claseSeleccionada, setClaseSeleccionada] = useState(null);
+
     const [clases, setClases] = useState([]);
+
     const [asistencias, setAsistencias] = useState([]);
+
     const [modoEdicion, setModoEdicion] = useState(false);
+
     const [historial, setHistorial] = useState([]);
+
     const [asistenciaRegistrada, setAsistenciaRegistrada] = useState(false);
+
     const [alerta, setAlerta] = useState(null);
-    const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false);
-    const [asistenciaAEliminar, setAsistenciaAEliminar] = useState(null);
-    const [modalEliminarTodasAist, setModalEliminarTodasAsist] = useState(false);
-    const [asistsAEliminar, setAsistsAEliminar] = useState(null);
+
+    // Catálogo de estados de asistencia
+    const [estadosAsistencia, setEstadosAsistencia] = useState([]);
 
     const navigate = useNavigate();
 
+    const [modalEliminarAsistencia, setModalEliminarAsistencia] = useState(false);
+
+    const [asistenciaAEliminar, setAsistenciaAEliminar] = useState(null);
+
+    const [modalEliminarTodasAsist, setModalEliminarTodasAsist] = useState(false);
+
+    const [todasAEliminar, setTodasAEliminar] = useState(null);
+
+
+    // ============================================================
+    // CARGAR ESTADOS DE ASISTENCIA
+    // ============================================================
+
     useEffect(() => {
-        async function cargarClases() {
+
+        async function cargarEstadosAsistencia() {
+
             try {
-                //Resetea las clases
+
+                const resultado = await getEstadosAsistencia();
+
+                setEstadosAsistencia(resultado);
+
+            } catch (error) {
+
+                console.error(
+                    "Error al cargar los estados de asistencia:",
+                    error
+                );
+
+                setAlerta({
+                    tipo: "error",
+                    titulo: "Error",
+                    mensaje: "No se pudieron cargar los estados de asistencia."
+                });
+
+            }
+        }
+
+        cargarEstadosAsistencia();
+
+    }, []);
+
+
+    // ============================================================
+    // CARGAR CLASES
+    // ============================================================
+
+    useEffect(() => {
+
+        async function cargarClases() {
+
+            try {
+
+                // Resetea las clases
                 setClaseSeleccionada(null);
                 setClases([]);
                 setAsistencias([]);
 
                 const resultado = await getClases(idComision);
+
                 const clasesActualizadas = await Promise.all(
                     resultado.map(actualizarEstadoAutomaticamente)
                 );
+
                 setClases(clasesActualizadas);
+
                 if (resultado.length > 0) {
+
                     const claseInicial = idClaseInicial
                         ? clasesActualizadas.find(
                             (clase) =>
@@ -56,254 +155,473 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                     );
                 }
 
-                const clasesSinAsistencia = []
+                const clasesSinAsistencia = [];
 
                 for (const clase of clasesActualizadas) {
-                    const asistenciasClase = await obtenerAsistenciasPorClase(clase.id);
+
+                    const asistenciasClase =
+                        await obtenerAsistenciasPorClase(clase.id);
 
                     if (asistenciasClase.length === 0) {
+
                         clasesSinAsistencia.push(clase);
+
                     }
+
                 }
 
-                setClases(clasesSinAsistencia)
+                setClases(clasesSinAsistencia);
+
             } catch (error) {
+
                 console.error(error);
+
             }
+
         }
+
         if (idComision) {
             cargarClases();
         }
+
     }, [idComision, idClaseInicial]);
 
+
+    // ============================================================
+    // CARGAR ASISTENCIAS DE LA CLASE SELECCIONADA
+    // ============================================================
+
     useEffect(() => {
+
         if (claseSeleccionada?.id) {
+
             cargarAsistencias();
+
         } else {
+
             setAsistencias([]);
+
         }
+
     }, [claseSeleccionada?.id]);
 
 
-
-
-    // Carga las asistencias de la clase seleccionada. Si no hay asistencias registradas,
-    //  carga los inscriptos de la comisión para poder registrar la asistencia.
     async function cargarAsistencias() {
+
         try {
-            const asistenciasObtenidas = await obtenerAsistenciasPorClase(claseSeleccionada.id);
+
+            const asistenciasObtenidas =
+                await obtenerAsistenciasPorClase(
+                    claseSeleccionada.id
+                );
+
             if (asistenciasObtenidas.length > 0) {
+
                 setAsistencias(asistenciasObtenidas);
+
                 setAsistenciaRegistrada(true);
+
             } else {
-                const inscriptos = await obtenerInscripcionesPorComision(idComision);
+
+                const inscriptos =
+                    await obtenerInscripcionesPorComision(
+                        idComision
+                    );
+
                 setAsistencias(inscriptos);
+
                 setAsistenciaRegistrada(false);
+
             }
+
         } catch (error) {
+
             console.error(error);
+
             setAsistenciaRegistrada(false);
 
         }
+
     }
 
-    // Actualiza el estado de UN integrante puntual dentro del array de asistencias.
-    // Recibe el id_inscripcion (para saber a quien le cambio el estado) y el
-    // nuevo id_estado que seleccionó el usuario.
+
+    // ============================================================
+    // CAMBIAR ESTADO DE UNA ASISTENCIA
+    // ============================================================
+
     function cambiarEstado(idInscripcion, idEstado) {
+
         setAsistencias(prev =>
             prev.map(a =>
                 a.id_inscripcion === idInscripcion
-                    ? { ...a, id_estado: idEstado }
+                    ? {
+                        ...a,
+                        id_estado: idEstado
+                    }
                     : a
             )
         );
+
     }
 
-    // Actualiza la observacion de UN integrante puntual dentro del array de asistencias.
-    // Recibe el id_inscripcion (para saber a quien le cambio la observacion) y el
-    // texto nuevo que escribio el usuario en el input.
-    function cambiarObservacion(idInscripcion, observacion) {
+
+    // ============================================================
+    // CAMBIAR OBSERVACIÓN
+    // ============================================================
+
+    function cambiarObservacion(
+        idInscripcion,
+        observacion
+    ) {
+
         setAsistencias(prev =>
             prev.map(a =>
                 a.id_inscripcion === idInscripcion
-                    // Si es el integrante correcto, le pisamos solo el campo "observacion"
-                    // (con el spread ...a mantenemos el resto de sus datos igual)
-                    ? { ...a, observacion }
-                    // Si no es el integrante que estamos editando, lo dejamos igual
+                    ? {
+                        ...a,
+                        observacion
+                    }
                     : a
             )
         );
+
     }
+
+
+    // ============================================================
+    // GUARDAR ASISTENCIAS
+    // ============================================================
 
     async function guardarAsistencias() {
 
         if (!claseSeleccionada?.id) {
-            console.error("No hay una clase seleccionada")
+
+            console.error(
+                "No hay una clase seleccionada"
+            );
+
             return;
         }
 
-        const observacionInvalida = asistencias.some(a => {
-            const obs = (a.observacion ?? "").trim();
 
-            // Si escribió algo, debe contener al menos una letra
-            return obs !== "" && !/[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(obs);
-        });
+        const observacionInvalida =
+            asistencias.some(a => {
+
+                const obs =
+                    (a.observacion ?? "").trim();
+
+                // Si escribió algo, debe contener al menos una letra
+                return (
+                    obs !== "" &&
+                    !/[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(obs)
+                );
+
+            });
+
 
         if (observacionInvalida) {
+
             setAlerta({
                 tipo: "error",
                 titulo: "Observación inválida",
-                mensaje: "La observación debe contener al menos una letra.",
+                mensaje:
+                    "La observación debe contener al menos una letra.",
             });
+
             return;
         }
 
+
         try {
-            const asistenciasExistentes = asistencias.filter((a) => a.id);
 
-            const asistenciasNuevas = asistencias.filter((a) => !a.id);
+            const asistenciasExistentes =
+                asistencias.filter(
+                    (a) => a.id
+                );
 
+            const asistenciasNuevas =
+                asistencias.filter(
+                    (a) => !a.id
+                );
+
+
+            // ----------------------------------------------------
+            // MODIFICAR ASISTENCIAS EXISTENTES
+            // ----------------------------------------------------
 
             if (asistenciasExistentes.length > 0) {
+
                 await Promise.all(
+
                     asistenciasExistentes.map((a) =>
-                        modificarAsistencia(a.id, {
-                            id_estado: a.id_estado,
-                            observacion: a.observacion ?? "",
-                        })
+
+                        modificarAsistencia(
+                            a.id,
+                            {
+                                id_estado: a.id_estado,
+                                observacion:
+                                    a.observacion ?? "",
+                            }
+                        )
+
                     )
-                )
+
+                );
+
             }
+
+
+            // ----------------------------------------------------
+            // CREAR NUEVAS ASISTENCIAS
+            // ----------------------------------------------------
 
             if (asistenciasNuevas.length > 0) {
+
                 const datos = {
-                    id_clase: claseSeleccionada.id,
+
+                    id_clase:
+                        claseSeleccionada.id,
+
                     asistencias:
                         asistenciasNuevas.map((a) => ({
-                            id_inscripcion: a.id_inscripcion,
-                            id_estado: a.id_estado,
-                            observacion: a.observacion ?? "",
-                        }))
-                }
 
-                await registrarAsistenciaService(datos);
+                            id_inscripcion:
+                                a.id_inscripcion,
+
+                            id_estado:
+                                a.id_estado,
+
+                            observacion:
+                                a.observacion ?? "",
+
+                        }))
+
+                };
+
+
+                await registrarAsistenciaService(
+                    datos
+                );
+
             }
 
-            //Elimina las clases del select una vez que se guardan las asistencias por primera vez
-            setClases((clasesActuales) =>
-                clasesActuales.filter((clase) => clase.id !== claseSeleccionada.id)
-            )
 
-            //Sale del modo edicion
+            // Elimina la clase del select una vez
+            // que se guardan las asistencias por primera vez
+            setClases((clasesActuales) =>
+                clasesActuales.filter(
+                    (clase) =>
+                        clase.id !==
+                        claseSeleccionada.id
+                )
+            );
+
+
+            // Sale del modo edición
             setModoEdicion(false);
-            //Limpia la tabla de asistencias
+
+
+            // Limpia la tabla
             setClaseSeleccionada(null);
+
             setAsistencias([]);
-            setAsistenciaRegistrada(false)
+
+            setAsistenciaRegistrada(false);
 
 
             await cargarHistorial();
+
 
             setAlerta({
                 tipo: "success",
                 titulo: "Asistencia registrada",
-                mensaje: "La asistencia se registró con éxito",
+                mensaje:
+                    "La asistencia se registró con éxito",
             });
 
 
         } catch (error) {
+
             setAlerta({
                 tipo: "error",
                 titulo: "Error",
-                mensaje: "Ocurrió un error al guardar la asistencia",
+                mensaje:
+                    "Ocurrió un error al guardar la asistencia",
             });
-            console.error("Error al guardar", error)
+
+            console.error(
+                "Error al guardar",
+                error
+            );
 
         }
 
     }
 
+
+    // ============================================================
+    // SELECCIONAR CLASE
+    // ============================================================
+
     function seleccionarClaseNormal(clase) {
+
         setClaseSeleccionada(clase);
+
         setModoEdicion(false);
+
     }
 
 
+    // ============================================================
+    // HISTORIAL
+    // ============================================================
+
     useEffect(() => {
+
         cargarHistorial();
+
     }, [idComision]);
 
 
     async function cargarHistorial() {
+
         if (!idComision) {
+
             setHistorial([]);
+
             return;
+
         }
 
+
         try {
+
             const resultado =
-                await obtenerHistorialPorComision(idComision);
+                await obtenerHistorialPorComision(
+                    idComision
+                );
 
             setHistorial(resultado);
+
         } catch (error) {
+
             console.error(
-                "Error al cargar el historial:", error
+                "Error al cargar el historial:",
+                error
             );
 
             setHistorial([]);
+
         }
+
     }
+
+
+    // ============================================================
+    // EDITAR DESDE HISTORIAL
+    // ============================================================
 
     async function editarDesdeHistorial(clase) {
+
         setClaseSeleccionada(clase);
+
         setModoEdicion(true);
 
-        try {
-            const resultado = await obtenerAsistenciasPorClase(clase.id);
 
-            setAsistencias(resultado)
+        try {
+
+            const resultado =
+                await obtenerAsistenciasPorClase(
+                    clase.id
+                );
+
+            setAsistencias(resultado);
+
             setAsistenciaRegistrada(true);
+
         } catch (error) {
-            console.error("Error al cargar la asistencia para editar", error)
+
+            console.error(
+                "Error al cargar la asistencia para editar",
+                error
+            );
+
         }
 
+
         window.scrollTo({
+
             top: 0,
+
             behavior: "smooth",
-        })
+
+        });
+
     }
 
+
+    // ============================================================
+    // ELIMINAR UNA ASISTENCIA
+    // ============================================================
+
     function eliminarUnaAsistencia(asistencia) {
+
         if (!asistencia?.id) {
+
             console.error(
                 "La asistencia no tiene un identificador válido"
             );
+
             return;
+
         }
 
         setAsistenciaAEliminar(asistencia);
-        setModalEliminarAbierto(true)
+        setModalEliminarAsistencia(true);
+
+
+        
 
     }
 
+    // ============================================================
+    // CONFIRMAR ELIMINAR UNA ASISTENCIA
+    // ============================================================
+
     async function confirmarEliminarAsistencia() {
-        if (!asistenciaAEliminar) return;
+        if(!asistenciaAEliminar){
+            return;
+        }
 
         try {
 
-            await eliminarAsistenciaService(asistenciaAEliminar.id);
-
-            const asistenciasRestantes = asistencias.filter(
-                    (item) => item.id !== asistenciaAEliminar.id
+            await eliminarAsistenciaService(
+                asistenciaAEliminar.id
             );
 
-            setAsistencias(asistenciasRestantes);
+
+            const asistenciasRestantes =
+                asistencias.filter(
+                    (item) =>
+                        item.id !== asistenciaAEliminar.id
+                );
+
+
+            setAsistencias(
+                asistenciasRestantes
+            );
+
 
             await cargarHistorial();
-            if (asistenciasRestantes.length === 0 && claseSeleccionada
+
+
+            if (
+                asistenciasRestantes.length === 0 &&
+                claseSeleccionada
             ) {
+
                 setClases((clasesActuales) => {
+
                     const yaExiste =
                         clasesActuales.some(
                             (clase) =>
@@ -311,39 +629,62 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                                 claseSeleccionada.id
                         );
 
+
                     if (yaExiste) {
                         return clasesActuales;
                     }
 
+
                     return [
+
                         ...clasesActuales,
+
                         claseSeleccionada,
+
                     ];
+
                 });
 
+
                 setClaseSeleccionada(null);
+
                 setAsistenciaRegistrada(false);
+
                 setModoEdicion(false);
+
             }
 
+
             setAlerta({
+
                 tipo: "success",
+
                 titulo: "Asistencia eliminada",
-                mensaje: `Se eliminó la asistencia de ${asistenciaAEliminar.alumno}.`,
+
+                mensaje:
+                    `Se eliminó la asistencia de ${asistenciaAEliminar.alumno}.`,
+
             });
+
+
         } catch (error) {
+
             console.error(
                 "Error al eliminar la asistencia:",
                 error
             );
 
+
             setAlerta({
+
                 tipo: "error",
+
                 titulo: "Error",
-                mensaje: "No se pudo eliminar la asistencia.",
+
+                mensaje:
+                    "No se pudo eliminar la asistencia.",
+
             });
-
-
 
         } finally {
             setModalEliminarAsistencia(false);
@@ -351,204 +692,375 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
         }
     }
 
-    async function eliminarDesdeHistorial(clase) {
-        const confirmar = window.confirm(`¿Querés eliminar todas las asistencias de ${clase.tema}`)
 
-        if (!confirmar) {
+    // ============================================================
+    // ELIMINAR ASISTENCIAS DE UNA CLASE
+    // ============================================================
+
+    function eliminarDesdeHistorial(clase) {
+
+        if(!clase?.id){
+            console.error("La clase no tiene un id válido");
+            return;
+        }
+
+        setTodasAEliminar(clase);
+        setModalEliminarTodasAsist(true);
+
+    }
+
+    // ============================================================
+    // CONFRIMAR ELIMINAR ASISTENCIAS DE UNA CLASE
+    // ============================================================
+
+    async function confirmarEliminarTodasAsistencias() {
+        if(!todasAEliminar){
             return;
         }
 
         try {
-            await eliminarAsistenciasPorClase(clase.id);
 
-            setHistorial((historialActual) =>
-                historialActual.filter(
-                    (item) => item.id !== clase.id
-                )
+            await eliminarAsistenciasPorClase(
+                todasAEliminar.id
             );
 
-            if (claseSeleccionada?.id === clase.id) {
+
+            setHistorial(
+                (historialActual) =>
+                    historialActual.filter(
+                        (item) =>
+                            item.id !== todasAEliminar.id
+                    )
+            );
+
+
+            if (
+                claseSeleccionada?.id === todasAEliminar.id
+            ) {
+
                 setAsistencias([]);
+
                 setModoEdicion(false);
+
             }
 
+
             setAlerta({
+
                 tipo: "success",
+
                 titulo: "Asistencia eliminada",
-                mensaje: "La asistencia se eliminó con éxito",
+
+                mensaje:
+                    "La asistencia se eliminó con éxito",
+
             });
+
+
         } catch (error) {
-            console.error("Error al eliminar las asistencias", error)
+
+            console.error(
+                "Error al eliminar las asistencias",
+                error
+            );
+
 
             setAlerta({
+
                 tipo: "error",
+
                 titulo: "Error",
-                mensaje: "Error al eliminar la asistencia",
+
+                mensaje:
+                    "Error al eliminar la asistencia",
+
             });
+
+        } finally {
+            setModalEliminarTodasAsist(false);
+            setTodasAEliminar(null);
         }
-
     }
-    const inscriptos = asistencias.length;
-    const presentes = asistencias.filter(a => a.id_estado === 1).length;
-    const ausentes = asistencias.filter(a => a.id_estado === 2).length;
-    const justificado = asistencias.filter(a => a.id_estado === 3).length;
-    const tarde = asistencias.filter(a => a.id_estado === 4).length;
 
+
+    // ============================================================
+    // ESTADÍSTICAS
+    // ============================================================
+
+    const inscriptos =
+        asistencias.length;
+
+
+    // Buscamos el ID de cada estado desde el catálogo.
+    const idPresente =
+        estadosAsistencia.find(
+            (estado) =>
+                estado.nombre === "Presente"
+        )?.id_estado_asistencia;
+
+
+    const idAusente =
+        estadosAsistencia.find(
+            (estado) =>
+                estado.nombre === "Ausente"
+        )?.id_estado_asistencia;
+
+
+    const idJustificado =
+        estadosAsistencia.find(
+            (estado) =>
+                estado.nombre === "Justificado"
+        )?.id_estado_asistencia;
+
+
+    const idTarde =
+        estadosAsistencia.find(
+            (estado) =>
+                estado.nombre === "Tarde"
+        )?.id_estado_asistencia;
+
+
+    const presentes =
+        asistencias.filter(
+            (a) =>
+                a.id_estado === idPresente
+        ).length;
+
+
+    const ausentes =
+        asistencias.filter(
+            (a) =>
+                a.id_estado === idAusente
+        ).length;
+
+
+    const justificado =
+        asistencias.filter(
+            (a) =>
+                a.id_estado === idJustificado
+        ).length;
+
+
+    const tarde =
+        asistencias.filter(
+            (a) =>
+                a.id_estado === idTarde
+        ).length;
+
+
+    // ============================================================
+    // RENDER
+    // ============================================================
 
     return (
+
         <div className="lg:col-span-9 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
 
             {alerta && (
+
                 <div className="p-4 pb-0 sm:p-8 sm:pb-0">
+
                     <Alert
                         tipo={alerta.tipo}
                         titulo={alerta.titulo}
                         mensaje={alerta.mensaje}
-                        onCerrar={() => setAlerta(null)}
+                        onCerrar={() =>
+                            setAlerta(null)
+                        }
                     />
+
                 </div>
+
             )}
 
-            {/* p-4 en mobile en vez de p-8, si no el contenido queda pegado a los bordes */}
+
             <div className="p-4 sm:p-8">
 
-                {/*
-                en mobile van en columna (flex-col), y desde sm
-                  vuelven a estar en fila.
-                */}
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
 
                     <div>
-                        {/* text-2xl en mobile, va creciendo hasta text-4xl en desktop */}
+
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 break-words">
                             {claseSeleccionada?.tema}
                         </h2>
 
-                        {/* flex-wrap: si no entran los 3 datos en una fila, pasan a la siguiente
-                            en vez de desbordar el contenedor */}
+
                         <div className="flex flex-wrap gap-x-6 gap-y-2 mt-3 sm:mt-4 text-gray-500 text-sm">
+
                             <div className="flex items-center gap-2">
-                                <CalendarDaysIcon className="h-5 w-5 text-red-600 shrink-0" />
-                                <span>{claseSeleccionada?.fecha}</span>
+
+                                <CalendarDaysIcon
+                                    className="h-5 w-5 text-red-600 shrink-0"
+                                />
+
+                                <span>
+                                    {claseSeleccionada?.fecha}
+                                </span>
+
+                            </div>
+
+
+                            <div className="flex items-center gap-2">
+
+                                <ClockIcon
+                                    className="h-5 w-5 text-red-600 shrink-0"
+                                />
+
+                                <span>
+                                    {claseSeleccionada?.hora_inicio}
+                                </span>
+
                             </div>
                             <div className="flex items-center gap-2">
-                                <ClockIcon className="h-5 w-5 text-red-600 shrink-0" />
-                                <span>{claseSeleccionada?.hora_inicio}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <ClockIcon className="h-5 w-5 text-red-600 shrink-0" />
-                                <span>{claseSeleccionada?.hora_fin}</span>
+                                <ClockIcon
+                                    className="h-5 w-5 text-red-600 shrink-0"
+                                />
+                                <span>
+                                    {claseSeleccionada?.hora_fin}
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* self-start en mobile para que no se estire a lo ancho */}
+
                     <button
-                        onClick={() => navigate("/GestionClases")}
+                        onClick={() =>
+                            navigate("/GestionClases")
+                        }
                         className="flex items-center gap-2 self-start sm:self-auto border border-gray-300 rounded-lg px-4 py-2 text-sm hover:bg-gray-100 transition shrink-0"
                     >
-                        <PencilSquareIcon className="h-5 w-5" />
+                        <PencilSquareIcon
+                            className="h-5 w-5"
+                        />
                         Gestionar Clases
                     </button>
-
                 </div>
             </div>
 
-            {/*Si estas editando una clase te especifica que estas en el modo de edicion */}
-            {modoEdicion && claseSeleccionada && (
-                <div className="mx-4 mb-4 rounded-xl border border-blue-300 bg-blue-50 p-4 sm:mx-8">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <p className="font-semibold text-blue-800">
-                                Estás editando  una asistencia registrada
-                            </p>
 
-                            <p>
-                                {claseSeleccionada.tema} .{" "}
-                                {claseSeleccionada.fecha}
-                            </p>
+            {/* Modo edición */}
+
+            {modoEdicion &&
+                claseSeleccionada && (
+                    <div className="mx-4 mb-4 rounded-xl border border-blue-300 bg-blue-50 p-4 sm:mx-8">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p className="font-semibold text-blue-800">
+                                    Estás editando una asistencia registrada
+                                </p>
+                                <p>
+                                    {claseSeleccionada.tema}
+                                    {" . "}
+                                    {claseSeleccionada.fecha}
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setModoEdicion(false)
+                                }
+                                className="self-start rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 sm:self-auto"
+                            >
+                                Cancelar edición
+                            </button>
                         </div>
-
-                        <button
-                            type="button"
-                            onClick={() => setModoEdicion(false)}
-                            className="self-start rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 sm:self-auto"
-                        >
-                            Cancelar edicion
-                        </button>
                     </div>
-                </div>
-            )}
+                )}
+
             {!modoEdicion && (
                 <ClaseSelect
                     clases={clases}
                     claseSeleccionada={claseSeleccionada}
-                    setClaseSeleccionada={seleccionarClaseNormal}
-
+                    setClaseSeleccionada={
+                        seleccionarClaseNormal
+                    }
                 />
             )}
 
-
             {claseSeleccionada && (
                 <>
-                    {asistenciaRegistrada && !modoEdicion && (
-                        <div className="
-                            mx-4 mb-4 rounded-xl border
-                            border-green-300 bg-green-50 p-4
-                            text-sm text-green-800 sm:mx-8
-                        ">
-                            Esta asistencia ya fue registrada. Para modificarla,
-                            seleccioná <strong>Editar</strong> desde el historial.
-                        </div>
-                    )}
-                    {/*
-                        2 columnas en mobile (2 filas de 2), 4 columnas desde sm.
-                    */}
+                    {asistenciaRegistrada &&
+                        !modoEdicion && (
+                            <div className="
+                                mx-4 mb-4 rounded-xl border
+                                border-green-300 bg-green-50 p-4
+                                text-sm text-green-800 sm:mx-8
+                            ">
+                                Esta asistencia ya fue registrada.
+                                Para modificarla, seleccioná
+                                <strong> Editar </strong>
+                                desde el historial.
+                            </div>
+                        )}
+
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6">
-                        <EstadisticaCard titulo="Inscriptos" cantidad={inscriptos} />
-                        <EstadisticaCard titulo="Presentes" cantidad={presentes} color="green" />
-                        <EstadisticaCard titulo="Ausentes" cantidad={ausentes} color="yellow" />
-                        <EstadisticaCard titulo="Tarde" cantidad={tarde} color="red" />
-                        <EstadisticaCard titulo="Justificados" cantidad={justificado} />
+
+                        <EstadisticaCard
+                            titulo="Inscriptos"
+                            cantidad={inscriptos}
+                        />
+
+                        <EstadisticaCard
+                            titulo="Presentes"
+                            cantidad={presentes}
+                            color="green"
+                        />
+
+                        <EstadisticaCard
+                            titulo="Ausentes"
+                            cantidad={ausentes}
+                            color="yellow"
+                        />
+
+                        <EstadisticaCard
+                            titulo="Tarde"
+                            cantidad={tarde}
+                            color="red"
+                        />
+                        <EstadisticaCard
+                            titulo="Justificados"
+                            cantidad={justificado}
+                        />
                     </div>
 
                     <TablaAsistencia
                         asistencias={asistencias}
+                        estados={estadosAsistencia}
                         onCambiarEstado={cambiarEstado}
                         onCambiarObservacion={cambiarObservacion}
                         onEliminarAsistencia={eliminarUnaAsistencia}
-                        soloLectura={asistenciaRegistrada && !modoEdicion}
-
+                        soloLectura={asistenciaRegistrada &&!modoEdicion}
                     />
-
-                    {/*
-                        Si esta en modo edicion mostrara guardar cambios, sino guardar asistencia
-                    */}
-                    {(!asistenciaRegistrada || modoEdicion) && (
-                        <div className="px-4 sm:px-6 pb-6">
-                            <button
-                                onClick={guardarAsistencias}
-                                className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white rounded-lg px-5 py-2 font-medium"
-                            >
-                                {modoEdicion
-
-                                    ? "Guardar cambios" : "Guardar asistencias"
-
-                                }
-                            </button>
-                        </div>
-                    )}
+                    {(!asistenciaRegistrada ||
+                        modoEdicion) && (
+                            <div className="px-4 sm:px-6 pb-6">
+                                <button
+                                    onClick={guardarAsistencias}
+                                    className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white rounded-lg px-5 py-2 font-medium"
+                                >
+                                    {modoEdicion
+                                        ? "Guardar cambios"
+                                        : "Guardar asistencias"
+                                    }
+                                </button>
+                            </div>
+                        )}
                 </>
             )}
 
-
             <HistorialAsistencias
                 historial={historial}
-                onEditar={editarDesdeHistorial}
-                onEliminar={eliminarDesdeHistorial}
+                onEditar={
+                    editarDesdeHistorial
+                }
+                onEliminar={
+                    eliminarDesdeHistorial
+                }
                 claseEditandoId={
                     modoEdicion
-                        ? claseSeleccionada?.id : null
+                        ? claseSeleccionada?.id
+                        : null
                 }
             />
 
@@ -565,6 +1077,18 @@ export default function PanelDetalleClase({ idComision, idClaseInicial = null, }
                 }}
             />
 
+            <ModalConfirmacion
+                abierto={modalEliminarTodasAsist}
+                titulo="Eliminar asistencias"
+                mensaje={`¿Querés eliminar todas las asistencias de "${todasAEliminar?.tema}"?`}
+                textoConfirmar="Eliminar"
+                textoCancelar="Cancelar"
+                onConfirmar={confirmarEliminarTodasAsistencias}
+                onCancelar={() => {
+                    setModalEliminarTodasAsist(false);
+                    setTodasAEliminar(null);
+                }}
+            />
         </div>
-    )
+    );
 }
