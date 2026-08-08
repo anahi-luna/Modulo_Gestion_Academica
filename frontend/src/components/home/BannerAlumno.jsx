@@ -6,7 +6,14 @@ import { useNavigate } from "react-router-dom";
 export default function BannerAlumno({ usuario, tieneInscripciones }) {
 
     const navigate = useNavigate();
-    const nombre = usuario.nombre.split(" ")[0];
+    // El objeto "usuario" que arma el login de Auth solo trae
+    // {id, id_legajo, email} (ver comentario en AuthContext.jsx) — no
+    // trae "nombre" ni "numero_legajo". Hasta que eso se resuelva
+    // (habría que pedir esos datos a Planes por separado), usamos el
+    // usuario del email como saludo para no romper el render.
+    const nombre = usuario?.nombre
+      ? usuario.nombre.split(" ")[0]
+      : usuario?.email?.split("@")[0] ?? "alumno";
 
     return (
         <div className="bg-red-800 text-white px-6 py-10">
@@ -27,7 +34,7 @@ export default function BannerAlumno({ usuario, tieneInscripciones }) {
 
                 <p className="text-red-200 mt-1 text-sm">
                     {tieneInscripciones
-                        ? `Legajo N° ${usuario.numero_legajo} · Integrante activo`
+                        ? `Legajo N° ${usuario?.id_legajo ?? "-"} · Integrante activo`
                         : "Tu legajo está listo"
                     }
                 </p>
