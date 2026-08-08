@@ -1,4 +1,4 @@
-from flask import request,g
+from flask import request, g, send_from_directory
 from marshmallow import ValidationError
 from services.certificado_service import *
 from schemas.certificado_schema import *
@@ -116,6 +116,36 @@ def actualizar_certificado_controller(id_certificado):
     except BusinessError as e:
 
         return error_response(message=e.message, status_code=e.status_code)
+
+
+# Adjunta el archivo PDF de un certificado ya emitido.
+def subir_archivo_certificado_controller(id_certificado):
+
+    try:
+
+        archivo = request.files.get("archivo")
+
+        certificado = adjuntar_archivo_certificado(id_certificado, archivo)
+
+        if not certificado:
+
+            return error_response("Certificado no encontrado.", status_code=404)
+
+        datos_certificado = certificado_schema.dump(certificado)
+
+        return success_response(
+            data=datos_certificado, message="Archivo adjuntado correctamente."
+        )
+
+    except BusinessError as e:
+
+        return error_response(message=e.message, status_code=e.status_code)
+
+
+# Descarga el archivo PDF de un certificado.
+def descargar_archivo_certificado_controller(nombre_archivo):
+
+    return send_from_directory(CARPETA_UPLOADS, nombre_archivo)
 
 
 # Elimina un certificado.

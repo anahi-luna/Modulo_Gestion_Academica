@@ -98,6 +98,28 @@ export async function editarCertificado(id, datos) {
     }
 }
 
+export async function subirArchivoCertificado(id, archivo) {
+    try {
+        const formData = new FormData();
+        formData.append("archivo", archivo);
+
+        const response = await fetch(`${API_URL}/certificados/${id}/archivo`, {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error al adjuntar el archivo del certificado", error);
+        throw error;
+    }
+}
+
 // Solo para desarrollo.
 export async function eliminarCertificado(id) {
     try {

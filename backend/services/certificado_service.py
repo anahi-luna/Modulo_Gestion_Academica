@@ -1,6 +1,8 @@
 from extensions import db
 from datetime import datetime
+import os
 import uuid
+from werkzeug.utils import secure_filename
 from utils.logger import logger
 from exceptions import BusinessError
 from sqlalchemy.exc import IntegrityError
@@ -8,6 +10,22 @@ from flask import g
 
 from models.modelo_certificado import Certificado
 from models.modelo_estado_certificado import EstadoCertificado
+
+# Carpeta donde se guardan los archivos de certificados subidos.
+# Al igual que en el servicio de documentos legales de auth, esta
+# carpeta queda dentro de /app, que está bind-mounteado al host, por
+# lo que los archivos persisten entre reinicios del contenedor.
+CARPETA_UPLOADS = "/app/uploads/certificados"
+
+EXTENSIONES_PERMITIDAS = {".pdf"}
+
+# Firma binaria que todo PDF válido tiene al inicio del archivo. Se
+# valida además de la extensión para evitar que un archivo renombrado
+# a ".pdf" (que en realidad no lo es) quede guardado como certificado.
+FIRMA_PDF = b"%PDF-"
+
+TAMANIO_MAXIMO_MB = 10
+TAMANIO_MAXIMO_BYTES = TAMANIO_MAXIMO_MB * 1024 * 1024
 
 from services.resultado_plan_service import obtener_resultado_plan_por_id
 from services.estado_certificado_service import obtener_estado_certificado_por_nombre
@@ -119,6 +137,132 @@ def preparar_datos_certificado(resultado_plan, tipo_certificado, estado_certific
         "ts_creacion": ahora,
         "ts_modificacion": None,
     }
+
+
+# -------------------ARCHIVO ADJUNTO-------------------#
+
+
+def _validar_es_pdf_real(archivo_werkzeug):
+    """Comprueba que el contenido sea realmente un PDF, no solo que el
+    nombre termine en .pdf."""
+    posicion_original = archivo_werkzeug.stream.tell()
+    archivo_werkzeug.stream.seek(0)
+    encabezado = archivo_werkzeug.stream.read(len(FIRMA_PDF))
+    archivo_werkzeug.stream.seek(posicion_original)
+
+    if encabezado != FIRMA_PDF:
+        raise BusinessError("El archivo seleccionado no es un PDF válido.", 400)
+
+
+def _validar_tamanio_archivo(archivo_werkzeug):
+    archivo_werkzeug.stream.seek(0, os.SEEK_END)
+    tamanio = archivo_werkzeug.stream.tell()
+    archivo_werkzeug.stream.seek(0)
+
+    if tamanio == 0:
+        raise BusinessError("El archivo está vacío.", 400)
+
+    if tamanio > TAMANIO_MAXIMO_BYTES:
+        raise BusinessError(
+            f"El archivo supera el tamaño máximo permitido ({TAMANIO_MAXIMO_MB} MB).", 400
+        )
+
+
+def _guardar_archivo_certificado(archivo_werkzeug):
+    nombre_original = secure_filename(archivo_werkzeug.filename or "")
+    _, extension = os.path.splitext(nombre_original)
+    extension = extension.lower()
+
+    if extension not in EXTENSIONES_PERMITIDAS:
+        raise BusinessError("El archivo debe ser un PDF.", 400)
+
+    _validar_tamanio_archivo(archivo_werkzeug)
+    _validar_es_pdf_real(archivo_werkzeug)
+
+    os.makedirs(CARPETA_UPLOADS, exist_ok=True)
+    nombre_final = f"{uuid.uuid4().hex}{extension}"
+    ruta_absoluta = os.path.join(CARPETA_UPLOADS, nombre_final)
+    archivo_werkzeug.save(ruta_absoluta)
+
+    return f"/certificados/archivos/{nombre_final}", ruta_absoluta
+
+
+def _borrar_archivo_certificado(url_documento):
+    """Borra del disco el archivo anterior de un certificado, si existía.
+    No falla el flujo si el archivo ya no está (por ejemplo, borrado a mano)."""
+    if not url_documento:
+        return
+
+    nombre_archivo = url_documento.rsplit("/", 1)[-1]
+    ruta_absoluta = os.path.join(CARPETA_UPLOADS, nombre_archivo)
+
+    try:
+        if os.path.isfile(ruta_absoluta):
+            os.remove(ruta_absoluta)
+    except OSError:
+        logger.exception(f"No fue posible borrar el archivo {ruta_absoluta}.")
+
+
+# Adjunta (o reemplaza) el archivo PDF de un certificado ya emitido.
+def adjuntar_archivo_certificado(id_certificado, archivo_werkzeug):
+    id_usuario_autenticado = g.id_usuario
+
+    logger.info(
+        f"Usuario {id_usuario_autenticado} "
+        f"adjuntando archivo al certificado {id_certificado}."
+    )
+
+    if not archivo_werkzeug:
+        raise BusinessError("El archivo PDF es requerido.", 400)
+
+    certificado = obtener_certificado_por_id(id_certificado)
+
+    if not certificado:
+        return None
+
+    try:
+
+        url_anterior = certificado.url_documento
+
+        nueva_url, _ = _guardar_archivo_certificado(archivo_werkzeug)
+
+        certificado.url_documento = nueva_url
+        certificado.id_usuario_modificacion = id_usuario_autenticado
+        certificado.ts_modificacion = datetime.now()
+
+        db.session.commit()
+
+        # Si había un archivo previo, se borra recién después de
+        # confirmar el commit, para no perder el anterior si algo falla.
+        _borrar_archivo_certificado(url_anterior)
+
+        logger.info(
+            f"Archivo adjuntado correctamente al certificado {id_certificado}."
+        )
+
+        return certificado
+
+    except BusinessError:
+
+        db.session.rollback()
+
+        raise
+
+    except IntegrityError:
+
+        db.session.rollback()
+
+        logger.exception("Error de integridad al adjuntar el archivo del certificado.")
+
+        raise BusinessError("No fue posible adjuntar el archivo.", 500)
+
+    except Exception:
+
+        db.session.rollback()
+
+        logger.exception("Ocurrió un error inesperado al adjuntar el archivo del certificado.")
+
+        raise BusinessError("Ocurrió un error interno del servidor.", 500)
 
 
 # -------------------CRUD-------------------#
@@ -295,9 +439,13 @@ def eliminar_certificado(id_certificado):
 
     try:
 
+        url_documento = certificado.url_documento
+
         db.session.delete(certificado)
 
         db.session.commit()
+
+        _borrar_archivo_certificado(url_documento)
 
         logger.info(f"Certificado {id_certificado} " "eliminado correctamente.")
 

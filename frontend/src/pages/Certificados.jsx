@@ -11,12 +11,14 @@ import {
   emitir,
   revocar,
   descargarCertificado,
+  subirArchivo,
 } from "../Services/certificadosService";
 import { generarResultadosAcademicos } from "../Services/resultadoAcademicoService";
 import { getComisiones } from "../api/comisiones";
 import CertificadoCard from "../components/certificados/CertificadoCard";
 import TablaCertificadosAdmin from "../components/certificados/TablaCertificadosAdmin";
 import ModalEmitirCertificado from "../components/certificados/ModalEmitirCertificado";
+import ModalAdjuntarArchivo from "../components/certificados/ModalAdjuntarArchivo";
 import { obtenerIdLegajo } from "../config/legajo";
 
 
@@ -24,12 +26,13 @@ export default function Certificados() {
   const { user: usuario, hasPermission, hasRole } = useAuth();
   const esAlumno = hasRole("Alumno");
   const idLegajo = obtenerIdLegajo(usuario);
+
   const puedeEmitir = hasPermission("inscripcion.certificados.emitir");
   const puedeActualizar = hasPermission("inscripcion.certificados.actualizar");
   const puedeGenerarResultado = hasPermission("inscripcion.resultado_academico.generar");
 
   if (esAlumno) {
-    return <VistaAlumno idLegajo={usuario?.id_legajo} usuario={usuario} />;
+    return <VistaAlumno idLegajo={idLegajo} usuario={usuario} />;
   }
 
   return (
@@ -127,6 +130,7 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
   const [cargando, setCargando] = useState(true);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [filaSeleccionada, setFilaSeleccionada] = useState(null);
+  const [certificadoParaArchivo, setCertificadoParaArchivo] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("");
 
   useEffect(() => { cargarDatos(); }, []);
@@ -166,8 +170,13 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
   }
 
   function handleDescargar(certificado) {
-    const fila = filas.find((f) => f.certificado?.id === certificado.id);
-    descargarCertificado(certificado, fila?.alumno ?? "-");
+    descargarCertificado(certificado);
+  }
+
+  async function handleAdjuntar(idCertificado, archivo) {
+    await subirArchivo(idCertificado, archivo);
+    setCertificadoParaArchivo(null);
+    cargarDatos();
   }
 
   const filtradas = filtroEstado
@@ -218,6 +227,7 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
             onEmitir={puedeEmitir ? abrirModalEmitir : null}
             onRevocar={puedeActualizar ? handleRevocar : null}
             onDescargar={handleDescargar}
+            onAdjuntar={puedeEmitir ? setCertificadoParaArchivo : null}
           />
         )}
 
@@ -227,6 +237,15 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
             fila={filaSeleccionada}
             onCerrar={() => setModalAbierto(false)}
             onEmitir={handleEmitir}
+          />
+        )}
+
+        {puedeEmitir && (
+          <ModalAdjuntarArchivo
+            abierto={!!certificadoParaArchivo}
+            certificado={certificadoParaArchivo}
+            onCerrar={() => setCertificadoParaArchivo(null)}
+            onAdjuntar={handleAdjuntar}
           />
         )}
       </main>
@@ -262,7 +281,7 @@ function VistaAlumno({ idLegajo, usuario }) {
   }, [idLegajo]);
 
   function handleDescargar(cert) {
-    descargarCertificado(cert, usuario.nombre);
+    descargarCertificado(cert);
   }
 
   return (
@@ -289,7 +308,7 @@ function VistaAlumno({ idLegajo, usuario }) {
 
         <div className="space-y-3">
           {certificados.map((c) => (
-            <CertificadoCard key={c.id_comision_asignatura} certificado={c} onDescargar={handleDescargar} />
+            <CertificadoCard key={c.id} certificado={c} onDescargar={handleDescargar} />
           ))}
         </div>
       </main>
