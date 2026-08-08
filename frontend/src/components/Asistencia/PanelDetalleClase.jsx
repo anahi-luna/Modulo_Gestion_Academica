@@ -1,24 +1,16 @@
 import ClaseSelect from "./ClaseSelect";
-import EstadisticaCard from "./EstadisticaCard";
-import TablaAsistencia from "./AsistenciaTabla";
-import HistorialAsistencias from "./HistorialAsistencias";
-
-import { useNavigate } from "react-router-dom";
-import { CalendarDaysIcon, ClockIcon, FlagIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import { useState, useEffect, use } from "react";
-import ClaseSelect from "./ClaseSelect";
-import EstadisticaCard from "./EstadisticaCard";
-import TablaAsistencia from "./AsistenciaTabla";
-import HistorialAsistencias from "./HistorialAsistencias";
 
 import { useNavigate } from "react-router-dom";
 import {
     CalendarDaysIcon,
     ClockIcon,
-    PencilSquareIcon
+    PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-
 import { useState, useEffect } from "react";
+
+import EstadisticaCard from "./EstadisticaCard";
+import TablaAsistencia from "./AsistenciaTabla";
+import HistorialAsistencias from "./HistorialAsistencias";
 
 import {
     getClases
