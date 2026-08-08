@@ -206,7 +206,7 @@ export default function InscripcionesAdmin() {
                     />
                 );
             })}
-
+            
             <ModalValidarInscripcion
                 abierto={modalValidar}
                 inscripcion={inscripcionSeleccionada}
@@ -214,12 +214,16 @@ export default function InscripcionesAdmin() {
                 onGuardar={guardarCambios}
                 comisiones={comisiones}
             />
+            
+            
+
             <ModalEliminarInscripcion
                 abierto={modalEliminar}
                 inscripcion={inscripcionSeleccionada}
                 onCerrar={cerrarModalEliminar}
                 onConfirmar={confirmarEliminar}
             />
+            
         </div>
     );
 }
