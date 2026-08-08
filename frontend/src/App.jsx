@@ -55,54 +55,64 @@ export default function App() {
                         />
 
                         {/* Asistencia: unificada, adentro se gatea con
-                            permiso de crear/actualizar si puede editar */}
+                            permiso de crear/actualizar si puede editar.
+                            Acepta el permiso general (personal) o el
+                            propio (alumno viendo su propia asistencia) */}
                         <Route
                             path="/asistencia"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.asistencias.leer"]}>
+                                <ProtectedRoute permissions={["inscripcion.asistencias.leer", "inscripcion.asistencias.leer_propio"]}>
                                     <Asistencia />
                                 </ProtectedRoute>
                             }
                         />
 
                         {/* Gestión de clases: sigue siendo una sola vista,
-                            ahora protegida por permiso en vez de por rol */}
+                            ahora protegida por permiso en vez de por rol.
+                            Acepta el permiso general o el propio (alumno
+                            viendo las clases de sus comisiones) */}
                         <Route
                             path="/GestionClases"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.clases.leer"]}>
+                                <ProtectedRoute permissions={["inscripcion.clases.leer", "inscripcion.clases.leer_propio"]}>
                                     <GestionClases />
                                 </ProtectedRoute>
                             }
                         />
 
                         {/* Calificaciones: unificada (staff vs alumno se
-                            resuelve adentro de la página) */}
+                            resuelve adentro de la página). Acepta el
+                            permiso general o el propio (alumno viendo
+                            sus propias notas) */}
                         <Route
                             path="/calificaciones"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.calificaciones.leer"]}>
+                                <ProtectedRoute permissions={["inscripcion.calificaciones.leer", "inscripcion.calificaciones.leer_propio"]}>
                                     <Calificaciones />
                                 </ProtectedRoute>
                             }
                         />
 
-                        {/* Gestión de evaluaciones */}
+                        {/* Gestión de evaluaciones. Acepta el permiso
+                            general o el propio (alumno viendo las
+                            evaluaciones de sus comisiones) */}
                         <Route
                             path="/GestionEvaluaciones"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.evaluaciones.leer"]}>
+                                <ProtectedRoute permissions={["inscripcion.evaluaciones.leer", "inscripcion.evaluaciones.leer_propio"]}>
                                     <GestionEvaluaciones />
                                 </ProtectedRoute>
                             }
                         />
 
                         {/* Certificados: unificada (staff vs alumno se
-                            resuelve adentro de la página) */}
+                            resuelve adentro de la página). Acepta el
+                            permiso general o el propio (alumno viendo
+                            sus propios certificados) */}
                         <Route
                             path="/certificados"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.certificados.leer"]}>
+                                <ProtectedRoute permissions={["inscripcion.certificados.leer", "inscripcion.certificados.leer_propio"]}>
                                     <Certificados />
                                 </ProtectedRoute>
                             }
