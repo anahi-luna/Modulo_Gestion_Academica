@@ -401,6 +401,7 @@ export default function InscripcionesAdmin() {
                 onCerrar={cerrarModalEliminar}
                 onConfirmar={confirmarEliminar}
             />
+            
         </div>
     );
 }
