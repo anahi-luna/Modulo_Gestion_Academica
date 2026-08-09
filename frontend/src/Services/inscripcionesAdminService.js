@@ -12,47 +12,33 @@ import {
 
 import { getLegajoPorId } from "../api/legajosApi";
 import { getComisiones } from "../api/comisiones";
+import { getEstadosInscripcion } from "../api/catalogosApi";
 
 // Obtiene todas las inscripciones
 export async function obtenerInscripciones() {
-
     const response = await getListaDeInscripciones();
     const comisiones = (await getComisiones()).data;
+
     const resultado = await Promise.all(
-
         response.data.map(async (inscripcion) => {
-
-            const legajo = (
-                await getLegajoPorId(inscripcion.id_legajo)
-            ).data;
+            const legajo = (await getLegajoPorId(inscripcion.id_legajo)).data;
 
             const comision = comisiones.find(
                 c => c.id_comision_asignatura === inscripcion.id_comision_asignatura
             );
 
             return {
-
                 id: inscripcion.id_inscripcion,
-
                 id_legajo: legajo.numero_legajo,
-
                 alumno: `${legajo.nombre} ${legajo.apellido}`,
-
                 id_comision_asignatura: inscripcion.id_comision_asignatura,
-
+                id_estado: inscripcion.id_estado,
                 comision: comision?.comision.descripcion ?? "-",
-
                 materia: comision?.nombre ?? "-",
-
-                estado: inscripcion.estado.nombre,
-
-                fecha_inscripcion:
-                    inscripcion.fecha_inscripcion
-
+                estado: inscripcion.estado?.nombre ?? "-",
+                fecha_inscripcion: inscripcion.fecha_inscripcion
             };
-
         })
-
     );
 
     return resultado;
@@ -60,68 +46,63 @@ export async function obtenerInscripciones() {
 
 // Obtener una inscripción
 export async function obtenerInscripcion(id) {
-
     const response = await getInscripcionPorId(id);
     return response.data;
-
 }
 
 export async function obtenerInscripcionesPorComision(idComision) {
-  const response = await getInscripcionesPorComision(idComision);
-  const comisiones = (await getComisiones()).data;
+    const response = await getInscripcionesPorComision(idComision);
+    const comisiones = (await getComisiones()).data;
+    const estados = await getEstadosInscripcion();
 
-  const resultado = await Promise.all(
-    (response?.data ?? []).map(async (inscripcion) => {
-      const legajo = (await getLegajoPorId(inscripcion.id_legajo)).data;
-      const comision = comisiones.find(
-        (c) => c.id_comision_asignatura === inscripcion.id_comision_asignatura
-      );
+    const estadoAceptada = estados.find(
+        estado => estado.nombre === "Aceptada"
+    );
 
-      return {
-        id_inscripcion: inscripcion.id_inscripcion,
-        id_legajo: legajo.numero_legajo,
-        alumno: `${legajo.nombre} ${legajo.apellido}`,
-        dni: legajo.dni,
-        id_comision_asignatura: inscripcion.id_comision_asignatura,
-        materia: comision?.nombre ?? "-",
-        estado: inscripcion.estado?.nombre ?? inscripcion.estado,
-      };
-    })
-  );
+    const resultado = await Promise.all(
+        (response?.data ?? []).map(async (inscripcion) => {
+            const legajo = (await getLegajoPorId(inscripcion.id_legajo)).data;
 
-  // Solo Aceptada para planillas de asistencia y calificaciones
-  return resultado.filter((i) => i.estado === "Aceptada");
+            const comision = comisiones.find(
+                c => c.id_comision_asignatura === inscripcion.id_comision_asignatura
+            );
+
+            return {
+                id_inscripcion: inscripcion.id_inscripcion,
+                id_legajo: legajo.numero_legajo,
+                alumno: `${legajo.nombre} ${legajo.apellido}`,
+                dni: legajo.dni,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
+                id_estado: inscripcion.id_estado,
+                materia: comision?.nombre ?? "-",
+                estado: inscripcion.estado?.nombre ?? "-"
+            };
+        })
+    );
+
+    if (!estadoAceptada) {
+        return [];
+    }
+
+    return resultado.filter(
+        inscripcion => inscripcion.id_estado === estadoAceptada.id_estado
+    );
 }
 
 // Actualizar inscripción
 // Puede modificar: id_estado, id_comision o ambos.
-export async function actualizarSolicitud(
-    idInscripcion,
-    datos
-) {
-
-    const response =
-        await actualizarInscripcion(
-            idInscripcion,
-            datos
-        );
-
+export async function actualizarSolicitud(idInscripcion, datos) {
+    const response = await actualizarInscripcion(idInscripcion, datos);
     return response.data;
-
 }
 
-//Eliminar la inscripcion
-export async function eliminarSolicitud(idInscripcion){
-
+// Eliminar la inscripción
+export async function eliminarSolicitud(idInscripcion) {
     return await eliminarInscripcion(idInscripcion);
-
 }
 
 // Obtener todas las comisiones
 export async function obtenerComisiones() {
-
     const response = await getComisiones();
-
     return response.data;
-
 }

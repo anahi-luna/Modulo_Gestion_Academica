@@ -24,13 +24,15 @@ export default function FilaInscripcion({ inscripcion, onValidar, onEliminar }) 
             </td>
             <td className="px-4 py-3">
                 <div className="flex gap-2 justify-end">
-                    <button
-                        onClick={() => onValidar(inscripcion)}
-                        title="Validar"
-                        className="p-1.5 rounded-md bg-green-100 hover:bg-green-200 text-green-700"
-                    >
-                        <CheckIcon className="h-4 w-4" />
-                    </button>
+                    {onValidar && (
+                        <button
+                            onClick={() => onValidar(inscripcion)}
+                            title="Modificar estado"
+                            className="p-1.5 rounded-md bg-green-100 hover:bg-green-200 text-green-700"
+                        >
+                            <CheckIcon className="h-4 w-4" />
+                        </button>
+                    )}
                     <button
                         onClick={() => onEliminar(inscripcion)}
                         title="Eliminar"

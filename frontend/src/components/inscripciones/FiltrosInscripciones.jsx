@@ -10,6 +10,7 @@ export default function FiltrosInscripciones({
     filtroEstado,
     setFiltroEstado,
     comisiones,
+    estadosInscripcion,
     onLimpiar
 }) {
     return (
@@ -46,10 +47,14 @@ export default function FiltrosInscripciones({
                                focus:outline-none focus:ring-2 focus:ring-red-300"
                 >
                     <option value="">Todos los estados</option>
-                    <option value="Pendiente">Pendiente</option>
-                    <option value="Aceptada">Aceptada</option>
-                    <option value="Rechazada">Rechazada</option>
-                    <option value="Cancelada">Cancelada</option>
+                    {estadosInscripcion.map((estado) => (
+                        <option
+                            key={estado.id_estado}
+                            value={estado.id_estado}
+                        >
+                            {estado.nombre}
+                        </option>
+                    ))}
                 </select>
                 <button
                     onClick={onLimpiar}
