@@ -45,26 +45,29 @@ def get_resultado_plan(id_resultado_plan):
         message="Resultado del plan encontrado."
     )
 
+
 def obtener_mi_resultado_plan():
 
     try:
 
-        resultado = ResultadoPlan.query.filter_by(
+        resultados = ResultadoPlan.query.filter_by(
             id_legajo=g.id_legajo
-        ).first()
+        ).all()
 
-        if not resultado:
-
-            return error_response(
-                "Resultado del plan no encontrado.",
-                status_code=404
-            )
-
-        datos = resultado_plan_schema.dump(resultado)
+        datos = resultados_plan_schema.dump(resultados)
 
         return success_response(
             data=datos,
-            message="Resultado del plan del alumno."
+            total=len(datos),
+            message="Resultados de planes del alumno."
+        )
+    
+    except ValidationError as err:
+
+        return error_response(
+            message="Error de validación.",
+            errors=err.messages,
+            status_code=400
         )
 
     except BusinessError as e:
@@ -73,6 +76,7 @@ def obtener_mi_resultado_plan():
             message=e.message,
             status_code=e.status_code
         )
+    
 
 # Genera o actualiza un resultado de plan.
 def agregar_resultado_plan():
