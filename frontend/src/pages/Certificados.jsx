@@ -1,51 +1,30 @@
-// Página de certificados: vista para alumnos y personal, según el rol del usuario. 
-// Si es alumno, ve solo sus certificados emitidos y puede descargarlos.
-// Si es personal, ve la tabla con el estado del plan de cada alumno y puede emitir/revocar certificados
-// según sus permisos. Además, si tiene el permiso de generar resultados académicos, puede hacerlo desde
-// un botón que abre un modal para elegir la comisión.
 import { useEffect, useState } from "react";
 import useAuth from "../auth/hooks/useAuth";
-import {
-  obtenerFilasCertificados,
-  obtenerMisCertificados,
-  emitir,
-  revocar,
-  descargarCertificado,
-  subirArchivo,
-} from "../Services/certificadosService";
-import { generarResultadosAcademicos } from "../Services/resultadoAcademicoService";
+import { obtenerFilasCertificados, obtenerMisCertificados, emitir, revocar, descargarCertificado, subirArchivo } from "../Services/certificadosService";
+import { getEstadosResultadoPlan } from "../api/catalogosApi";
 import { getComisiones } from "../api/comisiones";
+import { generarResultadosAcademicos } from "../Services/resultadoAcademicoService";
 import CertificadoCard from "../components/certificados/CertificadoCard";
 import TablaCertificadosAdmin from "../components/certificados/TablaCertificadosAdmin";
 import ModalEmitirCertificado from "../components/certificados/ModalEmitirCertificado";
 import ModalAdjuntarArchivo from "../components/certificados/ModalAdjuntarArchivo";
 import { obtenerIdLegajo } from "../config/legajo";
 
-
+// PÁGINA PRINCIPAL
 export default function Certificados() {
   const { user: usuario, hasPermission, hasRole } = useAuth();
   const esAlumno = hasRole("Alumno");
   const idLegajo = obtenerIdLegajo(usuario);
-
   const puedeEmitir = hasPermission("inscripcion.certificados.emitir");
   const puedeActualizar = hasPermission("inscripcion.certificados.actualizar");
   const puedeGenerarResultado = hasPermission("inscripcion.resultado_academico.generar");
 
-  if (esAlumno) {
-    return <VistaAlumno idLegajo={idLegajo} usuario={usuario} />;
-  }
+  if (esAlumno) return <VistaAlumno idLegajo={idLegajo} usuario={usuario} />;
 
-  return (
-    <VistaPersonal
-      puedeEmitir={puedeEmitir}
-      puedeActualizar={puedeActualizar}
-      puedeGenerarResultado={puedeGenerarResultado}
-    />
-  );
+  return <VistaPersonal puedeEmitir={puedeEmitir} puedeActualizar={puedeActualizar} puedeGenerarResultado={puedeGenerarResultado} />;
 }
 
-// Sección para generar en bloque los resultados académicos de una
-// comisión (por eso pide elegir la comisión, no un alumno puntual).
+// GENERAR RESULTADOS ACADÉMICOS
 function GenerarResultadosAcademicos() {
   const [comisiones, setComisiones] = useState([]);
   const [idComision, setIdComision] = useState("");
@@ -54,7 +33,15 @@ function GenerarResultadosAcademicos() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    getComisiones().then((res) => setComisiones(res.data));
+    async function cargarComisiones() {
+      try {
+        const res = await getComisiones();
+        setComisiones(res.data ?? []);
+      } catch (err) {
+        console.error("Error al obtener las comisiones", err);
+      }
+    }
+    cargarComisiones();
   }, []);
 
   async function handleGenerar() {
@@ -62,13 +49,10 @@ function GenerarResultadosAcademicos() {
     setGenerando(true);
     setMensaje(null);
     setError(null);
+
     try {
       const resultados = await generarResultadosAcademicos(Number(idComision));
-      setMensaje(
-        resultados.length > 0
-          ? `Se generaron ${resultados.length} resultado(s) académico(s) correctamente.`
-          : "Todos los alumnos de esa comisión ya tenían resultado académico generado."
-      );
+      setMensaje(resultados.length > 0 ? `Se generaron ${resultados.length} resultado(s) académico(s) correctamente.` : "Todos los alumnos de esa comisión ya tenían resultado académico generado.");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -78,52 +62,28 @@ function GenerarResultadosAcademicos() {
 
   return (
     <div className="bg-white rounded-xl shadow p-4 mb-6">
-      <h2 className="text-sm font-semibold text-gray-700 mb-1">
-        Generar resultados académicos
-      </h2>
-      <p className="text-xs text-gray-400 mb-3">
-        Elegí una comisión ya finalizada (todas sus clases dictadas) para calcular
-        el promedio, la asistencia y el estado académico de cada alumno aceptado.
-      </p>
-
+      <h2 className="text-sm font-semibold text-gray-700 mb-1">Generar resultados académicos</h2>
+      <p className="text-xs text-gray-400 mb-3">Elegí una comisión ya finalizada (todas sus clases dictadas) para calcular el promedio, la asistencia y el estado académico de cada alumno aceptado.</p>
       <div className="flex flex-col sm:flex-row gap-3">
-        <select
-          value={idComision}
-          onChange={(e) => setIdComision(e.target.value)}
-          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
-        >
+        <select value={idComision} onChange={(e) => setIdComision(e.target.value)} className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm">
           <option value="">Seleccioná una comisión</option>
           {comisiones.map((c) => (
-            <option key={c.id_comision_asignatura} value={c.id_comision_asignatura}>{c.comision.descripcion} - {c.nombre}</option>
+            <option key={c.id_comision_asignatura} value={c.id_comision_asignatura}>
+              {c.comision.descripcion} - {c.nombre}
+            </option>
           ))}
         </select>
-        <button
-          onClick={handleGenerar}
-          disabled={!idComision || generando}
-          className="bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap"
-        >
+        <button onClick={handleGenerar} disabled={!idComision || generando} className="bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap">
           {generando ? "Generando..." : "Generar resultados académicos"}
         </button>
       </div>
-
-      {mensaje && (
-        <p className="mt-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-          {mensaje}
-        </p>
-      )}
-      {error && (
-        <p className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-          {error}
-        </p>
-      )}
+      {mensaje && <p className="mt-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">{mensaje}</p>}
+      {error && <p className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>}
     </div>
   );
 }
 
-// Vista del personal: tabla con el estado del plan de cada alumno. Si
-// tiene el permiso de emitir/actualizar, ve los botones de acción; si
-// solo tiene el de leer (por ejemplo un auditor), ve la tabla sin
-// poder tocar nada.
+// VISTA DEL PERSONAL
 function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) {
   const [filas, setFilas] = useState([]);
   const [error, setError] = useState(null);
@@ -131,19 +91,34 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [filaSeleccionada, setFilaSeleccionada] = useState(null);
   const [certificadoParaArchivo, setCertificadoParaArchivo] = useState(null);
+  const [estadosPlan, setEstadosPlan] = useState([]);
   const [filtroEstado, setFiltroEstado] = useState("");
 
-  useEffect(() => { cargarDatos(); }, []);
+  useEffect(() => {
+    cargarDatos();
+    cargarEstadosPlan();
+  }, []);
 
   async function cargarDatos() {
     setCargando(true);
     setError(null);
     try {
-      setFilas(await obtenerFilasCertificados());
+      const datos = await obtenerFilasCertificados();
+      setFilas(datos);
     } catch (err) {
       setError(err.message);
     } finally {
       setCargando(false);
+    }
+  }
+
+  async function cargarEstadosPlan() {
+    try {
+      const estados = await getEstadosResultadoPlan();
+      setEstadosPlan(estados ?? []);
+    } catch (err) {
+      console.error("Error al obtener los estados del resultado de plan", err);
+      setError("No se pudieron cargar los estados del plan.");
     }
   }
 
@@ -153,17 +128,22 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
   }
 
   async function handleEmitir(idResultadoPlan) {
-    await emitir(idResultadoPlan);
-    setModalAbierto(false);
-    setFilaSeleccionada(null);
-    cargarDatos();
+    try {
+      await emitir(idResultadoPlan);
+      setModalAbierto(false);
+      setFilaSeleccionada(null);
+      await cargarDatos();
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
   }
 
   async function handleRevocar(certificado) {
     if (!confirm("¿Revocar este certificado?")) return;
     try {
       await revocar(certificado.id);
-      cargarDatos();
+      await cargarDatos();
     } catch (err) {
       setError(err.message);
     }
@@ -174,48 +154,36 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
   }
 
   async function handleAdjuntar(idCertificado, archivo) {
-    await subirArchivo(idCertificado, archivo);
-    setCertificadoParaArchivo(null);
-    cargarDatos();
+    try {
+      await subirArchivo(idCertificado, archivo);
+      setCertificadoParaArchivo(null);
+      await cargarDatos();
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
   }
 
-  const filtradas = filtroEstado
-    ? filas.filter((f) => f.estado_plan === filtroEstado)
-    : filas;
+  const filtradas = filtroEstado ? filas.filter((f) => f.estado_plan === filtroEstado) : filas;
 
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="max-w-6xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          {puedeEmitir ? "Gestionar certificados" : "Certificados"}
-        </h1>
-        <p className="text-sm text-gray-500 mb-6">
-          {puedeEmitir
-            ? "Estado del plan de cada alumno y emisión/revocación de certificados."
-            : "Consulta del estado del plan y certificados emitidos."}
-        </p>
+        <h1 className="text-2xl font-bold text-gray-800">{puedeEmitir ? "Gestionar certificados" : "Certificados"}</h1>
+        <p className="text-sm text-gray-500 mb-6">{puedeEmitir ? "Estado del plan de cada alumno y emisión/revocación de certificados." : "Consulta del estado del plan y certificados emitidos."}</p>
 
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-100 border border-red-300 p-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
+        {error && <div className="mb-4 rounded-lg bg-red-100 border border-red-300 p-3 text-sm text-red-700">{error}</div>}
         {puedeGenerarResultado && <GenerarResultadosAcademicos />}
 
         <div className="bg-white rounded-xl shadow p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
           <label htmlFor="filtro-estado-plan" className="text-xs text-gray-500">Estado del plan:</label>
-          <select
-            id="filtro-estado-plan"
-            value={filtroEstado}
-            onChange={(e) => setFiltroEstado(e.target.value)}
-            className="border border-gray-200 rounded-md px-3 py-2 text-sm w-full sm:w-auto"
-          >
+          <select id="filtro-estado-plan" value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)} className="border border-gray-200 rounded-md px-3 py-2 text-sm w-full sm:w-auto">
             <option value="">Todos</option>
-            <option value="En curso">En curso</option>
-            <option value="Finalizado">Finalizado</option>
-            <option value="Incompleto">Incompleto</option>
-            <option value="Abandonado">Abandonado</option>
+            {estadosPlan.map((estado) => (
+              <option key={estado.id_estado_resultado_plan} value={estado.nombre}>
+                {estado.nombre}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -253,8 +221,8 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
   );
 }
 
-// Vista del alumno: solo consulta y descarga de SUS certificados.
-function VistaAlumno({ idLegajo, usuario }) {
+// VISTA DEL ALUMNO
+function VistaAlumno({ idLegajo }) {
   const [certificados, setCertificados] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -265,6 +233,7 @@ function VistaAlumno({ idLegajo, usuario }) {
       setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
       return;
     }
+
     async function cargar() {
       setCargando(true);
       setError(null);
@@ -277,6 +246,7 @@ function VistaAlumno({ idLegajo, usuario }) {
         setCargando(false);
       }
     }
+
     cargar();
   }, [idLegajo]);
 
@@ -288,16 +258,9 @@ function VistaAlumno({ idLegajo, usuario }) {
     <div className="min-h-screen bg-gray-100">
       <main className="max-w-3xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-gray-800">Mis certificados</h1>
-        <p className="text-sm text-gray-500 mb-6">
-          Certificados de participación y aprobación emitidos a tu nombre.
-        </p>
+        <p className="text-sm text-gray-500 mb-6">Certificados de participación y aprobación emitidos a tu nombre.</p>
 
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-100 border border-red-300 p-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
+        {error && <div className="mb-4 rounded-lg bg-red-100 border border-red-300 p-3 text-sm text-red-700">{error}</div>}
         {cargando && <p className="text-sm text-gray-400">Cargando certificados...</p>}
 
         {!cargando && certificados.length === 0 && !error && (
