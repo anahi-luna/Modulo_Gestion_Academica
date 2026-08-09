@@ -22,8 +22,8 @@ import { obtenerIdLegajo } from "../config/legajo";
 // ============================================================
 
 export default function GestionEvaluaciones() {
-    const { user: usuario, hasPermission, hasRole } = useAuth();
-    const esAlumno = hasRole("Alumno");
+    const { user: usuario, hasPermission} = useAuth();
+    const esAlumno = hasPermission("inscripcion.evaluaciones.leer_propio");
     const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {
