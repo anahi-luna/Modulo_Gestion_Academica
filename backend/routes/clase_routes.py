@@ -19,6 +19,11 @@ clase_bp.route("/<int:id_clase>", methods=["GET"])(
     requires_permission("inscripcion.clases.leer")(get_clase)
 )
 
+# Obtener las clases del alumno autenticado
+clase_bp.route("/mis-clases", methods=["GET"])(
+    requires_permission("inscripcion.clases.leer_propio")(obtener_mis_clases)
+)
+
 # Modificar una clase
 clase_bp.route("/<int:id_clase>", methods=["PUT"])(
     requires_permission("inscripcion.clases.actualizar")(actualizar_clase)
