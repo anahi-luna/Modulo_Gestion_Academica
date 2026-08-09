@@ -5,16 +5,19 @@ import {
     getListaResultadosAcademicos,
     getMisResultadosAcademicos,
 } from "../api/resultadoAcademicoApi";
+import { getEstadosAcademicos } from "../api/catalogosApi";
+
+export async function obtenerEstadosAcademicos() {
+    const response = await getEstadosAcademicos();
+
+    return response.data.reduce((mapa, estado) => {
+        mapa[estado.id_estado_academico] = estado.nombre;
+        return mapa;
+    }, {});
+}
 
 // Coincide con seed/seed_estado_academico.py del back.
-const ESTADOS_ACADEMICOS = {
-    1: "Regular",
-    2: "Aprobado",
-    3: "Desaprobado",
-    4: "Libre",
-};
-
-function mapearResultado(r) {
+function mapearResultado(r, estadosAcademicos) {
     return {
         id: r.id_resultado_academico,
         id_inscripcion: r.id_inscripcion,
@@ -24,7 +27,7 @@ function mapearResultado(r) {
         id_comision_asignatura: r.inscripcion?.id_comision_asignatura,
         promedio_final: r.promedio_final,
         porcentaje_asistencia: r.porcentaje_asistencia,
-        estado_academico: r.estado?.nombre ?? ESTADOS_ACADEMICOS[r.id_estado_academico] ?? "-",
+        estado_academico: r.estado?.nombre ?? estadosAcademicos[r.id_estado_academico] ?? "-",
         fecha_resultado: r.fecha_resultado,
     };
 }
@@ -35,8 +38,11 @@ function mapearResultado(r) {
 // alumnos ya tenían resultado generado, el back devuelve un error
 // explicando por qué.
 export async function generarResultadosAcademicos(idComision) {
-    const response = await generarResultadosAcademicosApi(idComision);
-    return response.data.map(mapearResultado);
+    const [response, estadosAcademicos] = await Promise.all([
+        generarResultadosAcademicosApi(idComision),
+        obtenerEstadosAcademicos(),
+    ]); 
+    return response.data.map((r) => mapearResultado(r, estadosAcademicos));
 }
 
 // Todos los resultados académicos ya generados para el alumno
@@ -45,13 +51,19 @@ export async function generarResultadosAcademicos(idComision) {
 // idLegajo ya no hace falta mandarlo, pero se mantiene el parámetro
 // para no romper a quienes llaman a esta función.
 export async function obtenerResultadosAcademicos() {
-    const response = await getMisResultadosAcademicos();
-    return response.data.map(mapearResultado);
+    const [response, estadosAcademicos] = await Promise.all([
+        getMisResultadosAcademicos(),
+        obtenerEstadosAcademicos(),
+    ]);
+    return response.data.map((r) => mapearResultado(r, estadosAcademicos));
 }
 
 // Todos los resultados académicos generados hasta ahora (para la
 // vista de administración, si hace falta mostrarlos todos juntos)
 export async function obtenerTodosLosResultadosAcademicos() {
-    const response = await getListaResultadosAcademicos();
-    return response.data.map(mapearResultado);
+    const [response, estadosAcademicos] = await Promise.all([
+        getListaResultadosAcademicos(),
+        obtenerEstadosAcademicos(),
+    ]);
+    return response.data.map((r) => mapearResultado(r, estadosAcademicos));
 }
