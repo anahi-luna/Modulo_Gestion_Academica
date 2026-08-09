@@ -1,133 +1,94 @@
-// servicios relacionados con las evaluaciones de los alumnos, para el personal de gestión 
-//  muestra las evaluaciones de cada comisión y permite crear/editar/borrar evaluaciones.
+// Servicios relacionados con las evaluaciones de los alumnos, para el personal de gestión.
+// Muestra las evaluaciones de cada comisión y permite crear / editar / eliminar evaluaciones.
+// Los tipos de evaluación se obtienen desde el catálogo del backend. No se hardcodean IDs ni nombres.
+
 import {
     getListaEvaluaciones,
     getEvaluacionPorId,
     crearEvaluacion,
     editarEvaluacion,
-    eliminarEvaluacion,
+    eliminarEvaluacion
 } from "../api/evaluacionesApi";
-
 import { getComisiones, obtenerDocenteTitular } from "../api/comisiones";
+import { getTiposEvaluacion } from "../api/catalogosApi";
 
-// Coincide con seed/seed_tipo_evaluacion.py del back.
-const TIPOS_EVALUACION = {
-    1: "Parcial",
-    2: "Recuperatorio",
-    3: "Final",
-    4: "TP", // "Trabajo Práctico" en el back, lo dejo corto para la UI
-};
-
-// Coincide con seed/seed_tipo_evaluacion.py del back.
-const ID_POR_TIPO = {
-    Parcial: 1,
-    Recuperatorio: 2,
-    Final: 3,
-    TP: 4,
-    "Trabajo Práctico": 4,
-};
-
-function idATipo(idTipoEvaluacion, tipoEvaluacionNombre) {
-    if (tipoEvaluacionNombre === "Trabajo Práctico") return "TP";
-    return tipoEvaluacionNombre ?? TIPOS_EVALUACION[idTipoEvaluacion] ?? "-";
-}
+// ============================================================
+// OBTENER EVALUACIONES
+// ============================================================
 
 export async function getEvaluaciones(idComision) {
-
     const response = await getListaEvaluaciones(idComision);
-
     const comisiones = (await getComisiones()).data;
+    const tiposEvaluacion = await getTiposEvaluacion();
 
-    const resultado = response.data.map((evaluacion) => {
-
-        const comision = comisiones.find(
-            c => c.id_comision_asignatura === evaluacion.id_comision_asignatura
-        );
+    return response.data.map((evaluacion) => {
+        const comision = comisiones.find((c) => c.id_comision_asignatura === evaluacion.id_comision_asignatura);
+        const tipoEvaluacion = tiposEvaluacion.find((tipo) => tipo.id_tipo_evaluacion === evaluacion.id_tipo_evaluacion);
 
         return {
-
             id: evaluacion.id_evaluacion,
-
             id_comision: evaluacion.id_comision_asignatura,
-            
             id_comision_asignatura: evaluacion.id_comision_asignatura,
-            
-            codigo: comision?.comision.descripcion ?? "-",
-
+            id_tipo_evaluacion: evaluacion.id_tipo_evaluacion,
+            codigo: comision?.comision?.descripcion ?? "-",
             materia: comision?.nombre ?? "-",
-
             docente: obtenerDocenteTitular(comision),
-
             titulo: evaluacion.titulo,
-
-            tipo: idATipo(evaluacion.id_tipo_evaluacion, evaluacion.tipo_evaluacion?.nombre),
-
+            tipo: tipoEvaluacion?.nombre ?? evaluacion.tipo_evaluacion?.nombre ?? "-",
             fecha: evaluacion.fecha_evaluacion,
-
-            puntaje_maximo: evaluacion.puntaje_maximo,
-
+            puntaje_maximo: evaluacion.puntaje_maximo
         };
-
     });
-
-    return resultado;
-
 }
+
+// ============================================================
+// OBTENER UNA EVALUACIÓN
+// ============================================================
 
 export async function getEvaluacion(id) {
-
     const response = await getEvaluacionPorId(id);
-
     const comisiones = (await getComisiones()).data;
+    const tiposEvaluacion = await getTiposEvaluacion();
 
-    const comision = comisiones.find(
-        c => c.id_comision_asignatura === response.data.id_comision_asignatura
-    );
+    const evaluacion = response.data;
+    const comision = comisiones.find((c) => c.id_comision_asignatura === evaluacion.id_comision_asignatura);
+    const tipoEvaluacion = tiposEvaluacion.find((tipo) => tipo.id_tipo_evaluacion === evaluacion.id_tipo_evaluacion);
 
     return {
-  id: response.data.id_evaluacion,
-  id_comision: response.data.id_comision_asignatura,
-  id_comision_asignatura: response.data.id_comision_asignatura,
-  codigo: comision?.comision.descripcion ?? "-",
-  materia: comision?.nombre ?? "-",
-  docente: obtenerDocenteTitular(comision),
-  titulo: response.data.titulo,
-  tipo: idATipo(response.data.id_tipo_evaluacion, response.data.tipo_evaluacion?.nombre),
-  fecha: response.data.fecha_evaluacion,
-  puntaje_maximo: response.data.puntaje_maximo,
-};
-
+        id: evaluacion.id_evaluacion,
+        id_comision: evaluacion.id_comision_asignatura,
+        id_comision_asignatura: evaluacion.id_comision_asignatura,
+        id_tipo_evaluacion: evaluacion.id_tipo_evaluacion,
+        codigo: comision?.comision?.descripcion ?? "-",
+        materia: comision?.nombre ?? "-",
+        docente: obtenerDocenteTitular(comision),
+        titulo: evaluacion.titulo,
+        tipo: tipoEvaluacion?.nombre ?? evaluacion.tipo_evaluacion?.nombre ?? "-",
+        fecha: evaluacion.fecha_evaluacion,
+        puntaje_maximo: evaluacion.puntaje_maximo
+    };
 }
 
-// datos viene del formulario con { id_comision, titulo, tipo, fecha,
-// puntaje_maximo }. Acá lo traduzco a lo que pide el back:
-// { id_comision, id_tipo_evaluacion, titulo, fecha_evaluacion, puntaje_maximo }.
+// ============================================================
+// CONVERTIR DATOS DEL FORMULARIO AL BACKEND
+// ============================================================
+
 function aPayloadBack(datos) {
-  return {
-    id_comision_asignatura: Number(
-      datos.id_comision_asignatura ?? datos.id_comision
-    ),
-    id_tipo_evaluacion: ID_POR_TIPO[datos.tipo] ?? 1,
-    titulo: datos.titulo,
-    fecha_evaluacion: datos.fecha, // tiene que ser YYYY-MM-DD
-    puntaje_maximo: Number(datos.puntaje_maximo),
-  };
+    return {
+        id_comision_asignatura: Number(datos.id_comision_asignatura ?? datos.id_comision),
+        id_tipo_evaluacion: Number(datos.id_tipo_evaluacion),
+        titulo: datos.titulo,
+        fecha_evaluacion: datos.fecha,
+        puntaje_maximo: Number(datos.puntaje_maximo)
+    };
 }
 
-export async function registrarEvaluacion(datos) {
+// ============================================================
+// ACCIONES DE CREAR, MODIFICAR Y ELIMINAR
+// ============================================================
 
-    return await crearEvaluacion(aPayloadBack(datos));
+export async function registrarEvaluacion(datos) { return await crearEvaluacion(aPayloadBack(datos)); }
 
-}
+export async function modificarEvaluacion(id, datos) { return await editarEvaluacion(id, aPayloadBack(datos)); }
 
-export async function modificarEvaluacion(id, datos) {
-
-    return await editarEvaluacion(id, aPayloadBack(datos));
-
-}
-
-export async function borrarEvaluacion(id) {
-
-    return await eliminarEvaluacion(id);
-
-}
+export async function borrarEvaluacion(id) { return await eliminarEvaluacion(id); }

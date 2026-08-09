@@ -4,16 +4,22 @@ import EvaluacionModal from "../components/evaluaciones/EvaluacionModal";
 import EliminarEvaluacionModal from "../components/evaluaciones/EliminarEvaluacionModal";
 import Alert from "../components/Alert";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { getEvaluaciones, registrarEvaluacion, modificarEvaluacion, borrarEvaluacion } from "../Services/evaluacionesAdminService";
+
+import {
+    getEvaluaciones,
+    registrarEvaluacion,
+    modificarEvaluacion,
+    borrarEvaluacion,
+} from "../Services/evaluacionesAdminService";
 import { obtenerMisEvaluacionesPlano } from "../Services/evaluacionesAlumnoService";
 import { getComisiones } from "../api/comisiones";
+import { getTiposEvaluacion } from "../api/catalogosApi";
 import useAuth from "../auth/hooks/useAuth";
 import { obtenerIdLegajo } from "../config/legajo";
-//gestión de evaluaciones: vista para el alumno: solo lectura, muestra su propia asistencia en cada comisión
-//  en la que está inscripto.
-//vista para el personal (admin, profesor, etc): elijo una comisión y veo/cargo la asistencia de
-//  todos los alumnos de una clase.
 
+// ============================================================
+// PÁGINA PRINCIPAL
+// ============================================================
 
 export default function GestionEvaluaciones() {
     const { user: usuario, hasPermission, hasRole } = useAuth();
@@ -33,6 +39,10 @@ export default function GestionEvaluaciones() {
     );
 }
 
+// ============================================================
+// VISTA ALUMNO
+// ============================================================
+
 function VistaAlumno({ idLegajo }) {
     const [evaluaciones, setEvaluaciones] = useState([]);
     const [cargando, setCargando] = useState(true);
@@ -49,6 +59,7 @@ function VistaAlumno({ idLegajo }) {
             setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
             return;
         }
+
         async function cargar() {
             setCargando(true);
             setError(null);
@@ -61,6 +72,7 @@ function VistaAlumno({ idLegajo }) {
                 setCargando(false);
             }
         }
+
         cargar();
     }, [idLegajo]);
 
@@ -72,22 +84,21 @@ function VistaAlumno({ idLegajo }) {
         return true;
     });
 
-    function limpiarFiltros() {
-        setFiltroMateria("");
-        setFiltroComision("");
-        setFiltroDocente("");
-        setFiltroTipo("");
-    }
-
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-
             {error && (
-                <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />
+                <Alert
+                    tipo="error"
+                    titulo="Error"
+                    mensaje={error}
+                    onCerrar={() => setError(null)}
+                />
             )}
 
             <div className="mb-6">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Mis evaluaciones</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                    Mis evaluaciones
+                </h1>
                 <p className="text-gray-500 mt-1 text-sm sm:text-base">
                     Evaluaciones de las comisiones en las que estás inscripto.
                 </p>
@@ -99,19 +110,14 @@ function VistaAlumno({ idLegajo }) {
                 <EvaluacionesTable
                     evaluaciones={evaluacionesFiltradas}
                     todasLasEvaluaciones={evaluaciones}
-
                     filtroMateria={filtroMateria}
                     setFiltroMateria={setFiltroMateria}
-
                     filtroComision={filtroComision}
                     setFiltroComision={setFiltroComision}
-
                     filtroDocente={filtroDocente}
                     setFiltroDocente={setFiltroDocente}
-
                     filtroTipo={filtroTipo}
                     setFiltroTipo={setFiltroTipo}
-
                     soloLectura
                 />
             )}
@@ -119,18 +125,17 @@ function VistaAlumno({ idLegajo }) {
     );
 }
 
+// ============================================================
+// VISTA PERSONAL
+// ============================================================
+
 function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
-
     const [evaluaciones, setEvaluaciones] = useState([]);
-
     const [mostrarModal, setMostrarModal] = useState(false);
-
     const [evaluacionSeleccionada, setEvaluacionSeleccionada] = useState(null);
-
     const [mostrarEliminar, setMostrarEliminar] = useState(false);
-
     const [comisiones, setComisiones] = useState([]);
-
+    const [tiposEvaluacion, setTiposEvaluacion] = useState([]);
     const [error, setError] = useState(null);
 
     const [filtroMateria, setFiltroMateria] = useState("");
@@ -140,25 +145,30 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
 
     const puedeGestionar = puedeCrear || puedeActualizar || puedeEliminar;
 
+    // ========================================================
+    // CARGA INICIAL
+    // ========================================================
+
     useEffect(() => {
         cargarEvaluaciones();
         cargarComisiones();
+        cargarTiposEvaluacion();
     }, []);
 
-    async function cargarEvaluaciones() {
+    // ========================================================
+    // CARGAS DE DATOS
+    // ========================================================
 
+    async function cargarEvaluaciones() {
         try {
-            const resultado = await getEvaluaciones();
-            setEvaluaciones(resultado);
+            setEvaluaciones(await getEvaluaciones());
         } catch (error) {
             console.error(error);
             setError("No se pudieron cargar las evaluaciones.");
         }
-
     }
 
     async function cargarComisiones() {
-
         try {
             const resultado = await getComisiones();
             setComisiones(resultado.data);
@@ -166,16 +176,26 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
             console.error(error);
             setError("No se pudieron cargar las comisiones.");
         }
-
     }
 
-    const evaluacionesFiltradas = evaluaciones.filter((evaluacion) => {
+    async function cargarTiposEvaluacion() {
+        try {
+            setTiposEvaluacion(await getTiposEvaluacion());
+        } catch (error) {
+            console.error(error);
+            setError("No se pudieron cargar los tipos de evaluación.");
+        }
+    }
 
+    // ========================================================
+    // FILTROS Y ACCIONES
+    // ========================================================
+
+    const evaluacionesFiltradas = evaluaciones.filter((evaluacion) => {
         if (filtroMateria && evaluacion.materia !== filtroMateria) return false;
         if (filtroComision && evaluacion.codigo !== filtroComision) return false;
         if (filtroDocente && evaluacion.docente !== filtroDocente) return false;
         if (filtroTipo && evaluacion.tipo !== filtroTipo) return false;
-
         return true;
     });
 
@@ -186,7 +206,7 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
         setFiltroTipo("");
     }
 
-    async function abrirModalEditar(evaluacion) {
+    function abrirModalEditar(evaluacion) {
         setEvaluacionSeleccionada(evaluacion);
         setMostrarModal(true);
     }
@@ -201,45 +221,32 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
         setMostrarModal(true);
     }
 
+    // ========================================================
+    // OPERACIONES CRUD
+    // ========================================================
+
     async function confirmarEliminar(evaluacion) {
         try {
-
             await borrarEvaluacion(evaluacion.id);
-
             setMostrarEliminar(false);
             setEvaluacionSeleccionada(null);
-
             await cargarEvaluaciones();
-
         } catch (error) {
             console.error(error);
             setError("No se pudo eliminar la evaluación.");
         }
-
     }
 
     async function guardarEvaluacion(datos) {
-
         try {
-
             if (evaluacionSeleccionada) {
-
-                await modificarEvaluacion(
-                    evaluacionSeleccionada.id,
-                    datos
-                );
-
+                await modificarEvaluacion(evaluacionSeleccionada.id, datos);
             } else {
-
                 await registrarEvaluacion(datos);
-
             }
-
             setMostrarModal(false);
             setEvaluacionSeleccionada(null);
-
             await cargarEvaluaciones();
-
         } catch (error) {
             console.error(error);
             setError(
@@ -248,23 +255,28 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
                     : "No se pudo crear la evaluación."
             );
         }
-
     }
+
+    // ========================================================
+    // RENDER
+    // ========================================================
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-
             {error && (
-                <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />
+                <Alert
+                    tipo="error"
+                    titulo="Error"
+                    mensaje={error}
+                    onCerrar={() => setError(null)}
+                />
             )}
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
                         {puedeGestionar ? "Gestión de Evaluaciones" : "Evaluaciones"}
                     </h1>
-
                     <p className="text-gray-500 mt-1 text-sm sm:text-base">
                         {puedeGestionar
                             ? "Crear, editar y eliminar evaluaciones (parciales, trabajos prácticos y finales)."
@@ -273,7 +285,6 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-
                     <button
                         onClick={limpiarFiltros}
                         className="flex-1 sm:flex-none rounded-lg border border-gray-300 px-4 py-2.5 sm:py-3 hover:bg-gray-100 whitespace-nowrap"
@@ -290,29 +301,22 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
                             Nueva Evaluación
                         </button>
                     )}
-
                 </div>
-
             </div>
 
             <EvaluacionesTable
                 evaluaciones={evaluacionesFiltradas}
                 todasLasEvaluaciones={evaluaciones}
-
                 filtroMateria={filtroMateria}
                 setFiltroMateria={setFiltroMateria}
-
                 filtroComision={filtroComision}
                 setFiltroComision={setFiltroComision}
-
                 filtroDocente={filtroDocente}
                 setFiltroDocente={setFiltroDocente}
-
                 filtroTipo={filtroTipo}
                 setFiltroTipo={setFiltroTipo}
-
-                onEditar={abrirModalEditar}
-                onEliminar={abrirModalEliminar}
+                onEditar={puedeActualizar ? abrirModalEditar : undefined}
+                onEliminar={puedeEliminar ? abrirModalEliminar : undefined}
                 soloLectura={!puedeActualizar && !puedeEliminar}
             />
 
@@ -321,6 +325,7 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
                     abierto={mostrarModal}
                     evaluacion={evaluacionSeleccionada}
                     comisiones={comisiones}
+                    tiposEvaluacion={tiposEvaluacion}
                     onCerrar={() => setMostrarModal(false)}
                     onGuardar={guardarEvaluacion}
                 />
@@ -334,7 +339,6 @@ function VistaPersonal({ puedeCrear, puedeActualizar, puedeEliminar }) {
                     onConfirmar={confirmarEliminar}
                 />
             )}
-
         </div>
     );
 }
