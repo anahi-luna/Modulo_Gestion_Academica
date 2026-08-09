@@ -16,14 +16,14 @@ inscripcion_bp.route("/", methods=["GET"])(
 
 # Obtener cantidad de inscriptos por comisión
 inscripcion_bp.route("/conteo-comisiones", methods=["GET"])(
-    requires_permission("inscripcion.inscripciones.leer")(
+    requires_permission("inscripcion.inscripciones.leer_propio")(
         get_conteo_comisiones
     )
 )
 
 # Obtener las inscripciones del alumno autenticado
 inscripcion_bp.route("/mis-inscripciones", methods=["GET"])(
-    requires_permission("inscripcion.inscripciones.leer")(obtener_mis_inscripciones)
+    requires_permission("inscripcion.inscripciones.leer_propio")(obtener_mis_inscripciones)
 )
 
 # Obtener una inscripción por ID

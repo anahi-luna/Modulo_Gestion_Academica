@@ -16,7 +16,7 @@ asistencia_bp.route("/", methods=["GET"])(
 
 # Obtener la asistencia del alumno autenticado para una clase
 asistencia_bp.route("/mi-asistencia/<int:id_clase>", methods=["GET"])(
-    requires_permission("inscripcion.asistencias.leer")(obtener_mi_asistencia)
+    requires_permission("inscripcion.asistencias.leer_propio")(obtener_mi_asistencia)
 )
 
 # Obtener una asistencia

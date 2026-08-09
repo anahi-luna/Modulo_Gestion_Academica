@@ -11,7 +11,7 @@ resultado_academico_bp.route("/", methods=["POST"])(
 
 # Obtener los resultados académicos del alumno autenticado
 resultado_academico_bp.route("/mis-resultados-academicos", methods=["GET"])(
-    requires_permission("inscripcion.resultado_academico.leer")(
+    requires_permission("inscripcion.resultado_academico.leer_propio")(
         obtener_mis_resultados_academicos
     )
 )

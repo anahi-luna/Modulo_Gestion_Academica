@@ -16,7 +16,7 @@ resultado_plan_bp.route("/<int:id_resultado_plan>", methods=["GET"])(
 
 # Obtener el resultado del plan del alumno autenticado
 resultado_plan_bp.route("/mi-resultado-plan", methods=["GET"])(
-    requires_permission("inscripcion.resultado_plan.leer")(
+    requires_permission("inscripcion.resultado_plan.leer_propio")(
         obtener_mi_resultado_plan
     )
 )
