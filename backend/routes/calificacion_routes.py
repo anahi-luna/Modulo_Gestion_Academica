@@ -19,6 +19,13 @@ calificacion_bp.route("/<int:id_calificacion>", methods=["GET"])(
     requires_permission("inscripcion.calificaciones.leer")(get_calificacion)
 )
 
+# Obtener las calificaciones del alumno autenticado
+calificacion_bp.route("/mis-calificaciones", methods=["GET"])(
+    requires_permission("inscripcion.calificaciones.leer_propio")(
+        obtener_mis_calificaciones
+    )
+)
+
 # Modificar una calificación
 calificacion_bp.route("/<int:id_calificacion>", methods=["PUT"])(
     requires_permission("inscripcion.calificaciones.actualizar")(actualizar_calificacion)

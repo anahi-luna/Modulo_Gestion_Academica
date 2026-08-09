@@ -16,7 +16,7 @@ certificado_bp.route("/", methods=["GET"])(
 
 # Obtener los certificados del alumno autenticado
 certificado_bp.route("/mis-certificados", methods=["GET"])(
-    requires_permission("inscripcion.certificados.leer")(obtener_mis_certificados)
+    requires_permission("inscripcion.certificados.leer_propio")(obtener_mis_certificados)
 )
 
 # Obtener un certificado

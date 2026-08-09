@@ -19,6 +19,13 @@ evaluacion_bp.route("/<int:id_evaluacion>", methods=["GET"])(
     requires_permission("inscripcion.evaluaciones.leer")(get_evaluacion)
 )
 
+# Obtener las evaluaciones del alumno autenticado
+evaluacion_bp.route("/mis-evaluaciones", methods=["GET"])(
+    requires_permission("inscripcion.evaluaciones.leer_propio")(
+        obtener_mis_evaluaciones
+    )
+)
+
 # Modificar una evaluación
 evaluacion_bp.route("/<int:id_evaluacion>", methods=["PUT"])(
     requires_permission("inscripcion.evaluaciones.actualizar")(actualizar_evaluacion)
@@ -26,5 +33,7 @@ evaluacion_bp.route("/<int:id_evaluacion>", methods=["PUT"])(
 
 # Eliminar una evaluación
 evaluacion_bp.route("/<int:id_evaluacion>", methods=["DELETE"])(
-    requires_permission("inscripcion.evaluaciones.eliminar")(eliminar_evaluacion_controller)
+    requires_permission("inscripcion.evaluaciones.eliminar")(
+        eliminar_evaluacion_controller
+    )
 )
