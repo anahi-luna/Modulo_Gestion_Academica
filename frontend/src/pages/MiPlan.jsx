@@ -54,8 +54,10 @@ export default function MiPlan() {
 
   if (!esAlumno) {
     return (
-      <div className="bg-white rounded-xl shadow px-6 py-10 text-center text-sm text-gray-500">
-        Esta vista es exclusiva para alumnos. Si necesitás ver el avance de plan de todos los alumnos, entrá a "Resultado del plan".
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
+        <div className="bg-white rounded-xl shadow px-6 py-10 text-center text-sm text-gray-500 max-w-md w-full">
+          Esta vista es exclusiva para alumnos. Si necesitás ver el avance de plan de todos los alumnos, entrá a "Resultado del plan".
+        </div>
       </div>
     );
   }
@@ -71,14 +73,14 @@ export default function MiPlan() {
     : "bg-gray-100 text-gray-600";
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Mi plan</h1>
-        <p className="text-gray-500 text-sm sm:text-base">Avance del plan de estudios</p>
-        <p className="text-gray-500 text-sm">Tu progreso académico respecto del plan asignado</p>
-      </div>
-
+    <div className="min-h-screen bg-gray-100">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-4">
+        <div className="mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Mi plan</h1>
+          <p className="text-gray-500 text-sm sm:text-base">Avance del plan de estudios</p>
+          <p className="text-gray-500 text-sm">Tu progreso académico respecto del plan asignado</p>
+        </div>
+
         <div className="bg-white rounded-xl shadow px-4 py-3 text-sm text-gray-500">
           Vista de solo lectura — consultá con administración ante cualquier duda.
         </div>
