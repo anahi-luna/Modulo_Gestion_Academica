@@ -1,10 +1,11 @@
-from flask import request
+from flask import request,g
 from marshmallow import ValidationError
 from exceptions import BusinessError
 from schemas.evaluacion_schema import *
 from services.evaluacion_service import *
 from utils.response import success_response, error_response
-
+from models.modelo_evaluacion import Evaluacion
+from models.modelo_inscripcion import Inscripcion
 
 # Obtiene el listado de evaluaciones.
 # Permite filtrar por comisión o tipo de evaluación.
@@ -38,6 +39,47 @@ def get_evaluacion(id_evaluacion):
 
     return success_response(data=resultado, message="Evaluación encontrada.")
 
+
+# Obtiene las evaluaciones correspondientes al alumno autenticado.
+def obtener_mis_evaluaciones():
+
+    try:
+
+        evaluaciones = (
+            Evaluacion.query
+            .join(
+                Inscripcion,
+                Evaluacion.id_comision_asignatura
+                == Inscripcion.id_comision_asignatura
+            )
+            .filter(
+                Inscripcion.id_legajo == g.id_legajo
+            )
+            .order_by(
+                Evaluacion.fecha_evaluacion.asc()
+            )
+            .all()
+        )
+
+        resultado = evaluaciones_schema.dump(evaluaciones)
+
+        return success_response(
+            data=resultado,
+            total=len(resultado),
+            message="Listado de mis evaluaciones."
+        )
+    except ValidationError as err:
+
+        return error_response(
+            message="Error de validación.", errors=err.messages, status_code=400
+        )
+    
+    except BusinessError as e:
+
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )
 
 # Registra una nueva evaluación.
 def agregar_evaluacion():
