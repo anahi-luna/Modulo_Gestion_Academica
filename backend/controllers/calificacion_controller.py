@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, g
 from marshmallow import ValidationError
 
 from services.calificaciones_service import *
@@ -8,7 +8,8 @@ from schemas.calificacion_schema import *
 from utils.response import success_response, error_response
 
 from exceptions import BusinessError
-
+from models.modelo_calificacion import Calificacion
+from models.modelo_inscripcion import Inscripcion
 
 # Obtiene el listado de calificaciones.
 # Permite filtrar por evaluación o inscripción.
@@ -42,6 +43,44 @@ def get_calificacion(id_calificacion):
 
     return success_response(data=resultado, message="Calificación encontrada.")
 
+# Obtiene las calificaciones correspondientes al alumno autenticado.
+def obtener_mis_calificaciones():
+
+    try:
+
+        calificaciones = (
+            Calificacion.query
+            .join(
+                Inscripcion,
+                Calificacion.id_inscripcion
+                == Inscripcion.id_inscripcion
+            )
+            .filter(
+                Inscripcion.id_legajo == g.id_legajo
+            )
+            .all()
+        )
+
+        resultado = calificaciones_schema.dump(calificaciones)
+
+        return success_response(
+            data=resultado,
+            total=len(resultado),
+            message="Listado de mis calificaciones."
+        )
+    
+    except ValidationError as err:
+
+        return error_response(
+            message="Error de validación.", errors=err.messages, status_code=400
+        )
+
+    except BusinessError as e:
+
+        return error_response(
+            message=e.message,
+            status_code=e.status_code
+        )
 
 # Registra una o varias calificaciones.
 def agregar_calificaciones():
