@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useAuth from "../auth/hooks/useAuth";
-import { obtenerMiPlan, obtenerMisMateriasDePlan } from "../Services/planesService";
+import { obtenerMisPlanes, obtenerMisMateriasDePlan } from "../Services/planesService";
 import { getEstadosResultadoPlan } from "../api/catalogosApi";
 import ResumenMateriaPlanCard from "../components/planes/ResumenMateriaPlanCard";
 import { hasPermission } from "../auth/utils/permissions";
@@ -31,7 +31,7 @@ export default function MiPlan() {
 
       try {
         const [planesData, materiasData, estadosResponse] = await Promise.all([
-          obtenerMiPlan(),
+          obtenerMisPlanes(),
           obtenerMisMateriasDePlan(),
           getEstadosResultadoPlan(),
         ]);

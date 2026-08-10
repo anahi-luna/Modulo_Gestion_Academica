@@ -9,8 +9,8 @@ import { getEstadosAcademicos } from "../api/catalogosApi";
 
 export async function obtenerEstadosAcademicos() {
     const response = await getEstadosAcademicos();
-
-    return response.data.reduce((mapa, estado) => {
+    console.log("Estados académicos:", response);           
+    return response.reduce((mapa, estado) => {
         mapa[estado.id_estado_academico] = estado.nombre;
         return mapa;
     }, {});
@@ -42,7 +42,7 @@ export async function generarResultadosAcademicos(idComision) {
         generarResultadosAcademicosApi(idComision),
         obtenerEstadosAcademicos(),
     ]); 
-    return response.data.map((r) => mapearResultado(r, estadosAcademicos));
+    return response.map((r) => mapearResultado(r, estadosAcademicos));
 }
 
 // Todos los resultados académicos ya generados para el alumno
@@ -55,7 +55,7 @@ export async function obtenerResultadosAcademicos() {
         getMisResultadosAcademicos(),
         obtenerEstadosAcademicos(),
     ]);
-    return response.data.map((r) => mapearResultado(r, estadosAcademicos));
+    return response.map((r) => mapearResultado(r, estadosAcademicos));
 }
 
 // Todos los resultados académicos generados hasta ahora (para la
@@ -65,5 +65,5 @@ export async function obtenerTodosLosResultadosAcademicos() {
         getListaResultadosAcademicos(),
         obtenerEstadosAcademicos(),
     ]);
-    return response.data.map((r) => mapearResultado(r, estadosAcademicos));
+    return response.map((r) => mapearResultado(r, estadosAcademicos));
 }

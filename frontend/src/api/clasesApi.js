@@ -24,6 +24,23 @@ export async function getListaClases(idComision) {
         throw error
     }
 }
+// Obtiene las clases del alumno autenticado (nuevo endpoint dedicado)
+export async function getMisClases() {
+    try{
+        const response = await fetch(`${API_URL}/clases/mis-clases`);
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error(data.message)
+        }
+
+        return data;
+    }catch(error){
+        console.error("Error al obtener mis clases", error)
+        throw error
+    }
+}
+
 // Obtiene una clase por su id
 export async function getClasePorId(id) {
     try{

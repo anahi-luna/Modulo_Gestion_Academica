@@ -3,7 +3,8 @@
 // y para cada inscripción trae las evaluaciones de esa comisión.
 
 import { obtenerMisInscripciones } from "./inscripcionesService";
-import { getEvaluaciones } from "./evaluacionesAdminService";
+import { getMisEvaluaciones } from "../api/evaluacionesApi";
+import { getComisiones, obtenerDocenteTitular } from "../api/comisiones";
 
 export async function obtenerMisEvaluacionesPlano(idLegajo) {
     // si no hay inscripciones devuelvo vacío, la vista muestra estado vacío
@@ -18,11 +19,32 @@ export async function obtenerMisEvaluacionesPlano(idLegajo) {
 
     if (inscripciones.length === 0) return [];
 
-    const porComision = await Promise.all(
-        inscripciones.map((inscripcion) =>
-            getEvaluaciones(inscripcion.id_comision_asignatura)
-        )
-    );
+    const [evaluacionesResponse, comisionesResponse] = await Promise.all([
+        getMisEvaluaciones(),
+        getComisiones(),
+    ]);
 
-    return porComision.flat();
+    const comisiones = comisionesResponse.data;
+
+    // mismo formato que devolvía evaluacionesAdminService.getEvaluaciones,
+    // para no romper filtros ni tabla de la vista de alumno
+    return evaluacionesResponse.data.map((evaluacion) => {
+        const comision = comisiones.find(
+            (c) => c.id_comision_asignatura === evaluacion.id_comision_asignatura
+        );
+
+        return {
+            id: evaluacion.id_evaluacion,
+            id_comision: evaluacion.id_comision_asignatura,
+            id_comision_asignatura: evaluacion.id_comision_asignatura,
+            id_tipo_evaluacion: evaluacion.id_tipo_evaluacion,
+            codigo: comision?.comision?.descripcion ?? "-",
+            materia: comision?.nombre ?? "-",
+            docente: obtenerDocenteTitular(comision),
+            titulo: evaluacion.titulo,
+            tipo: evaluacion.tipo_evaluacion?.nombre ?? "-",
+            fecha: evaluacion.fecha_evaluacion,
+            puntaje_maximo: evaluacion.puntaje_maximo,
+        };
+    });
 }
