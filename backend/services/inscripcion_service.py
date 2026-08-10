@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,timedelta 
 from extensions import db
 from exceptions import BusinessError
 from sqlalchemy.exc import IntegrityError
@@ -134,6 +134,36 @@ def validar_transicion_estado(estado_actual, estado_nuevo):
         return
 
 
+def validar_periodo_inscripcion(comision):
+    """
+    Valida que la inscripción se encuentre dentro del período habilitado.
+
+    La inscripción se habilita 7 días antes del inicio de la cursada
+    y permanece habilitada hasta el inicio de la misma.
+    """
+
+    ahora = datetime.now()
+
+    fecha_inicio_cursada = datetime.fromisoformat(
+        comision["vigencia_desde"]
+    )
+    #Ahora dias esta en 1 para pruebas despues cambiar a 7 
+    fecha_inicio_inscripcion = fecha_inicio_cursada - timedelta(days=1)
+
+    if ahora < fecha_inicio_inscripcion:
+        raise BusinessError(
+            "El período de inscripción aún no se encuentra habilitado. "
+            "Las inscripciones se habilitan 7 días antes del inicio de la cursada.",
+            400,
+        )
+
+    if ahora >= fecha_inicio_cursada:
+        raise BusinessError(
+            "El período de inscripción ha finalizado porque la cursada ya comenzó.",
+            400,
+        )
+
+
 # -------------------CÁLCULOS-------------------#
 
 
@@ -203,6 +233,9 @@ def crear_inscripcion(datos):
 
         if not comision:
             raise BusinessError("La comisión no existe.", 404)
+
+        # Validamos el período de inscripción.
+        validar_periodo_inscripcion(comision)
 
         # Validamos si el Legajo puede inscribirse a la comision asignatura
         comision = obtener_comision_asignatura_por_id(
