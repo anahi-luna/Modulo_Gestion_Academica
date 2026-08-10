@@ -9,7 +9,6 @@ import { getEstadosResultadoPlan } from "../api/catalogosApi";
 // Se puede marcar un plan como abandonado y generar el certificado cuando corresponde.
 
 export default function ResultadoPlan() {
-  const { hasRole } = useAuth();
   const [planes, setPlanes] = useState([]);
   const [estados, setEstados] = useState([]);
   const [cargando, setCargando] = useState(true);

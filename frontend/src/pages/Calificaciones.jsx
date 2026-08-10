@@ -12,9 +12,9 @@ import { obtenerIdLegajo } from "../config/legajo";
 
 
 export default function Calificaciones() {
-  const { user: usuario, hasPermission, hasRole } = useAuth();
+  const { user: usuario, hasPermission} = useAuth();
 
-  const esAlumno = hasRole("Alumno");
+  const esAlumno = hasPermission("inscripcion.calificaciones.leer_propio");
 // Si el usuario es un alumno, no puede editar la calificación, solo puede verla.
 // Si el usuario es un docente o administrador, puede editar la calificación si tiene los permisos correspondientes.
   const puedeEditar = hasPermission("inscripcion.calificaciones.actualizar");

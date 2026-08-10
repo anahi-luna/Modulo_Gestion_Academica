@@ -94,8 +94,20 @@ export default function Navbar({ modulo }) {
   }
 
   // Si el usuario es un alumno, le muestro el link "Mi plan" en la navbar, que lo lleva a su plan de estudios.
-  const esAlumno = hasRole("Alumno");
-
+  const esAlumno =  [
+      "inscripcion.inscripciones.crear",
+      "inscripcion.inscripciones.leer_propio",
+      "inscripcion.asistencias.leer_propio",
+      "inscripcion.clases.leer_propio",
+      "inscripcion.evaluaciones.leer_propio",
+      "inscripcion.calificaciones.leer_propio",
+      "inscripcion.resultado_academico.leer_propio",
+      "inscripcion.resultado_plan.leer_propio",
+      "inscripcion.certificados.leer_propio",
+    ]
+    console.log(
+  hasPermission("inscripcion.calificaciones.leer_propio")
+);
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">

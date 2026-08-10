@@ -3,16 +3,17 @@ import useAuth from "../auth/hooks/useAuth";
 import { obtenerMiPlan, obtenerMisMateriasDePlan } from "../Services/planesService";
 import { getEstadosResultadoPlan } from "../api/catalogosApi";
 import ResumenMateriaPlanCard from "../components/planes/ResumenMateriaPlanCard";
+import { hasPermission } from "../auth/utils/permissions";
 
 // Vista del plan de estudios del alumno:
 // resumen general del plan y detalle materia por materia.
 // Solo lectura.
 
 export default function MiPlan() {
-  const { user: usuario, hasRole } = useAuth();
-  const esAlumno = hasRole("Alumno");
+  const { user: usuario, hasPermission } = useAuth();
+  const esAlumno = hasPermission("inscripcion.resultado_plan.leer_propio");
 
-  const [plan, setPlan] = useState(null);
+  const [planes, setPlanes] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [estados, setEstados] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -29,17 +30,17 @@ export default function MiPlan() {
       setError(null);
 
       try {
-        const [planData, materiasData, estadosResponse] = await Promise.all([
+        const [planesData, materiasData, estadosResponse] = await Promise.all([
           obtenerMiPlan(),
           obtenerMisMateriasDePlan(),
           getEstadosResultadoPlan(),
         ]);
-
+        console.log(planesData);
         const estadosData = Array.isArray(estadosResponse)
           ? estadosResponse
           : estadosResponse.data ?? [];
 
-        setPlan(planData);
+        setPlanes(planesData);
         setMaterias(materiasData);
         setEstados(estadosData);
       } catch (err) {
@@ -68,10 +69,6 @@ export default function MiPlan() {
     [estadoFinalizado?.id_estado_resultado_plan]: "bg-green-100 text-green-700",
   };
 
-  const estadoVisual = plan
-    ? estilosEstado[plan.id_estado_resultado_plan] ?? "bg-gray-100 text-gray-600"
-    : "bg-gray-100 text-gray-600";
-
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-4">
@@ -89,75 +86,82 @@ export default function MiPlan() {
 
         {cargando && <p className="text-sm text-gray-400">Cargando tu plan...</p>}
 
-        {!cargando && !plan && !error && (
+        {!cargando && planes.length === 0 && !error && (
           <div className="bg-white rounded-xl shadow px-6 py-10 text-center text-sm text-gray-400">
             Todavía no tenés un plan de estudios asignado.
           </div>
         )}
 
-        {!cargando && plan && (
-          <>
-            <div className="bg-white rounded-xl shadow p-5 sm:p-6">
-              <p className="font-bold text-gray-800">Plan Nº {plan.id_plan}</p>
-              <p className="text-xs text-gray-400 mb-4">Estado general de tu plan</p>
+        {!cargando && planes.map((plan) =>{
 
-              <div className="flex items-center justify-between mb-1">
-                <div>
-                  <p className="text-xs text-gray-400">Estado actual</p>
-                  <span className={`inline-block mt-1 px-3 py-1 rounded-lg text-sm font-medium ${estadoVisual}`}>
-                    {plan.estado}
-                  </span>
-                </div>
+          const estadoVisual = estilosEstado[plan.id_estado_resultado_plan] ?? "bg-gray-100 text-gray-600";
+          return(
+            <div key={plan.id_plan}>
+                
+                  <div className="bg-white rounded-xl shadow p-5 sm:p-6">
+                    <p className="font-bold text-gray-800">Plan Nº {plan.id_plan}</p>
+                    <p className="text-xs text-gray-400 mb-4">Estado general de tu plan</p>
 
-                <div className="text-right">
-                  <p className="text-xs text-gray-400">Avance</p>
-                  <p className="text-2xl font-bold text-gray-800">{plan.avance}%</p>
-                </div>
-              </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <div>
+                        <p className="text-xs text-gray-400">Estado actual</p>
+                        <span className={`inline-block mt-1 px-3 py-1 rounded-lg text-sm font-medium ${estadoVisual}`}>
+                          {plan.estado}
+                        </span>
+                      </div>
 
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mt-3">
-                <div className="h-full bg-red-700 rounded-full" style={{ width: `${plan.avance}%` }} />
-              </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400">Avance</p>
+                        <p className="text-2xl font-bold text-gray-800">{plan.avance}%</p>
+                      </div>
+                    </div>
+
+                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mt-3">
+                      <div className="h-full bg-red-700 rounded-full" style={{ width: `${plan.avance}%` }} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="bg-white rounded-xl shadow p-5 text-center">
+                      <p className="text-xs text-gray-400">Materias totales</p>
+                      <p className="text-2xl font-bold text-gray-800 mt-1">{plan.materias_totales}</p>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow p-5 text-center">
+                      <p className="text-xs text-gray-400">Materias aprobadas</p>
+                      <p className="text-2xl font-bold text-gray-800 mt-1">{plan.materias_aprobadas}</p>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow p-5 text-center">
+                      <p className="text-xs text-gray-400">Materias finalizadas</p>
+                      <p className="text-2xl font-bold text-gray-800 mt-1">{plan.materias_finalizadas}</p>
+                    </div>
+                  </div>
+
+                  {plan.id_estado_resultado_plan === estadoFinalizado?.id_estado_resultado_plan && (
+                    <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm">
+                      ✓ Completaste tu plan de estudios. Revisá tu certificado en la sección "Mis certificados".
+                    </div>
+                  )}
+
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-700 mb-3">Materias</h2>
+
+                    {materias.length === 0 && (
+                      <div className="bg-white rounded-xl shadow px-6 py-8 text-center text-sm text-gray-400">
+                        Todavía no tenés materias cursadas.
+                      </div>
+                    )}
+
+                    {materias.map((materia) => (
+                      <ResumenMateriaPlanCard key={materia.id_comision_asignatura} materia={materia} />
+                    ))}
+                  </div>
+                
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-xl shadow p-5 text-center">
-                <p className="text-xs text-gray-400">Materias totales</p>
-                <p className="text-2xl font-bold text-gray-800 mt-1">{plan.materias_totales}</p>
-              </div>
-
-              <div className="bg-white rounded-xl shadow p-5 text-center">
-                <p className="text-xs text-gray-400">Materias aprobadas</p>
-                <p className="text-2xl font-bold text-gray-800 mt-1">{plan.materias_aprobadas}</p>
-              </div>
-
-              <div className="bg-white rounded-xl shadow p-5 text-center">
-                <p className="text-xs text-gray-400">Materias finalizadas</p>
-                <p className="text-2xl font-bold text-gray-800 mt-1">{plan.materias_finalizadas}</p>
-              </div>
-            </div>
-
-            {plan.id_estado_resultado_plan === estadoFinalizado?.id_estado_resultado_plan && (
-              <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm">
-                ✓ Completaste tu plan de estudios. Revisá tu certificado en la sección "Mis certificados".
-              </div>
-            )}
-
-            <div>
-              <h2 className="text-base font-semibold text-gray-700 mb-3">Materias</h2>
-
-              {materias.length === 0 && (
-                <div className="bg-white rounded-xl shadow px-6 py-8 text-center text-sm text-gray-400">
-                  Todavía no tenés materias cursadas.
-                </div>
-              )}
-
-              {materias.map((materia) => (
-                <ResumenMateriaPlanCard key={materia.id_comision_asignatura} materia={materia} />
-              ))}
-            </div>
-          </>
-        )}
+          );
+          
+        })}
       </div>
     </div>
   );

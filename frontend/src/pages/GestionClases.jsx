@@ -13,8 +13,8 @@ import useAuth from "../auth/hooks/useAuth";
 import { obtenerIdLegajo } from "../config/legajo";
 
 export default function GestionClases() {
-    const { user: usuario, hasPermission, hasRole } = useAuth();
-    const esAlumno = hasRole("Alumno");
+    const { user: usuario, hasPermission } = useAuth();
+    const esAlumno = hasPermission("inscripcion.clases.leer_propio");
     const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {

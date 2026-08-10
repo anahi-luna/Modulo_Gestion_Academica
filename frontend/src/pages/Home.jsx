@@ -17,15 +17,14 @@ import pdfManual from "../docs/manualUsuario.pdf";
 export default function Home() {
     const {
         user: usuario,
-        hasPermission,
-        hasRole
+        hasPermission
     } = useAuth();
 
     const [historial, setHistorial] = useState([]);
     const [estadosInscripcion, setEstadosInscripcion] = useState([]);
     const [error, setError] = useState(null);
 
-    const esAlumno = hasRole("Alumno");
+    const esAlumno = hasPermission("inscripcion.inscripciones.leer_propio");
 
     // CARGAR DATOS
     useEffect(() => {
