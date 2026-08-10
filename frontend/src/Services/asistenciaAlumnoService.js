@@ -59,7 +59,7 @@ export async function obtenerMiAsistencia() {
             const porcentaje = registradas > 0 ? Math.round(((presentes + tarde) / registradas) * 100) : 0;
 
             return {
-                id_comision: inscripcion.id_comision_asignatura,
+                id_comision_asignatura: inscripcion.id_comision_asignatura,
                 materia: inscripcion.materia,
                 comision: inscripcion.comision,
                 detalle,
