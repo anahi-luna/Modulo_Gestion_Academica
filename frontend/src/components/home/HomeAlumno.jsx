@@ -1,4 +1,4 @@
-// Componente para mostrar la página de inicio del alumno, con un banner, un resumen de sus inscripciones, 
+// Componente para mostrar la página de inicio del alumno, con un banner, un resumen de sus inscripciones,
 // plan, clases y asistencia, y un listado de próximas clases por comisión.
 
 import { useEffect, useState } from "react";
@@ -12,8 +12,8 @@ import { obtenerMiPlan } from "../../Services/planesService";
 import { obtenerMisClases } from "../../Services/clasesAlumnoService";
 import { obtenerMiAsistencia } from "../../Services/asistenciaAlumnoService";
 import { obtenerMisCertificados } from "../../Services/certificadosService";
-import { obtenerIdLegajo } from "../../config/legajo";
- 
+import useAuth from "../../auth/hooks/useAuth";
+
 const ESTILOS_ESTADO_PLAN = {
   Finalizado: "bg-green-100 text-green-700",
   "En curso": "bg-blue-100 text-blue-700",
@@ -21,11 +21,19 @@ const ESTILOS_ESTADO_PLAN = {
   Abandonado: "bg-red-100 text-red-700",
 };
 
-export default function HomeAlumno({ usuario }) {
-  const idLegajo = obtenerIdLegajo(usuario);
+export default function HomeAlumno() {
+  // Usuario autenticado obtenido desde Auth
+  const { user: usuario } = useAuth();
+
+  // El id_legajo viene directamente del usuario autenticado
+  const idLegajo = usuario?.id_legajo;
+
   const [inscripciones, setInscripciones] = useState([]);
   const [plan, setPlan] = useState(null);
-  const [clasesInfo, setClasesInfo] = useState({ porComision: [], proximaClase: null });
+  const [clasesInfo, setClasesInfo] = useState({
+    porComision: [],
+    proximaClase: null,
+  });
   const [porcentajeAsistencia, setPorcentajeAsistencia] = useState(null);
   const [certificadosObtenidos, setCertificadosObtenidos] = useState(0);
   const [cargando, setCargando] = useState(true);
@@ -34,21 +42,31 @@ export default function HomeAlumno({ usuario }) {
   useEffect(() => {
     if (!idLegajo) {
       setCargando(false);
-      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
+      setError(
+        "No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte."
+      );
       return;
     }
+
     async function cargar() {
       setCargando(true);
       setError(null);
+
       try {
-        const [misInscripciones, miPlan, misClases, miAsistencia, misCertificados] =
-          await Promise.all([
-            obtenerMisInscripciones(),
-            obtenerMiPlan(),
-            obtenerMisClases(usuario?.id_legajo),
-            obtenerMiAsistencia(),
-            obtenerMisCertificados(),
-          ]);
+        const [
+          misInscripciones,
+          miPlan,
+          misClases,
+          miAsistencia,
+          misCertificados,
+        ] = await Promise.all([
+          obtenerMisInscripciones(),
+          obtenerMiPlan(),
+          obtenerMisClases(idLegajo),
+          obtenerMiAsistencia(),
+          obtenerMisCertificados(),
+        ]);
+
         setInscripciones(misInscripciones);
         setPlan(miPlan);
         setClasesInfo(misClases);
@@ -63,8 +81,9 @@ export default function HomeAlumno({ usuario }) {
         setCargando(false);
       }
     }
+
     cargar();
-  }, [usuario?.id_legajo]);
+  }, [idLegajo]);
 
   const tieneInscripciones = inscripciones.length > 0;
 
@@ -73,10 +92,18 @@ export default function HomeAlumno({ usuario }) {
       <BannerAlumno usuario={usuario} tieneInscripciones={tieneInscripciones} />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {error && (
+          <Alert
+            tipo="error"
+            titulo="Error"
+            mensaje={error}
+            onCerrar={() => setError(null)}
+          />
+        )}
 
-        {error && <Alert tipo="error" titulo="Error" mensaje={error} onCerrar={() => setError(null)} />}
-
-        {cargando && <p className="text-sm text-gray-400">Cargando tu resumen...</p>}
+        {cargando && (
+          <p className="text-sm text-gray-400">Cargando tu resumen...</p>
+        )}
 
         {!cargando && (
           tieneInscripciones ? (
@@ -90,24 +117,32 @@ export default function HomeAlumno({ usuario }) {
           )
         )}
 
-        {/* Estado del plan + próxima clase: los muestro apenas hay
-            algo que contar (plan asignado o alguna clase programada) */}
         {!cargando && (plan || clasesInfo.proximaClase) && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
             <div className="bg-white rounded-xl shadow p-5">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 Estado del plan
               </p>
+
               {plan ? (
                 <>
-                  <span className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${ESTILOS_ESTADO_PLAN[plan.estado] ?? "bg-gray-100 text-gray-600"}`}>
+                  <span
+                    className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${
+                      ESTILOS_ESTADO_PLAN[plan.estado] ??
+                      "bg-gray-100 text-gray-600"
+                    }`}
+                  >
                     {plan.estado}
                   </span>
-                  <p className="text-xs text-gray-400 mt-2">Plan Nº {plan.id_plan}</p>
+
+                  <p className="text-xs text-gray-400 mt-2">
+                    Plan Nº {plan.id_plan}
+                  </p>
                 </>
               ) : (
-                <p className="text-sm text-gray-400">Todavía no tenés un plan asignado.</p>
+                <p className="text-sm text-gray-400">
+                  Todavía no tenés un plan asignado.
+                </p>
               )}
             </div>
 
@@ -115,31 +150,35 @@ export default function HomeAlumno({ usuario }) {
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 Próxima clase
               </p>
+
               {clasesInfo.proximaClase ? (
                 <>
-                  <p className="font-medium text-gray-800">{clasesInfo.proximaClase.tema}</p>
+                  <p className="font-medium text-gray-800">
+                    {clasesInfo.proximaClase.tema}
+                  </p>
+
                   <p className="text-xs text-gray-400 mt-1">
                     {clasesInfo.proximaClase.fecha} · {clasesInfo.proximaClase.docente}
                   </p>
                 </>
               ) : (
-                <p className="text-sm text-gray-400">No tenés clases programadas próximamente.</p>
+                <p className="text-sm text-gray-400">
+                  No tenés clases programadas próximamente.
+                </p>
               )}
             </div>
-
           </div>
         )}
 
-        {/* Próximas clases por comisión */}
         {!cargando && tieneInscripciones && (
           <div>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Próximas clases
             </p>
+
             <ProximasClasesPorComision porComision={clasesInfo.porComision} />
           </div>
         )}
-
       </div>
     </div>
   );

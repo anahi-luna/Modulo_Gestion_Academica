@@ -62,7 +62,7 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
 
       <div className="space-y-1 mb-3">
         <p className="text-xs text-gray-500">{obtenerDocenteTitular(comision)}</p>
-        <p className="text-xs text-gray-500">{comision.modalidad ?? "-"}</p>
+        <p className="text-xs text-gray-500">{comision.plan_asignaturas?.modalidad ?? "-"}</p>
         {idPlan != null && (
           <p className="text-xs text-gray-500">Plan de estudios Nº {idPlan}</p>
         )}
