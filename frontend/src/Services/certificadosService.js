@@ -1,5 +1,5 @@
 import { getListaCertificados, getMisCertificados, crearCertificado, editarCertificado, subirArchivoCertificado } from "../api/certificadosApi";
-import { obtenerTodosLosPlanes } from "./planesService";
+import { obtenerTodosLosPlanes, obtenerMisPlanes } from "./planesService";
 import { getEstadosCertificado, getEstadosResultadoPlan } from "../api/catalogosApi";
 import API_URL from "../api/api";
 
@@ -51,7 +51,7 @@ export async function obtenerFilasCertificados() {
 
 // CERTIFICADOS DEL ALUMNO
 export async function obtenerMisCertificados(idLegajo) {
-    const [planes, certificadosRes] = await Promise.all([obtenerTodosLosPlanes(), getMisCertificados()]);
+const [planes, certificadosRes] = await Promise.all([obtenerMisPlanes(), getMisCertificados()]);
     const certificados = (certificadosRes.data ?? []).map(mapearCertificado);
 
     return certificados.map((certificado) => {
