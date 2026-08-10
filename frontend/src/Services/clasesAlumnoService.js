@@ -34,12 +34,12 @@ export async function obtenerMisClases() {
     let inscripciones = [];
 
     try {
-        inscripciones = await getMisInscripciones();
+        const response = await getMisInscripciones();
+        inscripciones = await response.data;
     } catch (error) {
         console.error("No pude traer inscripciones:", error);
         return { porComision: [], proximaClase: null };
     }
-
     if (inscripciones.length === 0) {
         return { porComision: [], proximaClase: null };
     }

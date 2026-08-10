@@ -2,7 +2,7 @@
 // Muestra su propia asistencia en cada comisión en la que está inscripto.
 
 import { obtenerMisInscripciones } from "./inscripcionesService";
-import { getClases } from "./clasesAdminService";
+import { obtenerMisClasesPlano } from "./clasesAlumnoService";
 import { getMisAsistencias } from "../api/asistenciasApi";
 import { getEstadosAsistencia } from "../api/catalogosApi";
 
@@ -31,10 +31,10 @@ export async function obtenerMiAsistencia() {
 
     // Mapa: id_estado_asistencia -> nombre (Ej: 1 -> "Presente")
     const mapaEstados = Object.fromEntries(estadosAsistencia.map((estado) => [estado.id_estado_asistencia, estado.nombre]));
-
+    const clases = await obtenerMisClasesPlano();
     const porComision = await Promise.all(
         inscripciones.map(async (inscripcion) => {
-            const clases = await getClases(inscripcion.id_comision_asignatura);
+            const clasesComision = clases.filter((clase) => clase.id_comision_asignatura === inscripcion.id_comision_asignatura);
 
             const detalle = await Promise.all(
                 clases.map(async (clase) => {

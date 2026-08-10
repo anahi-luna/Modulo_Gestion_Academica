@@ -29,7 +29,6 @@ export async function getMisClases() {
     try{
         const response = await fetch(`${API_URL}/clases/mis-clases`);
         const data = await response.json();
-
         if(!response.ok){
             throw new Error(data.message)
         }
