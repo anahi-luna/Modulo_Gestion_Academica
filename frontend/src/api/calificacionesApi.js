@@ -37,6 +37,24 @@ export async function getCalificacionesPorInscripcion(idInscripcion) {
     }
 }
 
+// Calificaciones del alumno autenticado (nuevo endpoint dedicado)
+export async function getMisCalificaciones() {
+    try {
+        const response = await fetch(`${API_URL}/calificaciones/mis-calificaciones`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Error al obtener las calificaciones."
+            );
+        }
+        return data;
+    } catch (error) {
+        console.error("Error al obtener la calificación")
+        throw error
+    }
+}
+
 // Calificaciones de una inscripción puntual, en todas sus evaluaciones
 export async function getCalificacionPorId(id) {
     try {

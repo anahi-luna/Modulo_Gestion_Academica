@@ -25,6 +25,21 @@ export async function getListaEvaluaciones(idComision) {
     }
 }
 
+// Obtiene las evaluaciones del alumno autenticado (nuevo endpoint dedicado)
+export async function getMisEvaluaciones() {
+    try{
+        const response = await fetch(`${API_URL}/evaluaciones/mis-evaluaciones`);
+        const data = await response.json();
+        if(!response.ok){
+            throw new Error(data.message)
+        }
+        return data;
+    }catch(error){
+        console.error("Error al obtener mis evaluaciones", error)
+        throw error
+    }
+}
+
 // Evaluaciones de una inscripción puntual, en todas sus evaluaciones
 export async function getEvaluacionPorId(id) {
     try{

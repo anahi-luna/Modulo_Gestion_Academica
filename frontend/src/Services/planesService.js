@@ -41,10 +41,17 @@ function mapearResultadoPlan(r, estados = []) {
     };
 }
 
-// Obtiene el resultado de plan del alumno autenticado.
-export async function obtenerMiPlan() {
+// Obtiene TODOS los resultados de plan del alumno autenticado
+// (puede estar inscripto en más de un plan a la vez).
+export async function obtenerMisPlanes() {
     const [respuesta, estados] = await Promise.all([getMiResultadoPlan(), obtenerEstadosPlan()]);
-    return respuesta.data ? mapearResultadoPlan(respuesta.data, estados) : null;
+    return (respuesta.data ?? []).map((r) => mapearResultadoPlan(r, estados));
+}
+
+// Compatibilidad con HomeAlumno, que solo muestra un resumen: primer plan o null.
+export async function obtenerMiPlan() {
+    const planes = await obtenerMisPlanes();
+    return planes[0] ?? null;
 }
 
 // Obtiene todos los resultados de plan, con nombre y número de legajo.
