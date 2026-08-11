@@ -13,7 +13,7 @@ import { obtenerIdLegajo } from "../config/legajo";
 // PÁGINA PRINCIPAL
 export default function Certificados() {
   const { user: usuario, hasPermission } = useAuth();
-  const esAlumno = hasPermission("inscripcion.certificados.leer_propio");
+  const esAlumno = hasPermission("inscripcion.certificados.leer_propio") && !hasPermission("inscripcion.certificados.leer");
   const idLegajo = obtenerIdLegajo(usuario);
   const puedeEmitir = hasPermission("inscripcion.certificados.emitir");
   const puedeActualizar = hasPermission("inscripcion.certificados.actualizar");

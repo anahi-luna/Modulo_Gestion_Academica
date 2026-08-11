@@ -14,7 +14,7 @@ import { obtenerIdLegajo } from "../config/legajo";
 
 export default function GestionClases() {
     const { user: usuario, hasPermission } = useAuth();
-    const esAlumno = hasPermission("inscripcion.clases.leer_propio");
+    const esAlumno = hasPermission("inscripcion.clases.leer_propio") && !hasPermission("inscripcion.clases.leer");
     const idLegajo = obtenerIdLegajo(usuario);
 
     if (esAlumno) {

@@ -12,7 +12,7 @@ export default function Asistencia() {
   const [comisionSeleccionada, setComisionSeleccionada] = useState(null);
   const { user: usuario, hasPermission } = useAuth();
 
-  const esAlumno = hasPermission("inscripcion.asistencias.leer_propio");
+  const esAlumno = hasPermission("inscripcion.asistencias.leer_propio") && !hasPermission("inscripcion.asistencias.leer");
 
 // Si el usuario es un alumno, no puede editar la asistencia, solo puede verla.
 // Si el usuario es un docente o administrador, puede editar la asistencia si tiene los permisos correspondientes.

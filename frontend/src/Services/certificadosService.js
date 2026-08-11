@@ -51,7 +51,7 @@ export async function obtenerFilasCertificados() {
 
 // CERTIFICADOS DEL ALUMNO
 export async function obtenerMisCertificados(idLegajo) {
-const [planes, certificadosRes] = await Promise.all([obtenerMisPlanes(), getMisCertificados()]);
+    const [planes, certificadosRes] = await Promise.all([obtenerMisPlanes(), getMisCertificados()]);
     const certificados = (certificadosRes.data ?? []).map(mapearCertificado);
 
     return certificados.map((certificado) => {

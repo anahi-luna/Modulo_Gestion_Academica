@@ -24,7 +24,7 @@ export default function Home() {
     const [estadosInscripcion, setEstadosInscripcion] = useState([]);
     const [error, setError] = useState(null);
 
-    const esAlumno = hasPermission("inscripcion.inscripciones.leer_propio");
+    const esAlumno = hasPermission("inscripcion.inscripciones.leer_propio") && !hasPermission("inscripcion.inscripciones.leer");
 
     // CARGAR DATOS
     useEffect(() => {
