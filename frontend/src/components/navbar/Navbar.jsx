@@ -22,6 +22,7 @@ import useAuth from "../../auth/hooks/useAuth";
 import { LOGIN_ROUTE, PORTAL_URL } from "../../auth/config";
 import { MODULOS } from "../../config/modulos";
 import NavDropdown from "./DropDown";
+import NavDropdownMobile from "./NavDropdownMobile";
 
 // Componente de barra de navegación (navbar) que muestra el logo, el título del sistema, los links a los módulos
 // disponibles según los permisos del usuario, y un menú de usuario con opciones de notificaciones y cerrar sesión.
@@ -262,8 +263,9 @@ export default function Navbar({ modulo }) {
                   <NavLink
                     key={modulo.id}
                     to={opcion.ruta}
-                    className={linkClass}
+                    className={linkClassMobile}
                     end
+                    onClick={closeMenus}
                   >
                     <Icon className="size-[17px]"/>
                     {modulo.titulo}
@@ -272,11 +274,12 @@ export default function Navbar({ modulo }) {
               }
 
               return(
-                <NavDropdown
+                <NavDropdownMobile
                   key={modulo.id}
                   titulo={modulo.titulo}
                   icon={modulo.icon}
                   opciones={modulo.opciones}
+                  onClose={closeMenus}
                 />
               )
             })}
