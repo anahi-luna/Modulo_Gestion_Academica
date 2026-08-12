@@ -17,7 +17,7 @@ function estadoLegible(estado) {
 
 function ComisionClasesCard({ comision }) {
   const [abierto, setAbierto] = useState(false);
-
+  console.log(JSON.stringify(comision, null, 2));
   return (
     <div className="bg-white rounded-xl shadow border overflow-hidden mb-4">
       <button
@@ -25,8 +25,8 @@ function ComisionClasesCard({ comision }) {
         className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 text-left"
       >
         <div>
-          <p className="font-semibold text-gray-800">{comision.materia}</p>
-          <p className="text-xs text-gray-400">{comision.comision}</p>
+          <p className="font-semibold text-gray-800">{comision.clases[0]?.materia}</p>
+          <p className="text-xs text-gray-400">{comision.clases[0]?.comision}</p>
         </div>
 
         <div className="flex items-center gap-4">
