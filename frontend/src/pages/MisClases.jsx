@@ -1,4 +1,3 @@
-import useAuth from "../auth/hooks/useAuth";
 import { useEffect, useState } from "react";
 import Alert from "../components/Alert";
 import ClasesTable from "../components/clases/ClaseTable";
@@ -7,8 +6,6 @@ import { obtenerMisClasesPlano } from "../Services/clasesAlumnoService";
 
 
 export default function MisClases() {
-    const {user: usuario} = useAuth();
-    const idLegajo = usuario?.id_legajo;
     const [clases, setClases] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
@@ -20,16 +17,12 @@ export default function MisClases() {
     const [filtroTema, setFiltroTema] = useState("");
 
     useEffect(() => {
-        if (!idLegajo) {
-            setCargando(false);
-            setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
-            return;
-        }
+
         async function cargar() {
             setCargando(true);
             setError(null);
             try {
-                setClases(await obtenerMisClasesPlano(idLegajo));
+                setClases(await obtenerMisClasesPlano());
             } catch (err) {
                 console.error(err);
                 setError("No se pudieron cargar tus clases.");
@@ -38,7 +31,7 @@ export default function MisClases() {
             }
         }
         cargar();
-    }, [idLegajo]);
+    }, []);
 
     const clasesFiltradas = clases.filter((clase) => {
         if (filtroMateria && clase.materia !== filtroMateria) return false;

@@ -920,7 +920,7 @@ export default function PanelDetalleClase({
 
                     <button
                         onClick={() =>
-                            navigate("/GestionClases")
+                            navigate("/gestion-clases")
                         }
                         className="flex items-center gap-2 self-start sm:self-auto border border-gray-300 rounded-lg px-4 py-2 text-sm hover:bg-gray-100 transition shrink-0"
                     >

@@ -7,23 +7,18 @@ import {
 
 import CertificadoCard from "../components/certificados/CertificadoCard";
 
-export default function MisCertificados({idLegajo}) {
+export default function MisCertificados() {
   const [certificados, setCertificados] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!idLegajo) {
-      setCargando(false);
-      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
-      return;
-    }
 
     async function cargar() {
       setCargando(true);
       setError(null);
       try {
-        const data = await obtenerMisCertificados(idLegajo);
+        const data = await obtenerMisCertificados();
         setCertificados(data);
       } catch (err) {
         setError(err.message);
@@ -33,7 +28,7 @@ export default function MisCertificados({idLegajo}) {
     }
 
     cargar();
-  }, [idLegajo]);
+  }, []);
 
   function handleDescargar(cert) {
     descargarCertificado(cert);

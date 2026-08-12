@@ -50,7 +50,7 @@ export default function MiPlan() {
     }
 
     cargar();
-  }, [esAlumno, usuario]);
+  }, [esAlumno]);
 
   if (!esAlumno) {
     return (

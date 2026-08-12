@@ -17,7 +17,6 @@ export default function GestionCalificaciones() {
   const puedeEditar = hasPermission("inscripcion.calificaciones.actualizar");
   const puedeCrear = hasPermission("inscripcion.calificaciones.crear");
   const puedeEliminar = hasPermission("inscripcion.calificaciones.eliminar");
-  const idLegajo = obtenerIdLegajo(usuario)
 
   
   return <VistaComisiones puedeEditar={puedeEditar} puedeCrear={puedeCrear} puedeEliminar={puedeEliminar} />;

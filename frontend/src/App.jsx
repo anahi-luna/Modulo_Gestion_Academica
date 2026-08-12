@@ -9,11 +9,8 @@ import HomeAlumno from './pages/HomeAlumno';
 import HomeRouter from './routes/HomeRouter';
 import Inscripciones from "./pages/Inscripciones";
 import InscripcionesAdmin from './pages/InscripcionesAdmin';
-import Asistencia from './pages/GestionAsistencia';
 import GestionClases from "./pages/GestionClases";
-import Calificaciones from "./pages/GestionCalificaciones";
 import GestionEvaluaciones from "./pages/GestionEvaluaciones";
-import Certificados from "./pages/GestionCertificados";
 import MisClases from './pages/MisClases';
 import GestionAsistencia from './pages/GestionAsistencia';
 import MiAsistencia from './pages/MiAsistencia';
@@ -75,7 +72,7 @@ export default function App() {
                         {/* Gestión de inscripciones: requiere poder leerlas
                             como personal de gestión */}
                         <Route
-                            path="/inscripcionesAdmin"
+                            path="/inscripciones-admin"
                             element={
                                 <ProtectedRoute permissions={["inscripcion.inscripciones.leer"]}>
                                     <InscripcionesAdmin />
@@ -144,7 +141,7 @@ export default function App() {
 
                         {/* Gestión de evaluaciones y vista alumno*/}
                         <Route
-                            path="/GestionEvaluaciones"
+                            path="/gestion-evaluaciones"
                             element={
                                 <ProtectedRoute permissions={["inscripcion.evaluaciones.leer"]}>
                                     <GestionEvaluaciones />
@@ -181,7 +178,14 @@ export default function App() {
                         />
 
 
-                        <Route path="/mi-plan" element={<MiPlan />} />
+                        <Route
+                            path="/mi-plan"
+                            element={
+                                <ProtectedRoute permissions={["inscripcion.resultado_plan.leer_propio"]}>
+                                    <MiPlan />
+                                </ProtectedRoute>
+                            }
+                        />
                         <Route
                             path="/resultado-plan"
                             element={

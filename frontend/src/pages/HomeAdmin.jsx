@@ -82,7 +82,9 @@ export default function HomeAdmin() {
 
     // MÓDULOS
     const modulosVisibles = MODULOS.filter((modulo) =>
-        hasPermission(modulo.permisoLeer)
+        modulo.opciones.some((opcion) =>
+            hasPermission(opcion.permiso)
+        )
     );
 
     return (
@@ -165,23 +167,27 @@ export default function HomeAdmin() {
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {modulosVisibles.map((modulo) => (
-                        <ModuloCard
-                            key={modulo.id}
-                            titulo={modulo.titulo}
-                            descripcion={modulo.descripcion}
-                            cantidad={
-                                modulo.id === "inscripciones"
-                                    ? `${pendientes} pendientes`
-                                    : null
-                            }
-                            color={modulo.color}
-                            ruta={modulo.ruta}
-                            icono={
-                                <ClipboardDocumentListIcon className="h-6 w-6" />
-                            }
-                        />
-                    ))}
+                    {modulosVisibles.map((modulo) => {
+                        const rutaAdmin = modulo.opciones[0]?.ruta;
+
+                        return (
+                            <ModuloCard
+                                key={modulo.id}
+                                titulo={modulo.titulo}
+                                descripcion={modulo.descripcion}
+                                cantidad={
+                                    modulo.id === "inscripciones"
+                                        ? `${pendientes} pendientes`
+                                        : null
+                                }
+                                color={modulo.color}
+                                ruta={rutaAdmin}
+                                icono={
+                                    <ClipboardDocumentListIcon className="h-6 w-6" />
+                                }
+                            />
+                        );
+                    })}
                 </div>
             </div>
         </div>

@@ -16,17 +16,13 @@ export default function MisEvaluaciones() {
     const [filtroTipo, setFiltroTipo] = useState("");
 
     useEffect(() => {
-        if (!idLegajo) {
-            setCargando(false);
-            setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
-            return;
-        }
+
 
         async function cargar() {
             setCargando(true);
             setError(null);
             try {
-                setEvaluaciones(await obtenerMisEvaluacionesPlano(idLegajo));
+                setEvaluaciones(await obtenerMisEvaluacionesPlano());
             } catch (err) {
                 console.error(err);
                 setError("No se pudieron cargar tus evaluaciones.");
@@ -36,7 +32,7 @@ export default function MisEvaluaciones() {
         }
 
         cargar();
-    }, [idLegajo]);
+    }, []);
 
     const evaluacionesFiltradas = evaluaciones.filter((evaluacion) => {
         if (filtroMateria && evaluacion.materia !== filtroMateria) return false;

@@ -20,6 +20,8 @@ import {
 import logo from "../../images/logo.jpeg";
 import useAuth from "../../auth/hooks/useAuth";
 import { LOGIN_ROUTE, PORTAL_URL } from "../../auth/config";
+import { MODULOS } from "../../config/modulos";
+import NavDropdown from "./DropDown";
 
 // Componente de barra de navegación (navbar) que muestra el logo, el título del sistema, los links a los módulos
 // disponibles según los permisos del usuario, y un menú de usuario con opciones de notificaciones y cerrar sesión.
@@ -66,23 +68,13 @@ export default function Navbar({ modulo }) {
   // "permisoAlumno" es el equivalente "_propio" del permiso general: en las páginas unificadas
   // (donde adentro se resuelve si es personal o alumno) el link se muestra si el usuario tiene
   // cualquiera de los dos, para no ocultarle el acceso a un alumno que solo tiene el permiso propio.
-  const links = [
-    { to: "/inscripcionesAdmin", label: "Inscripciones", permiso: "inscripcion.inscripciones.leer", icon: ClipboardDocumentListIcon },
-    { to: "/inscripciones", label: "Inscribirme", permiso: "inscripcion.inscripciones.crear", icon: PencilSquareIcon },
-    { to: "/asistencia", label: "Asistencia", permiso: "inscripcion.asistencias.leer", permisoAlumno: "inscripcion.asistencias.leer_propio", icon: CalendarDaysIcon },
-    { to: "/GestionClases", label: "Clases", permiso: "inscripcion.clases.leer", permisoAlumno: "inscripcion.clases.leer_propio", icon: BookOpenIcon },
-    { to: "/GestionEvaluaciones", label: "Evaluaciones", permiso: "inscripcion.evaluaciones.leer", permisoAlumno: "inscripcion.evaluaciones.leer_propio", icon: DocumentTextIcon },
-    { to: "/calificaciones", label: "Calificaciones", permiso: "inscripcion.calificaciones.leer", permisoAlumno: "inscripcion.calificaciones.leer_propio", icon: ChartBarIcon },
-    { to: "/certificados", label: "Certificados", permiso: "inscripcion.certificados.leer", permisoAlumno: "inscripcion.certificados.leer_propio", icon: CheckBadgeIcon },
-    { to: "/resultado-plan", label: "Resultado del plan", permiso: "inscripcion.resultado_plan.leer", icon: ClipboardDocumentCheckIcon },
-  ];
+ const modulosVisibles = MODULOS.map((modulo) =>({
+    ...modulo,
+    opciones: modulo.opciones.filter((opcion) =>
+        hasPermission(opcion.permiso)
+    ),
 
-  function debeMostrarse(link) {
-    return (
-      hasPermission(link.permiso) ||
-      (link.permisoAlumno && hasPermission(link.permisoAlumno))
-    );
-  }
+ })).filter((modulo) => modulo.opciones.length > 0);
 
   if (!user) {
     // Mientras no sé quién es el usuario todavía (se está restaurando
@@ -110,8 +102,9 @@ export default function Navbar({ modulo }) {
 );
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-3 text-left cursor-pointer shrink-0">
+      <div className="max-w-7xl mx-auto px-5 py-3 grid grid-cols-[auto_1fr_auto] items-center">
+        <Link to="/" className="flex items-center gap-3 text-left min-w-[220px]">
+        
           <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
               src={logo}
@@ -136,7 +129,7 @@ export default function Navbar({ modulo }) {
           <Bars3Icon className="size-[22px]" />
         </button>
 
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex flex-1 justify-center items-center gap-1">
           <a
             onClick={() => (window.location.href = PORTAL_URL)}
             className={linkClass}
@@ -145,21 +138,40 @@ export default function Navbar({ modulo }) {
             Portal inicio
           </a>
 
-          {esAlumno && (
-            <NavLink to="/mi-plan" className={linkClass} end>
-              <AcademicCapIcon className="size-[17px]" />
-              Mi plan
-            </NavLink>
-          )}
+          
 
-          {links.filter(debeMostrarse).map((link) => {
-            const Icon = link.icon;
-            return (
-              <NavLink key={link.to} to={link.to} className={linkClass} end>
-                <Icon className="size-[17px]" />
-                {link.label}
+          {modulosVisibles.map((modulo)=> {
+            if(modulo.opciones.length === 1) {
+              const Icon = modulo.icon;
+              const opcion = modulo.opciones[0];
+
+              return(
+                <NavLink
+                  key={modulo.id}
+                  to={opcion.ruta}
+                  className={linkClass}
+                  end
+                >
+                  <Icon className="size-[17px]"/>
+                  {modulo.titulo}
+                </NavLink>
+              )
+            }
+            {esAlumno && (
+              <NavLink to="/mi-plan" className={linkClass} end>
+                <AcademicCapIcon className="size-[17px]" />
+                Mi plan
               </NavLink>
-            );
+            )}
+
+            return(
+              <NavDropdown
+                key={modulo.id}
+                titulo={modulo.titulo}
+                icon={modulo.icon}
+                opciones={modulo.opciones}
+              />
+            )
           })}
 
           {modulo && (
@@ -241,22 +253,32 @@ export default function Navbar({ modulo }) {
               </NavLink>
             )}
 
-            {links.filter(debeMostrarse).map((link) => {
-              const Icon = link.icon;
-              return (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  className={linkClassMobile}
-                  end
-                  onClick={closeMenus}
-                >
-                  <span className="w-10 h-10 text-red-700 flex items-center justify-center rounded-xl bg-red-50">
-                    <Icon className="size-5" />
-                  </span>
-                  {link.label}
-                </NavLink>
-              );
+            {modulosVisibles.map((modulo)=> {
+              if(modulo.opciones.length === 1) {
+                const Icon = modulo.icon;
+                const opcion = modulo.opciones[0];
+
+                return(
+                  <NavLink
+                    key={modulo.id}
+                    to={opcion.ruta}
+                    className={linkClass}
+                    end
+                  >
+                    <Icon className="size-[17px]"/>
+                    {modulo.titulo}
+                  </NavLink>
+                )
+              }
+
+              return(
+                <NavDropdown
+                  key={modulo.id}
+                  titulo={modulo.titulo}
+                  icon={modulo.icon}
+                  opciones={modulo.opciones}
+                />
+              )
             })}
 
             <button
