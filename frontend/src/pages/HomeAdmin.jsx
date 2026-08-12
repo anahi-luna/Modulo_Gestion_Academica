@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import ModuloCard from "../components/ModuloCard";
-import HomeAlumno from "../components/home/HomeAlumno";
 import Alert from "../components/Alert";
 import { obtenerInscripciones } from "../Services/inscripcionesAdminService";
 import useAuth from "../auth/hooks/useAuth";
@@ -14,7 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import pdfManual from "../docs/manualUsuario.pdf";
 
-export default function Home() {
+export default function HomeAdmin() {
     const {
         user: usuario,
         hasPermission
@@ -24,14 +23,13 @@ export default function Home() {
     const [estadosInscripcion, setEstadosInscripcion] = useState([]);
     const [error, setError] = useState(null);
 
-    const esAlumno = hasPermission("inscripcion.inscripciones.leer_propio");
 
     // CARGAR DATOS
     useEffect(() => {
-        if (!esAlumno && hasPermission("inscripcion.inscripciones.leer")) {
+        if (hasPermission("inscripcion.inscripciones.leer")) {
             cargarDatos();
         }
-    }, [esAlumno, usuario, hasPermission]);
+    }, [usuario, hasPermission]);
 
     async function cargarDatos() {
         try {
@@ -55,10 +53,6 @@ export default function Home() {
         return <div>Cargando...</div>;
     }
 
-    // DASHBOARD ALUMNO
-    if (esAlumno) {
-        return <HomeAlumno />;
-    }
 
     // IDS DESDE CATÁLOGO
     const idEstadoPendiente = estadosInscripcion.find(

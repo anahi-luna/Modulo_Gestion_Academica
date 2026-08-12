@@ -4,14 +4,24 @@ import Navbar from "./components/navbar/Navbar";
 import ProtectedRoute from './auth/routes/ProtectedRoute';
 import MiPlan from "./pages/MiPlan";
 import ResultadoPlan from "./pages/ResultadoPlan";
-import Home from "./pages/Home";
+import HomeAdmin from './pages/HomeAdmin';
+import HomeAlumno from './pages/HomeAlumno';
+import HomeRouter from './routes/HomeRouter';
 import Inscripciones from "./pages/Inscripciones";
 import InscripcionesAdmin from './pages/InscripcionesAdmin';
-import Asistencia from './pages/Asistencia';
+import Asistencia from './pages/GestionAsistencia';
 import GestionClases from "./pages/GestionClases";
-import Calificaciones from "./pages/Calificaciones";
+import Calificaciones from "./pages/GestionCalificaciones";
 import GestionEvaluaciones from "./pages/GestionEvaluaciones";
-import Certificados from "./pages/Certificados";
+import Certificados from "./pages/GestionCertificados";
+import MisClases from './pages/MisClases';
+import GestionAsistencia from './pages/GestionAsistencia';
+import MiAsistencia from './pages/MiAsistencia';
+import GestionCalificaciones from './pages/GestionCalificaciones';
+import MisCalificaciones from './pages/MisCalificaciones';
+import MisEvaluaciones from './pages/MisEvaluaciones';
+import GestionCertificados from './pages/GestionCertificados';
+import MisCertificados from './pages/MisCertificados';
 
 // La app principal, que arma el navbar y el router con todas las páginas. 
 export default function App() {
@@ -23,14 +33,33 @@ export default function App() {
             <main>
                 <Routes>
 
-                        {/* Home: uno solo para todos, arma las cards de
-                            módulos según los permisos del usuario */}
+                        {/* Homes */}
                         <Route path="/" element={
                                 <ProtectedRoute>
-                                    <Home />
+                                    <HomeRouter />
                                 </ProtectedRoute>
                                 
                             } />
+
+                        <Route
+                            path='/inicio-admin'
+                            element={
+                                <ProtectedRoute permissions={["inscripcion.inscripciones.leer"]}>
+                                    <HomeAdmin/>
+                                </ProtectedRoute>
+                            }
+
+                        />
+
+                        <Route
+                            path='/inicio-alumno'
+                            element={
+                                <ProtectedRoute permissions={["inscripcion.inscripciones.crear"]}>
+                                    <HomeAlumno/>
+                                </ProtectedRoute>
+                            }
+
+                        />
 
                         {/* Pedir una inscripción: no depende de un permiso
                             del microservicio, cualquiera autenticado
@@ -54,69 +83,104 @@ export default function App() {
                             }
                         />
 
-                        {/* Asistencia: unificada, adentro se gatea con
-                            permiso de crear/actualizar si puede editar.
-                            Acepta el permiso general (personal) o el
-                            propio (alumno viendo su propia asistencia) */}
+                        {/* Asistencia para alumno y administracion */}
                         <Route
-                            path="/asistencia"
+                            path="/gestion-asistencia"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.asistencias.leer", "inscripcion.asistencias.leer_propio"]}>
-                                    <Asistencia />
+                                <ProtectedRoute permissions={["inscripcion.asistencias.leer"]}>
+                                    <GestionAsistencia />
                                 </ProtectedRoute>
                             }
                         />
 
-                        {/* Gestión de clases: sigue siendo una sola vista,
-                            ahora protegida por permiso en vez de por rol.
-                            Acepta el permiso general o el propio (alumno
-                            viendo las clases de sus comisiones) */}
                         <Route
-                            path="/GestionClases"
+                            path="/mi-asistencia"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.clases.leer", "inscripcion.clases.leer_propio"]}>
+                                <ProtectedRoute permissions={["inscripcion.asistencias.leer_propio"]}>
+                                    <MiAsistencia />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        {/* Gestión de clases y vista para alumno*/}
+                        <Route
+                            path="/gestion-clases"
+                            element={
+                                <ProtectedRoute permissions={["inscripcion.clases.leer"]}>
                                     <GestionClases />
                                 </ProtectedRoute>
                             }
                         />
 
-                        {/* Calificaciones: unificada (staff vs alumno se
-                            resuelve adentro de la página). Acepta el
-                            permiso general o el propio (alumno viendo
-                            sus propias notas) */}
                         <Route
-                            path="/calificaciones"
+                            path="/mis-clases"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.calificaciones.leer", "inscripcion.calificaciones.leer_propio"]}>
-                                    <Calificaciones />
+                                <ProtectedRoute permissions={["inscripcion.clases.leer_propio"]}>
+                                    <MisClases />
                                 </ProtectedRoute>
                             }
                         />
 
-                        {/* Gestión de evaluaciones. Acepta el permiso
-                            general o el propio (alumno viendo las
-                            evaluaciones de sus comisiones) */}
+
+
+                        {/* Gestionar calificaciones y vista alumno */}
+                        <Route
+                            path="/gestion-calificaciones"
+                            element={
+                                <ProtectedRoute permissions={["inscripcion.calificaciones.leer"]}>
+                                    <GestionCalificaciones />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/mis-calificaciones"
+                            element={
+                                <ProtectedRoute permissions={["inscripcion.calificaciones.leer_propio"]}>
+                                    <MisCalificaciones />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        {/* Gestión de evaluaciones y vista alumno*/}
                         <Route
                             path="/GestionEvaluaciones"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.evaluaciones.leer", "inscripcion.evaluaciones.leer_propio"]}>
+                                <ProtectedRoute permissions={["inscripcion.evaluaciones.leer"]}>
                                     <GestionEvaluaciones />
                                 </ProtectedRoute>
                             }
                         />
 
-                        {/* Certificados: unificada (staff vs alumno se
-                            resuelve adentro de la página). Acepta el
-                            permiso general o el propio (alumno viendo
-                            sus propios certificados) */}
                         <Route
-                            path="/certificados"
+                            path="/mis-evaluaciones"
                             element={
-                                <ProtectedRoute permissions={["inscripcion.certificados.leer", "inscripcion.certificados.leer_propio"]}>
-                                    <Certificados />
+                                <ProtectedRoute permissions={["inscripcion.evaluaciones.leer_propio"]}>
+                                    <MisEvaluaciones />
                                 </ProtectedRoute>
                             }
                         />
+
+                        {/* Gestión certificados y vista alumno*/}
+                        <Route
+                            path="/gestion-certificados"
+                            element={
+                                <ProtectedRoute permissions={["inscripcion.certificados.leer"]}>
+                                    <GestionCertificados />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/mis-certificados"
+                            element={
+                                <ProtectedRoute permissions={["inscripcion.certificados.leer_propio"]}>
+                                    <MisCertificados />
+                                </ProtectedRoute>
+                            }
+                        />
+
+
                         <Route path="/mi-plan" element={<MiPlan />} />
                         <Route
                             path="/resultado-plan"

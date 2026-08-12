@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import useAuth from "../auth/hooks/useAuth";
 import EstadisticaCard from "../components/Asistencia/EstadisticaCard";
 import TablaResultadoPlan from "../components/planes/TablaResultadoPlan";
 import { obtenerTodosLosPlanes, marcarAbandono, generarCertificadoDePlan } from "../Services/planesService";

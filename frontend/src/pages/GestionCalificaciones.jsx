@@ -6,25 +6,19 @@ import useAuth from "../auth/hooks/useAuth";
 import PanelesComision from "../components/Calificaciones/PanelesComision";
 import PanelDetalleCalificaciones from "../components/Calificaciones/PanelDetalleCalificaciones";
 import ResumenComisionCard from "../components/Calificaciones/ResumenComisionCard";
-import { obtenerMisCalificaciones } from "../Services/calificacionesAlumnoService";
-import { obtenerIdLegajo } from "../config/legajo";
 
 
 
-export default function Calificaciones() {
-  const { user: usuario, hasPermission} = useAuth();
 
-  const esAlumno = hasPermission("inscripcion.calificaciones.leer_propio");
-// Si el usuario es un alumno, no puede editar la calificación, solo puede verla.
+export default function GestionCalificaciones() {
+  const {  hasPermission} = useAuth();
+
 // Si el usuario es un docente o administrador, puede editar la calificación si tiene los permisos correspondientes.
   const puedeEditar = hasPermission("inscripcion.calificaciones.actualizar");
   const puedeCrear = hasPermission("inscripcion.calificaciones.crear");
   const puedeEliminar = hasPermission("inscripcion.calificaciones.eliminar");
   const idLegajo = obtenerIdLegajo(usuario)
 
-  if (esAlumno) {
-    return <VistaAlumno idLegajo={usuario?.id_legajo} />;
-  }
   
   return <VistaComisiones puedeEditar={puedeEditar} puedeCrear={puedeCrear} puedeEliminar={puedeEliminar} />;
 }
@@ -67,68 +61,6 @@ function VistaComisiones({ puedeEditar, puedeCrear, puedeEliminar }) {
 
       </div>
 
-    </div>
-  );
-}
-
-// Vista para el alumno: solo lectura, muestra sus propias notas en
-// cada comisión en la que está inscripto.
-function VistaAlumno({ idLegajo }) {
-  const [comisiones, setComisiones] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!idLegajo) {
-      setCargando(false);
-      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
-      return;
-    }
-    async function cargar() {
-      setCargando(true);
-      setError(null);
-      try {
-        const data = await obtenerMisCalificaciones();
-        setComisiones(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setCargando(false);
-      }
-    }
-    cargar();
-  }, [idLegajo]);
-
-  return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto">
-
-        <h1 className="text-3xl font-bold text-gray-800">Mis calificaciones</h1>
-        <p className="text-gray-500 mb-6">
-          Notas obtenidas en cada comisión en la que estás inscripto. Esta vista es de solo lectura.
-        </p>
-
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-100 border border-red-300 p-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        {cargando && (
-          <p className="text-sm text-gray-400">Cargando calificaciones...</p>
-        )}
-
-        {!cargando && comisiones.length === 0 && !error && (
-          <div className="bg-white rounded-xl shadow px-6 py-10 text-center text-sm text-gray-400">
-            Todavía no tenés calificaciones cargadas.
-          </div>
-        )}
-
-        {comisiones.map((c) => (
-          <ResumenComisionCard key={c.id_comision_asignatura} comision={c} />
-        ))}
-
-      </div>
     </div>
   );
 }

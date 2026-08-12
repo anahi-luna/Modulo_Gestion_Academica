@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react";
 import useAuth from "../auth/hooks/useAuth";
-import { obtenerFilasCertificados, obtenerMisCertificados, emitir, revocar, descargarCertificado, subirArchivo } from "../Services/certificadosService";
+import { obtenerFilasCertificados, emitir, revocar, descargarCertificado, subirArchivo } from "../Services/certificadosService";
 import { getEstadosResultadoPlan } from "../api/catalogosApi";
 import { getComisiones } from "../api/comisiones";
 import { generarResultadosAcademicos } from "../Services/resultadoAcademicoService";
-import CertificadoCard from "../components/certificados/CertificadoCard";
 import TablaCertificadosAdmin from "../components/certificados/TablaCertificadosAdmin";
 import ModalEmitirCertificado from "../components/certificados/ModalEmitirCertificado";
 import ModalAdjuntarArchivo from "../components/certificados/ModalAdjuntarArchivo";
-import { obtenerIdLegajo } from "../config/legajo";
 
-// PÁGINA PRINCIPAL
-export default function Certificados() {
-  const { user: usuario, hasPermission } = useAuth();
-  const esAlumno = hasPermission("inscripcion.certificados.leer_propio");
-  const idLegajo = obtenerIdLegajo(usuario);
+export default function GestionCertificados() {
+  const { hasPermission } = useAuth();
   const puedeEmitir = hasPermission("inscripcion.certificados.emitir");
   const puedeActualizar = hasPermission("inscripcion.certificados.actualizar");
   const puedeGenerarResultado = hasPermission("inscripcion.resultado_academico.generar");
 
-  if (esAlumno) return <VistaAlumno idLegajo={idLegajo} usuario={usuario} />;
 
   return <VistaPersonal puedeEmitir={puedeEmitir} puedeActualizar={puedeActualizar} puedeGenerarResultado={puedeGenerarResultado} />;
 }
@@ -216,64 +210,6 @@ function VistaPersonal({ puedeEmitir, puedeActualizar, puedeGenerarResultado }) 
             onAdjuntar={handleAdjuntar}
           />
         )}
-      </main>
-    </div>
-  );
-}
-
-// VISTA DEL ALUMNO
-function VistaAlumno({ idLegajo }) {
-  const [certificados, setCertificados] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!idLegajo) {
-      setCargando(false);
-      setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
-      return;
-    }
-
-    async function cargar() {
-      setCargando(true);
-      setError(null);
-      try {
-        const data = await obtenerMisCertificados(idLegajo);
-        setCertificados(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setCargando(false);
-      }
-    }
-
-    cargar();
-  }, [idLegajo]);
-
-  function handleDescargar(cert) {
-    descargarCertificado(cert);
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <main className="max-w-3xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-800">Mis certificados</h1>
-        <p className="text-sm text-gray-500 mb-6">Certificados de participación y aprobación emitidos a tu nombre.</p>
-
-        {error && <div className="mb-4 rounded-lg bg-red-100 border border-red-300 p-3 text-sm text-red-700">{error}</div>}
-        {cargando && <p className="text-sm text-gray-400">Cargando certificados...</p>}
-
-        {!cargando && certificados.length === 0 && !error && (
-          <div className="bg-white rounded-xl shadow px-6 py-10 text-center text-sm text-gray-400">
-            Todavía no tenés certificados.
-          </div>
-        )}
-
-        <div className="space-y-3">
-          {certificados.map((c) => (
-            <CertificadoCard key={c.id} certificado={c} onDescargar={handleDescargar} />
-          ))}
-        </div>
       </main>
     </div>
   );

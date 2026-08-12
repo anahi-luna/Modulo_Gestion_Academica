@@ -2,17 +2,17 @@
 // plan, clases y asistencia, y un listado de próximas clases por comisión.
 
 import { useEffect, useState } from "react";
-import BannerAlumno from "./BannerAlumno";
-import ResumenActivo from "./ResumenActivo";
-import ResumenVacio from "./ResumenVacio";
-import ProximasClasesPorComision from "./ProximasClasesPorComision";
-import Alert from "../Alert";
-import { obtenerMisInscripciones } from "../../Services/inscripcionesService";
-import { obtenerMiPlan } from "../../Services/planesService";
-import { obtenerMisClases } from "../../Services/clasesAlumnoService";
-import { obtenerMiAsistencia } from "../../Services/asistenciaAlumnoService";
-import { obtenerMisCertificados } from "../../Services/certificadosService";
-import useAuth from "../../auth/hooks/useAuth";
+import BannerAlumno from "../components/home/BannerAlumno";
+import ResumenActivo from "../components/home/ResumenActivo";
+import ResumenVacio from "../components/home/ResumenVacio";
+import ProximasClasesPorComision from "../components/home/ProximasClasesPorComision";
+import Alert from "../components/Alert";
+import { obtenerMisInscripciones } from "../Services/inscripcionesService";
+import { obtenerMiPlan } from "../Services/planesService";
+import { obtenerMisClases } from "../Services/clasesAlumnoService";
+import { obtenerMiAsistencia } from "../Services/asistenciaAlumnoService";
+import { obtenerMisCertificados } from "../Services/certificadosService";
+import useAuth from "../auth/hooks/useAuth";
 
 const ESTILOS_ESTADO_PLAN = {
   Finalizado: "bg-green-100 text-green-700",

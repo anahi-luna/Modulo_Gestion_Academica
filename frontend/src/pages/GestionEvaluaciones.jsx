@@ -11,24 +11,18 @@ import {
     modificarEvaluacion,
     borrarEvaluacion,
 } from "../Services/evaluacionesAdminService";
-import { obtenerMisEvaluacionesPlano } from "../Services/evaluacionesAlumnoService";
 import { getComisiones } from "../api/comisiones";
 import { getTiposEvaluacion } from "../api/catalogosApi";
 import useAuth from "../auth/hooks/useAuth";
-import { obtenerIdLegajo } from "../config/legajo";
+
 
 // ============================================================
 // PÁGINA PRINCIPAL
 // ============================================================
 
 export default function GestionEvaluaciones() {
-    const { user: usuario, hasPermission} = useAuth();
-    const esAlumno = hasPermission("inscripcion.evaluaciones.leer_propio");
-    const idLegajo = obtenerIdLegajo(usuario);
+    const { hasPermission} = useAuth();
 
-    if (esAlumno) {
-        return <VistaAlumno idLegajo={usuario?.id_legajo} />;
-    }
 
     return (
         <VistaPersonal
@@ -39,91 +33,7 @@ export default function GestionEvaluaciones() {
     );
 }
 
-// ============================================================
-// VISTA ALUMNO
-// ============================================================
 
-function VistaAlumno({ idLegajo }) {
-    const [evaluaciones, setEvaluaciones] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState(null);
-
-    const [filtroMateria, setFiltroMateria] = useState("");
-    const [filtroComision, setFiltroComision] = useState("");
-    const [filtroDocente, setFiltroDocente] = useState("");
-    const [filtroTipo, setFiltroTipo] = useState("");
-
-    useEffect(() => {
-        if (!idLegajo) {
-            setCargando(false);
-            setError("No pudimos identificar tu legajo. Volvé a iniciar sesión o contactá a soporte.");
-            return;
-        }
-
-        async function cargar() {
-            setCargando(true);
-            setError(null);
-            try {
-                setEvaluaciones(await obtenerMisEvaluacionesPlano(idLegajo));
-            } catch (err) {
-                console.error(err);
-                setError("No se pudieron cargar tus evaluaciones.");
-            } finally {
-                setCargando(false);
-            }
-        }
-
-        cargar();
-    }, [idLegajo]);
-
-    const evaluacionesFiltradas = evaluaciones.filter((evaluacion) => {
-        if (filtroMateria && evaluacion.materia !== filtroMateria) return false;
-        if (filtroComision && evaluacion.codigo !== filtroComision) return false;
-        if (filtroDocente && evaluacion.docente !== filtroDocente) return false;
-        if (filtroTipo && evaluacion.tipo !== filtroTipo) return false;
-        return true;
-    });
-
-    return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-            {error && (
-                <Alert
-                    tipo="error"
-                    titulo="Error"
-                    mensaje={error}
-                    onCerrar={() => setError(null)}
-                />
-            )}
-
-            <div className="mb-6">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-                    Mis evaluaciones
-                </h1>
-                <p className="text-gray-500 mt-1 text-sm sm:text-base">
-                    Evaluaciones de las comisiones en las que estás inscripto.
-                </p>
-            </div>
-
-            {cargando ? (
-                <p className="text-sm text-gray-400">Cargando...</p>
-            ) : (
-                <EvaluacionesTable
-                    evaluaciones={evaluacionesFiltradas}
-                    todasLasEvaluaciones={evaluaciones}
-                    filtroMateria={filtroMateria}
-                    setFiltroMateria={setFiltroMateria}
-                    filtroComision={filtroComision}
-                    setFiltroComision={setFiltroComision}
-                    filtroDocente={filtroDocente}
-                    setFiltroDocente={setFiltroDocente}
-                    filtroTipo={filtroTipo}
-                    setFiltroTipo={setFiltroTipo}
-                    soloLectura
-                />
-            )}
-        </div>
-    );
-}
 
 // ============================================================
 // VISTA PERSONAL

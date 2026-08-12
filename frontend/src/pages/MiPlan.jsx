@@ -3,14 +3,13 @@ import useAuth from "../auth/hooks/useAuth";
 import { obtenerMisPlanes, obtenerMisMateriasDePlan } from "../Services/planesService";
 import { getEstadosResultadoPlan } from "../api/catalogosApi";
 import ResumenMateriaPlanCard from "../components/planes/ResumenMateriaPlanCard";
-import { hasPermission } from "../auth/utils/permissions";
 
 // Vista del plan de estudios del alumno:
 // resumen general del plan y detalle materia por materia.
 // Solo lectura.
 
 export default function MiPlan() {
-  const { user: usuario, hasPermission } = useAuth();
+  const { hasPermission } = useAuth();
   const esAlumno = hasPermission("inscripcion.resultado_plan.leer_propio");
 
   const [planes, setPlanes] = useState([]);
