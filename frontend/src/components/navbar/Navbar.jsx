@@ -103,8 +103,8 @@ export default function Navbar({ modulo }) {
 );
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-5 py-3 grid grid-cols-[auto_1fr_auto] items-center">
-        <Link to="/" className="flex items-center gap-3 text-left min-w-[220px]">
+      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
+        <Link to="/" className="flex items-center gap-3 text-left shrink-0">
         
           <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
@@ -130,16 +130,21 @@ export default function Navbar({ modulo }) {
           <Bars3Icon className="size-[22px]" />
         </button>
 
-        <nav className="hidden lg:flex flex-1 justify-center items-center gap-1">
+        <nav className="hidden lg:flex flex-1 min-w-0 items-center gap-1 overflow-x-auto">
           <a
             onClick={() => (window.location.href = PORTAL_URL)}
-            className={linkClass}
+            className={`${linkClass} shrink-0`}
           >
             <HomeIcon className="size-[17px]" />
             Portal inicio
           </a>
 
-          
+          {esAlumno && (
+            <NavLink to="/mi-plan" className={`${linkClass} shrink-0`} end>
+              <AcademicCapIcon className="size-[17px]" />
+              Mi plan
+            </NavLink>
+          )}
 
           {modulosVisibles.map((modulo)=> {
             if(modulo.opciones.length === 1) {
@@ -150,7 +155,7 @@ export default function Navbar({ modulo }) {
                 <NavLink
                   key={modulo.id}
                   to={opcion.ruta}
-                  className={linkClass}
+                  className={`${linkClass} shrink-0`}
                   end
                 >
                   <Icon className="size-[17px]"/>
@@ -158,12 +163,6 @@ export default function Navbar({ modulo }) {
                 </NavLink>
               )
             }
-            {esAlumno && (
-              <NavLink to="/mi-plan" className={linkClass} end>
-                <AcademicCapIcon className="size-[17px]" />
-                Mi plan
-              </NavLink>
-            )}
 
             return(
               <NavDropdown
@@ -176,11 +175,13 @@ export default function Navbar({ modulo }) {
           })}
 
           {modulo && (
-            <span className="ml-1 text-xs bg-white/15 text-white px-3 py-1 rounded-full font-medium">
+            <span className="ml-1 shrink-0 text-xs bg-white/15 text-white px-3 py-1 rounded-full font-medium">
               {modulo}
             </span>
           )}
+        </nav>
 
+        <div className="hidden lg:flex items-center gap-1 shrink-0">
           <Menu as="div" className="relative ml-1">
             <MenuButton className="relative flex items-center justify-center rounded-full cursor-pointer">
               <span className="sr-only">Menú usuario</span>
@@ -205,7 +206,7 @@ export default function Navbar({ modulo }) {
             <ArrowRightStartOnRectangleIcon className="size-[17px]" />
             Cerrar Sesión
           </button>
-        </nav>
+        </div>
       </div>
 
       {mobileOpen && (
