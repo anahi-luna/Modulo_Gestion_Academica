@@ -133,7 +133,7 @@ function enriquecerComisionConPlanYCorrelativas(
         correlativas_nombres: correlativas.map(
             (correlativa) =>
                 mapaNombresAsignatura[
-                    correlativa.asignatura_id
+                correlativa.asignatura_id
                 ] ??
                 `Asignatura #${correlativa.asignatura_id}`
         ),
@@ -228,10 +228,18 @@ export async function obtenerComisionesDisponibles(idLegajo) {
             )
         )
         .filter((comision) => {
-            // ========================================================
-            // 1. VALIDACIÓN DE CORRELATIVAS
-            // ========================================================
+            //VALIDACIÓN DE MATERIA YA APROBADA
+            const idAsignatura =
+                comision.plan_asignaturas?.asignatura_id;
 
+            if (
+                idAsignatura != null &&
+                materiasAprobadas.includes(idAsignatura)
+            ) {
+                return false;
+            }
+
+            //VALIDACIÓN DE CORRELATIVAS
             const correlativas =
                 comision.plan_asignaturas?.correlativas ?? [];
 
@@ -248,10 +256,7 @@ export async function obtenerComisionesDisponibles(idLegajo) {
                 }
             }
 
-            // ========================================================
-            // 2. VALIDACIÓN DE CUPO
-            // ========================================================
-
+            //VALIDACIÓN DE CUPO
             if (
                 comision.inscriptos >=
                 comision.cupo_maximo
@@ -263,10 +268,7 @@ export async function obtenerComisionesDisponibles(idLegajo) {
         });
 }
 
-// ============================================================
 // CARGA INICIAL DE INSCRIPCIÓN
-// ============================================================
-
 export async function cargarDatosInscripcion(idLegajo) {
     const legajo = await buscarLegajoPorId(idLegajo);
 

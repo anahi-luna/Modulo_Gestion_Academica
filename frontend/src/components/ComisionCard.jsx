@@ -1,7 +1,36 @@
-// Componente de tarjeta de comisión que muestra información relevante de la comisión, como código, 
-// materia, docente, horario, cupo y correlativas.
+// Componente de tarjeta de comisión que muestra información relevante de la comisión, como código,
+// materia, docente, horario, cupo, correlativas y estado del período de inscripción.
 // Componente de tarjeta de comisión
 import { obtenerDocenteTitular } from "../api/comisiones";
+
+// La cursada arranca en "vigencia_desde". Mientras no llegue esa fecha, la inscripción
+// sigue abierta; una vez llegada, se considera cerrada (la cursada ya comenzó).
+// Nota: el back solo guarda fecha (sin hora), así que la comparación es por día.
+function calcularEstadoInscripcion(comision) {
+  const vigenciaDesde = comision.vigencia_desde
+    ? new Date(`${comision.vigencia_desde}T00:00:00`)
+    : null;
+
+  if (!vigenciaDesde) {
+    return { cerrada: false, fechaCierre: null };
+  }
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  return {
+    cerrada: hoy >= vigenciaDesde,
+    fechaCierre: vigenciaDesde,
+  };
+}
+
+function formatearFecha(fecha) {
+  return fecha.toLocaleDateString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
 
 export default function ComisionCard({ comision, onSeleccionar, seleccionada }) {
   const cupo = Number(comision.cupo_maximo ?? comision.cupo ?? 0);
@@ -10,10 +39,9 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
   const porcentaje = cupo > 0 ? Math.round((inscriptos / cupo) * 100) : 0;
   const sinCupo = cupoLibre <= 0;
 
-  // correlativas_nombres e id_plan vienen ya resueltos desde
-  // inscripcionesService.js (obtenerComisionesDisponibles). Si por
-  // algún motivo no vienen (ej: se usa este componente con datos
-  // crudos de otro lado), caemos en los ids como estaba antes.
+  const { cerrada: inscripcionCerrada, fechaCierre } = calcularEstadoInscripcion(comision);
+  const noDisponible = sinCupo || inscripcionCerrada;
+
   const correlativas = comision.correlativas_nombres
     ?? (comision.plan_asignaturas?.correlativas ?? []).map(c => `Asignatura #${c.asignatura_id}`);
   const idPlan = comision.id_plan ?? comision.plan_asignaturas?.plan_id ?? null;
@@ -30,7 +58,7 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
       className={`
         rounded-xl border-2 p-4 transition-all cursor-pointer
         ${
-          sinCupo
+          noDisponible
             ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
             : seleccionada
               ? "border-red-600 bg-red-50 shadow-md"
@@ -38,7 +66,7 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
         }
       `}
       onClick={() => {
-        if (!sinCupo) onSeleccionar(comision);
+        if (!noDisponible) onSeleccionar(comision);
       }}
     >
       <div className="flex items-start justify-between gap-2 mb-3">
@@ -70,6 +98,19 @@ export default function ComisionCard({ comision, onSeleccionar, seleccionada }) 
           <p className="text-xs text-blue-600">
             Requiere: {correlativas.join(", ")}
           </p>
+        )}
+
+        {/* Estado del período de inscripción */}
+        {inscripcionCerrada ? (
+          <p className="text-xs text-red-600 font-semibold">
+            Las inscripciones a esta comisión ya finalizaron
+          </p>
+        ) : (
+          fechaCierre && (
+            <p className="text-xs text-amber-600">
+              Cierra el {formatearFecha(fechaCierre)}
+            </p>
+          )
         )}
       </div>
 

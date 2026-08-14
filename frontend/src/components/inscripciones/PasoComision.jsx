@@ -65,7 +65,8 @@ export default function PasoComision({
                 <h2 className="text-lg font-bold text-gray-800 mb-1">Elegir comisión</h2>
                 <p className="text-sm text-gray-500 mb-4">
                     Seleccioná la comisión en la que querés inscribirte.
-                    Las que aparecen opacas no tienen cupo disponible.
+                    Las que aparecen opacas no están disponibles (sin cupo o
+                    porque el período de inscripción ya finalizó).
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
