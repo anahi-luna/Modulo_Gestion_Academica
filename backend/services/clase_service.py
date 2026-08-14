@@ -7,7 +7,84 @@ from flask import g, request
 from models.modelo_clase import Clase, EstadoClase
 from models.modelo_asistencia import Asistencia
 from clients.planes_cliente import obtener_comision_asignatura_por_id
+import re
 
+DIAS_SEMANA = {
+    "Lu": 0, "Ma": 1, "Mi": 2, "Ju": 3, "Vi": 4, "Sa": 5, "Do": 6,
+}
+
+MODALIDAD_REGEX = re.compile(
+    r"^(?P<dias>(?:(?:Lu|Ma|Mi|Ju|Vi|Sa|Do)\s*)+)"
+    r"(?P<hora_inicio>\d{2}:\d{2})\s*a\s*(?P<hora_fin>\d{2}:\d{2})\s*hs$"
+)
+
+
+# Interpreta el campo `modalidad` de la comisión asignatura
+# (ej: "Lu Mi 18:00 a 20:00 hs") y devuelve los días de cursada
+# (como índices de weekday(), Lunes=0) y el horario esperado.
+def parsear_modalidad(modalidad):
+
+    if not modalidad:
+        raise BusinessError(
+            "La comisión asignatura no posee modalidad configurada.", 422
+        )
+
+    match = MODALIDAD_REGEX.match(modalidad.strip())
+
+    if not match:
+        logger.error(f"No fue posible interpretar la modalidad: '{modalidad}'.")
+        raise BusinessError(
+            "No fue posible interpretar el formato de la modalidad de la comisión.",
+            422,
+        )
+
+    dias_str = match.group("dias").split()
+
+    dias = []
+    for dia in dias_str:
+        if dia not in DIAS_SEMANA:
+            raise BusinessError(f"Día de modalidad inválido: '{dia}'.", 422)
+        dias.append(DIAS_SEMANA[dia])
+
+    hora_inicio = datetime.strptime(match.group("hora_inicio"), "%H:%M").time()
+    hora_fin = datetime.strptime(match.group("hora_fin"), "%H:%M").time()
+
+    return dias, hora_inicio, hora_fin
+
+
+# Valida que la fecha y el horario de una clase coincidan
+# con la modalidad de cursada de la comisión asignatura.
+def validar_horario_contra_modalidad(fecha, hora_inicio, hora_fin, comision):
+
+    dias_permitidos, hora_inicio_comision, hora_fin_comision = parsear_modalidad(
+        comision.get("modalidad")
+    )
+
+    if isinstance(fecha, str):
+        fecha = datetime.fromisoformat(fecha).date()
+
+    dia_semana = fecha.weekday()
+
+    if dia_semana not in dias_permitidos:
+
+        dias_legibles = ", ".join(
+            nombre for nombre, idx in DIAS_SEMANA.items() if idx in dias_permitidos
+        )
+
+        raise BusinessError(
+            f"La fecha de la clase no coincide con los días de cursada "
+            f"de la comisión ({dias_legibles}).",
+            400,
+        )
+
+    if hora_inicio != hora_inicio_comision or hora_fin != hora_fin_comision:
+
+        raise BusinessError(
+            f"El horario de la clase debe coincidir con el de la comisión "
+            f"({hora_inicio_comision.strftime('%H:%M')} a "
+            f"{hora_fin_comision.strftime('%H:%M')} hs).",
+            400,
+        )
 
 # -------------------CONSULTAS-------------------#
 
@@ -107,6 +184,11 @@ def crear_clase(datos):
 
             raise BusinessError("La comisión asignatura no existe.", 404)
 
+        # Valida que fecha y horario coincidan con la modalidad de la comisión.
+        validar_horario_contra_modalidad(
+            datos["fecha"], datos["hora_inicio"], datos["hora_fin"], comision
+        )
+
         # Verifica número de clase.
         if existe_numero_clase(datos["id_comision_asignatura"], datos["numero_clase"]):
 
@@ -191,6 +273,26 @@ def modificar_clase(id_clase, datos):
             raise BusinessError(
                 "No es posible modificar la comisión asignatura de una clase.",
                 400,
+            )
+
+        # Si cambia fecha y/o horario, revalida contra la modalidad de la comisión.
+        if "fecha" in datos or "hora_inicio" in datos or "hora_fin" in datos:
+
+            auth_headers = {"Authorization": request.headers.get("Authorization")}
+
+            comision = obtener_comision_asignatura_por_id(
+                clase.id_comision_asignatura, headers=auth_headers
+            )
+
+            if not comision:
+                raise BusinessError("La comisión asignatura no existe.", 404)
+
+            nueva_fecha = datos.get("fecha", clase.fecha)
+            nueva_hora_inicio = datos.get("hora_inicio", clase.hora_inicio)
+            nueva_hora_fin = datos.get("hora_fin", clase.hora_fin)
+
+            validar_horario_contra_modalidad(
+                nueva_fecha, nueva_hora_inicio, nueva_hora_fin, comision
             )
 
         if "fecha" in datos:

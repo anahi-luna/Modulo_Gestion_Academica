@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useModalAccessibility } from "../../hooks/useModalAccessibility";
 import { obtenerDocenteTitular } from "../../api/comisiones";
+import { validarContraModalidad } from "../../config/modalidad"
 // Componente para mostrar un modal de creación o edición de clase, con campos para seleccionar 
 // comisión, fecha, horarios, tema y estado.
 export default function ModalClase({
@@ -66,11 +67,29 @@ export default function ModalClase({
 
     function manejarGuardar() {
 
-        if (formulario.hora_inicio && formulario.hora_fin && formulario.hora_inicio >= formulario.hora_fin) {
+        if (!formulario.fecha || !formulario.hora_inicio || !formulario.hora_fin) {
+            setErrorHorario("Completá fecha, hora de inicio y hora de fin.");
+            return;
+        }
 
+        if (formulario.hora_inicio >= formulario.hora_fin) {
             setErrorHorario("El horario de inicio no puede ser mayor ni igual al horario de fin.");
             return;
+        }
 
+        if (comisionSeleccionada) {
+
+            const errorModalidad = validarContraModalidad(
+                formulario.fecha,
+                formulario.hora_inicio,
+                formulario.hora_fin,
+                comisionSeleccionada
+            );
+
+            if (errorModalidad) {
+                setErrorHorario(errorModalidad);
+                return;
+            }
         }
 
         setErrorHorario("");
@@ -152,6 +171,11 @@ export default function ModalClase({
                                 <strong>Docente:</strong>{" "}
 
                                 {obtenerDocenteTitular(comisionSeleccionada)}
+                            </p>
+
+                            <p className="break-words">
+                                <strong>Cursada:</strong>{" "}
+                                {comisionSeleccionada.modalidad ?? "-"}
                             </p>
 
                         </div>
@@ -326,9 +350,9 @@ export default function ModalClase({
                         </div>
                     )}
 
-                    
 
-                
+
+
 
                 </div>
 

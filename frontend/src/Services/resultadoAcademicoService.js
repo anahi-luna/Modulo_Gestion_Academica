@@ -7,10 +7,17 @@ import {
 } from "../api/resultadoAcademicoApi";
 import { getEstadosAcademicos } from "../api/catalogosApi";
 
+// El back envuelve las listas en { data: [...], total, message }.
+// Esta función centraliza el desempaquetado para no repetirlo
+// (y no olvidarlo) en cada service que consume una lista.
+function desempaquetar(response) {
+    return response?.data ?? response ?? [];
+}
+
 export async function obtenerEstadosAcademicos() {
     const response = await getEstadosAcademicos();
-    console.log("Estados académicos:", response);
-    return response.reduce((mapa, estado) => {
+    const estados = desempaquetar(response);
+    return estados.reduce((mapa, estado) => {
         mapa[estado.id_estado_academico] = estado.nombre;
         return mapa;
     }, {});
@@ -42,7 +49,8 @@ export async function generarResultadosAcademicos(idComision) {
         generarResultadosAcademicosApi(idComision),
         obtenerEstadosAcademicos(),
     ]);
-    return response.map((r) => mapearResultado(r, estadosAcademicos));
+    const resultados = desempaquetar(response);
+    return resultados.map((r) => mapearResultado(r, estadosAcademicos));
 }
 
 // Todos los resultados académicos ya generados para el alumno
@@ -51,12 +59,11 @@ export async function generarResultadosAcademicos(idComision) {
 // idLegajo ya no hace falta mandarlo, pero se mantiene el parámetro
 // para no romper a quienes llaman a esta función.
 export async function obtenerResultadosAcademicos() {
-
     const [response, estadosAcademicos] = await Promise.all([
         getMisResultadosAcademicos(),
         obtenerEstadosAcademicos(),
     ]);
-    const resultados = response.data ?? response;
+    const resultados = desempaquetar(response);
 
     return resultados.map((r) =>
         mapearResultado(r, estadosAcademicos)
@@ -70,5 +77,6 @@ export async function obtenerTodosLosResultadosAcademicos() {
         getListaResultadosAcademicos(),
         obtenerEstadosAcademicos(),
     ]);
-    return response.map((r) => mapearResultado(r, estadosAcademicos));
+    const resultados = desempaquetar(response);
+    return resultados.map((r) => mapearResultado(r, estadosAcademicos));
 }
