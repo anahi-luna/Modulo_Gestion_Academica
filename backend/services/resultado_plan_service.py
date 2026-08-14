@@ -73,8 +73,9 @@ def obtener_inscripciones_plan(id_legajo, id_plan):
 # Obtiene todas las comisiones asignaturas
 # correspondientes a un plan.
 def obtener_comisiones_plan(id_plan):
+    auth_headers = {"Authorization": request.headers.get("Authorization")}
 
-    return obtener_comisiones_asignaturas_por_plan(id_plan,headers=request.headers)
+    return obtener_comisiones_asignaturas_por_plan(id_plan,headers=auth_headers)
 
 
 # Obtiene los resultados académicos correspondientes a un plan.
@@ -172,16 +173,18 @@ def plan_finalizado(id_legajo, id_plan):
 # Valida la existencia de los datos necesarios
 # para generar el resultado del plan.
 def validar_resultado_plan(id_legajo, id_plan):
+    
+    auth_headers = {"Authorization": request.headers.get("Authorization")}
 
     # Verifica el legajo.
-    legajo = obtener_legajo(id_legajo,headers=request.headers)
+    legajo = obtener_legajo(id_legajo,headers=auth_headers)
 
     if not legajo:
 
         raise BusinessError("El legajo no existe.", 404)
 
     # Verifica el plan.
-    plan = obtener_plan(id_plan,headers=request.headers)
+    plan = obtener_plan(id_plan,headers=auth_headers)
 
     if not plan:
 

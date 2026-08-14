@@ -64,11 +64,11 @@ def obtener_inscripciones_aceptadas(id_comision_asignatura):
 
 # Obtiene las reglas académicas de la inscripción.
 def obtener_reglas_academicas(inscripcion):
-
+    auth_headers = {"Authorization": request.headers.get("Authorization")}
     # Obtiene el plan de asignatura.
     plan_asignatura = obtener_plan_asignatura_por_comision_asignatura(
         inscripcion.id_comision_asignatura,
-        headers=request.headers
+        headers=auth_headers
     )
 
     if not plan_asignatura:
@@ -242,6 +242,7 @@ def crear_resultado_academico(datos):
     )
 
     try:
+        auth_headers = {"Authorization": request.headers.get("Authorization")}
 
         # Verifica que la comisión haya finalizado.
         validar_comision_finalizada(datos["id_comision_asignatura"])
@@ -313,7 +314,7 @@ def crear_resultado_academico(datos):
 
             finalizar_inscripcion(inscripcion)
 
-            id_plan = obtener_id_plan_por_comision_asignatura(inscripcion.id_comision_asignatura,headers=request.headers)
+            id_plan = obtener_id_plan_por_comision_asignatura(inscripcion.id_comision_asignatura,headers=auth_headers)
             if not id_plan:
                 raise BusinessError("No fue posible obtener el plan de estudio.",404)
             

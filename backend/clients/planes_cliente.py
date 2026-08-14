@@ -10,12 +10,19 @@ PLANES_SERVICE_URL = os.getenv("PLANES_SERVICE_URL", "http://localhost:5000")
 
 def _get(endpoint: str, params=None, headers=None):
     # Realiza una petición GET al MS1
+    if headers:
+        headers = {"Authorization": headers.get("Authorization")}
+
     url = f"{PLANES_SERVICE_URL.rstrip('/')}/{endpoint.lstrip('/')}"
 
     try:
         logger.info(f"Consultando MS1: {url}")
+        logger.info(
+            f"Authorization enviado a MS1: "
+            f"{bool(headers and headers.get('Authorization'))}"
+        )
 
-        respuesta = requests.get(url, params=params, headers=headers, timeout=10)
+        respuesta = requests.get(url, params=params, headers=headers, timeout=30)
 
         logger.info(f"Código de respuesta: {respuesta.status_code}")
 
@@ -29,22 +36,21 @@ def _get(endpoint: str, params=None, headers=None):
             logger.error(f"Respuesta del servidor: {e.response.text}")
         return None
 
-#Obtiene todas las comisiones asignaturas existen en el Microservicio 1
+
+# Obtiene todas las comisiones asignaturas existen en el Microservicio 1
 def obtener_comisiones_asignaturas(headers=None):
 
     logger.info("Obteniendo todas las comisiones asignaturas.")
 
-    respuesta = _get(
-        "comisiones-asignaturas/GetDetalleFromLegajoID",
-        headers=headers
-    )
-
+    respuesta = _get("comisiones-asignaturas/GetDetalleFromLegajoID", headers=headers)
+    
     if not respuesta:
         return None
 
     return respuesta.get("data")
 
-#Obtiene la comisión asignatura del listado general por su id
+
+# Obtiene la comisión asignatura del listado general por su id
 def obtener_comision_asignatura_por_id_general(id_comision_asignatura, headers=None):
 
     comisiones = obtener_comisiones_asignaturas(headers=headers)
@@ -63,7 +69,7 @@ def obtener_comision_asignatura_por_id_general(id_comision_asignatura, headers=N
 def obtener_comisiones_disponibles(id_legajo=None, headers=None):
 
     logger.info(f"Obteniendo comisiones disponibles para legajo {id_legajo}.")
-    
+
     params = None
 
     if id_legajo is not None:
@@ -100,7 +106,7 @@ def obtener_comision_asignatura_por_id(
         if comision.get("id_comision_asignatura") == id_comision_asignatura:
             logger.info(f"Comisión asignatura {id_comision_asignatura} encontrada.")
             return comision
-    
+
     logger.warning(
         f"La comisión asignatura {id_comision_asignatura} no fue encontrada."
     )
@@ -127,7 +133,7 @@ def obtener_legajo(id_legajo, headers=None):
 def obtener_plan_asignatura_por_comision_asignatura(
     id_comision_asignatura, id_legajo=None, headers=None
 ):
-    
+
     comision = obtener_comision_asignatura_por_id(
         id_comision_asignatura, id_legajo=id_legajo, headers=headers
     )

@@ -91,9 +91,12 @@ def crear_clase(datos):
         logger.info(
             f"Usuario {id_usuario_autenticado} " "inició el registro de una clase."
         )
+
+        auth_headers = {"Authorization": request.headers.get("Authorization")}
+        
         # Valida la comisión.
         comision = obtener_comision_asignatura_por_id(
-            datos["id_comision_asignatura"], headers=request.headers
+            datos["id_comision_asignatura"], headers=auth_headers
         )
 
         if not comision:

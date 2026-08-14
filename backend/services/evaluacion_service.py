@@ -55,10 +55,12 @@ def existe_calificacion_evaluacion(id_evaluacion):
 # Verifica que los datos de una evaluación sean válidos.
 def validar_evaluacion(datos):
 
+    auth_headers = {"Authorization": request.headers.get("Authorization")}
+    
     # Verifica que exista la comisión.
     comision = obtener_comision_asignatura_por_id(
         datos["id_comision_asignatura"],
-        headers=request.headers
+        headers=auth_headers
     )
 
     if not comision:
@@ -171,6 +173,8 @@ def modificar_evaluacion(id_evaluacion, datos):
             f"Usuario {id_usuario_autenticado} " f"modificando la evaluación {id_evaluacion}."
         )
 
+        auth_headers = {"Authorization": request.headers.get("Authorization")}
+
         # Busca la evaluación.
         evaluacion = obtener_evaluacion_por_id(id_evaluacion)
 
@@ -184,7 +188,7 @@ def modificar_evaluacion(id_evaluacion, datos):
         # Comisión
         if "id_comision_asignatura" in datos:
 
-            if not obtener_comision_asignatura_por_id(datos["id_comision_asignatura"],headers=request.headers):
+            if not obtener_comision_asignatura_por_id(datos["id_comision_asignatura"],headers=auth_headers):
                 logger.warning(f"La comisión asignatura {datos['id_comision_asignatura']} no existe.")
                 raise BusinessError("La comisión asignatura no existe.", 404)
 

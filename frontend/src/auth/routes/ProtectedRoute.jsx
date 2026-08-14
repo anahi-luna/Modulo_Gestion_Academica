@@ -28,8 +28,8 @@ export default function ProtectedRoute({
 
   if (!isAuthenticated) {
     console.log("Redirigiendo...");
-    //window.location.replace(LOGIN_ROUTE);
-    //return null;
+    window.location.replace(LOGIN_ROUTE);
+    return null;
   }
 
   if (

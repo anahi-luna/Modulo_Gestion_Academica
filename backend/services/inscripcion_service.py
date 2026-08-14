@@ -1,4 +1,4 @@
-from datetime import datetime,timedelta 
+from datetime import datetime, timedelta
 from extensions import db
 from exceptions import BusinessError
 from sqlalchemy.exc import IntegrityError
@@ -48,6 +48,7 @@ def obtener_inscripcion_por_id(id_inscripcion):
 
     return db.session.get(Inscripcion, id_inscripcion)
 
+
 def obtener_conteo_comisiones():
 
     estado_aceptada = obtener_estado_por_nombre("Aceptada")
@@ -56,24 +57,21 @@ def obtener_conteo_comisiones():
     conteo = (
         db.session.query(
             Inscripcion.id_comision_asignatura,
-            func.count(Inscripcion.id_inscripcion).label("inscriptos")
+            func.count(Inscripcion.id_inscripcion).label("inscriptos"),
         )
         .filter(
-            Inscripcion.id_estado.in_([
-                estado_aceptada.id_estado,
-                estado_finalizada.id_estado
-            ])
+            Inscripcion.id_estado.in_(
+                [estado_aceptada.id_estado, estado_finalizada.id_estado]
+            )
         )
-        .group_by(
-            Inscripcion.id_comision_asignatura
-        )
+        .group_by(Inscripcion.id_comision_asignatura)
         .all()
     )
 
     return [
         {
             "id_comision_asignatura": fila.id_comision_asignatura,
-            "inscriptos": fila.inscriptos
+            "inscriptos": fila.inscriptos,
         }
         for fila in conteo
     ]
@@ -144,10 +142,8 @@ def validar_periodo_inscripcion(comision):
 
     ahora = datetime.now()
 
-    fecha_inicio_cursada = datetime.fromisoformat(
-        comision["vigencia_desde"]
-    )
-    #Ahora dias esta en 1 para pruebas despues cambiar a 7 
+    fecha_inicio_cursada = datetime.fromisoformat(comision["vigencia_desde"])
+    # Ahora dias esta en 1 para pruebas despues cambiar a 7
     fecha_inicio_inscripcion = fecha_inicio_cursada - timedelta(days=1)
 
     if ahora < fecha_inicio_inscripcion:
@@ -212,6 +208,12 @@ def crear_inscripcion(datos):
         logger.info(
             f"Usuario {id_usuario_autenticado} inició el registro de una inscripción."
         )
+        auth_headers = {"Authorization": request.headers.get("Authorization")}
+
+        logger.info(
+            f"Authorization recibido en MS2: "
+            f"{bool(auth_headers.get('Authorization'))}"
+        )
 
         # Obtener el estado Pendiente desde la BD
         estado = obtener_estado_por_nombre("Pendiente")
@@ -221,14 +223,14 @@ def crear_inscripcion(datos):
             raise BusinessError("No existe el estado Pendiente.", 500)
 
         # Validamos si existe legajo
-        legajo = obtener_legajo(datos["id_legajo"], headers=request.headers)
+        legajo = obtener_legajo(datos["id_legajo"], auth_headers)
         if not legajo:
             logger.warning(f"El legajo {datos['id_legajo']} no existe.")
             raise BusinessError("El legajo no existe.", 404)
 
         # Validamos si existe la comision
         comision = obtener_comision_asignatura_por_id_general(
-            datos["id_comision_asignatura"], headers=request.headers
+            datos["id_comision_asignatura"], auth_headers
         )
 
         if not comision:
@@ -239,7 +241,7 @@ def crear_inscripcion(datos):
 
         # Validamos si el Legajo puede inscribirse a la comision asignatura
         comision = obtener_comision_asignatura_por_id(
-            datos["id_comision_asignatura"], datos["id_legajo"], headers=request.headers
+            datos["id_comision_asignatura"], datos["id_legajo"], auth_headers
         )
 
         if not comision:
@@ -287,10 +289,10 @@ def crear_inscripcion(datos):
         logger.exception("Error de integridad al registrar la inscripción.")
         raise BusinessError("Ocurrió un error al guardar la inscripción.", 500)
 
-    except BusinessError:
+    except BusinessError as e:
 
         db.session.rollback()
-
+        logger.warning(f"Validación de inscripción rechazada: {e}")
         raise
 
     except Exception:
@@ -312,6 +314,8 @@ def modificar_inscripcion(id_inscripcion, datos):
             f"Usuario {id_usuario_autenticado} modificando la inscripción {id_inscripcion}."
         )
 
+        auth_headers = {"Authorization": request.headers.get("Authorization")}
+        
         # Busca la inscripción.
         inscripcion = obtener_inscripcion_por_id(id_inscripcion)
 
@@ -377,7 +381,7 @@ def modificar_inscripcion(id_inscripcion, datos):
                 comision = obtener_comision_asignatura_por_id(
                     inscripcion.id_comision_asignatura,
                     inscripcion.id_legajo,
-                    headers=request.headers,
+                    headers=auth_headers,
                 )
 
                 if not comision:
