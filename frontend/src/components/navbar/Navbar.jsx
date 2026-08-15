@@ -7,13 +7,6 @@ import {
   HomeIcon,
   AcademicCapIcon,
   ClipboardDocumentListIcon,
-  PencilSquareIcon,
-  CalendarDaysIcon,
-  BookOpenIcon,
-  DocumentTextIcon,
-  ChartBarIcon,
-  CheckBadgeIcon,
-  ClipboardDocumentCheckIcon,
   ArrowRightStartOnRectangleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -30,6 +23,15 @@ import NavDropdownMobile from "./NavDropdownMobile";
 // El diseño (colores, tipografía, formato del logo, estilo de los links y del menú mobile) está alineado
 // con el navbar del microservicio de planes. Los links, permisos y rutas son los propios de inscripciones
 // y no se modificaron.
+//
+// En desktop, en vez de tener un link/dropdown por cada módulo (Inscripciones,
+// Clases, Asistencia, Evaluaciones, Calificaciones, Certificados, Plan), agrupamos
+// todas las opciones "propio" (alumno) en un dropdown "Mi actividad" y todas las
+// "gestion" (admin/staff) en "Gestión académica" -- mismo criterio que usa el
+// navbar de planes con "Personal" / "Gestión educativa". El módulo "Inicio" queda
+// aparte porque es la home y ya se resuelve solo (un único link visible según
+// el permiso que tenga el usuario). El filtro de permisos (hasPermission) sigue
+// corriendo exactamente igual que antes, opción por opción, antes de agrupar.
 export default function Navbar({ modulo }) {
   // useAuth devuelve el usuario logueado, sus roles y funciones para verificar permisos y cerrar sesión.
   const { user, hasPermission, hasRole, logout } = useAuth();
@@ -65,17 +67,12 @@ export default function Navbar({ modulo }) {
   const linkClassMobile =
     "flex items-center gap-4 rounded-2xl bg-white border border-slate-200 px-4 py-4 font-bold text-slate-700 shadow-sm cursor-pointer";
 
-  // Lista de links a los módulos del sistema, con la ruta, el label, el ícono y el/los permiso(s) requerido(s) para mostrarlos.
-  // "permisoAlumno" es el equivalente "_propio" del permiso general: en las páginas unificadas
-  // (donde adentro se resuelve si es personal o alumno) el link se muestra si el usuario tiene
-  // cualquiera de los dos, para no ocultarle el acceso a un alumno que solo tiene el permiso propio.
- const modulosVisibles = MODULOS.map((modulo) =>({
+  // Lista de módulos con sus opciones ya filtradas por permiso. Cada opción
+  // trae su "tipo" (propio/gestion) definido en config/modulos.js.
+  const modulosVisibles = MODULOS.map((modulo) => ({
     ...modulo,
-    opciones: modulo.opciones.filter((opcion) =>
-        hasPermission(opcion.permiso)
-    ),
-
- })).filter((modulo) => modulo.opciones.length > 0);
+    opciones: modulo.opciones.filter((opcion) => hasPermission(opcion.permiso)),
+  })).filter((modulo) => modulo.opciones.length > 0);
 
   if (!user) {
     // Mientras no sé quién es el usuario todavía (se está restaurando
@@ -86,26 +83,31 @@ export default function Navbar({ modulo }) {
     );
   }
 
-  // Si el usuario es un alumno, le muestro el link "Mi plan" en la navbar, que lo lleva a su plan de estudios.
-  const esAlumno =  [
-      "inscripcion.inscripciones.crear",
-      "inscripcion.inscripciones.leer_propio",
-      "inscripcion.asistencias.leer_propio",
-      "inscripcion.clases.leer_propio",
-      "inscripcion.evaluaciones.leer_propio",
-      "inscripcion.calificaciones.leer_propio",
-      "inscripcion.resultado_academico.leer_propio",
-      "inscripcion.resultado_plan.leer_propio",
-      "inscripcion.certificados.leer_propio",
-    ]
-    console.log(
-  hasPermission("inscripcion.calificaciones.leer_propio")
-);
+  // "Inicio" se maneja aparte: es la home y ya se resuelve solo con la
+  // lógica de "single option -> link directo" / "varias -> dropdown".
+  const moduloInicio = modulosVisibles.find((m) => m.id === "inicio");
+  const modulosResto = modulosVisibles.filter((m) => m.id !== "inicio");
+
+  // Junto en dos listas planas todas las opciones "propio" y "gestion" de
+  // todos los módulos restantes (Inscripciones, Clases, Asistencia,
+  // Evaluaciones, Calificaciones, Certificados, Plan), cada una con el
+  // ícono de su módulo de origen, para armar los dos dropdowns agrupados.
+  const opcionesPropias = modulosResto.flatMap((modulo) =>
+    modulo.opciones
+      .filter((opcion) => opcion.tipo === "propio")
+      .map((opcion) => ({ ...opcion, icon: modulo.icon }))
+  );
+
+  const opcionesGestion = modulosResto.flatMap((modulo) =>
+    modulo.opciones
+      .filter((opcion) => opcion.tipo === "gestion")
+      .map((opcion) => ({ ...opcion, icon: modulo.icon }))
+  );
+
   return (
     <header className="bg-gradient-to-b from-red-700 to-red-900 text-white shadow-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center gap-4">
         <Link to="/" className="flex items-center gap-3 text-left shrink-0">
-        
           <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
               src={logo}
@@ -122,15 +124,72 @@ export default function Navbar({ modulo }) {
           </div>
         </Link>
 
+        {/* Botón mobile: se va a la derecha del todo cuando no hay nav desktop */}
         <button
           onClick={() => setMobileOpen(true)}
-          className="lg:hidden w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center cursor-pointer"
+          className="lg:hidden ml-auto w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center cursor-pointer"
           aria-label="Abrir menú"
         >
           <Bars3Icon className="size-[22px]" />
         </button>
 
+        {/* Links desktop: viven en la MISMA fila que el logo (antes era un
+            <nav> aparte con su propio fondo/borde -> daba el efecto "2 navbars") */}
+        <nav className="hidden lg:flex items-center gap-1.5 flex-1 min-w-0">
+          <a
+            onClick={() => (window.location.href = PORTAL_URL)}
+            className={linkClass}
+          >
+            <HomeIcon className="size-[16px]" />
+            Portal inicio
+          </a>
+
+          {moduloInicio && moduloInicio.opciones.length === 1 && (
+            <NavLink
+              key={moduloInicio.opciones[0].ruta}
+              to={moduloInicio.opciones[0].ruta}
+              className={({ isActive }) =>
+                `${linkClass} ${isActive ? "bg-white text-red-800 hover:bg-white" : ""} shrink-0`
+              }
+              end
+            >
+              <moduloInicio.icon className="size-[16px]" />
+              {moduloInicio.titulo}
+            </NavLink>
+          )}
+
+          {moduloInicio && moduloInicio.opciones.length > 1 && (
+            <NavDropdown
+              titulo={moduloInicio.titulo}
+              icon={moduloInicio.icon}
+              opciones={moduloInicio.opciones}
+            />
+          )}
+
+          {opcionesPropias.length > 0 && (
+            <NavDropdown
+              titulo="Mi actividad"
+              icon={AcademicCapIcon}
+              opciones={opcionesPropias}
+            />
+          )}
+
+          {opcionesGestion.length > 0 && (
+            <NavDropdown
+              titulo="Gestión académica"
+              icon={ClipboardDocumentListIcon}
+              opciones={opcionesGestion}
+            />
+          )}
+        </nav>
+
         <div className="hidden lg:flex items-center gap-2 shrink-0">
+          {modulo && (
+            <span className="text-xs bg-white/15 text-white px-3 py-1 rounded-full font-medium">
+              {modulo}
+            </span>
+          )}
+
           <Menu as="div" className="relative">
             <MenuButton className="relative flex items-center justify-center rounded-full cursor-pointer">
               <span className="sr-only">Menú usuario</span>
@@ -157,67 +216,6 @@ export default function Navbar({ modulo }) {
           </button>
         </div>
       </div>
-
-      <nav className="hidden lg:block border-t border-white/10 bg-black/10">
-        <div className="max-w-7xl mx-auto px-5 py-2 flex flex-wrap items-center gap-1.5">
-          <a
-            onClick={() => (window.location.href = PORTAL_URL)}
-            className={linkClass}
-          >
-            <HomeIcon className="size-[16px]" />
-            Portal inicio
-          </a>
-
-          {esAlumno && (
-            <NavLink
-              to="/mi-plan"
-              className={({ isActive }) =>
-                `${linkClass} ${isActive ? "bg-white text-red-800 hover:bg-white" : ""}`
-              }
-              end
-            >
-              <AcademicCapIcon className="size-[16px]" />
-              Mi plan
-            </NavLink>
-          )}
-
-          {modulosVisibles.map((modulo)=> {
-            if(modulo.opciones.length === 1) {
-              const Icon = modulo.icon;
-              const opcion = modulo.opciones[0];
-
-              return(
-                <NavLink
-                  key={modulo.id}
-                  to={opcion.ruta}
-                  className={({ isActive }) =>
-                    `${linkClass} ${isActive ? "bg-white text-red-800 hover:bg-white" : ""}`
-                  }
-                  end
-                >
-                  <Icon className="size-[16px]"/>
-                  {modulo.titulo}
-                </NavLink>
-              )
-            }
-
-            return(
-              <NavDropdown
-                key={modulo.id}
-                titulo={modulo.titulo}
-                icon={modulo.icon}
-                opciones={modulo.opciones}
-              />
-            )
-          })}
-
-          {modulo && (
-            <span className="ml-auto text-xs bg-white/15 text-white px-3 py-1 rounded-full font-medium">
-              {modulo}
-            </span>
-          )}
-        </div>
-      </nav>
 
       {mobileOpen && (
         <div className="fixed inset-0 bg-slate-50 text-slate-800 z-[100] p-5 lg:hidden overflow-y-auto">
@@ -251,40 +249,32 @@ export default function Navbar({ modulo }) {
               Portal inicio
             </button>
 
-            {esAlumno && (
-              <NavLink
-                to="/mi-plan"
-                className={linkClassMobile}
-                end
-                onClick={closeMenus}
-              >
-                <span className="w-10 h-10 text-red-700 flex items-center justify-center rounded-xl bg-red-50">
-                  <AcademicCapIcon className="size-5" />
-                </span>
-                Mi plan
-              </NavLink>
-            )}
-
-            {modulosVisibles.map((modulo)=> {
-              if(modulo.opciones.length === 1) {
+            {/* Mobile queda igual que antes: un item por módulo (ya andaba
+                bien). Si más adelante quieren la misma agrupación acá,
+                se reemplaza este bloque por los mismos dos NavDropdownMobile
+                de "Mi actividad" / "Gestión académica". */}
+            {modulosVisibles.map((modulo) => {
+              if (modulo.opciones.length === 1) {
                 const Icon = modulo.icon;
                 const opcion = modulo.opciones[0];
 
-                return(
+                return (
                   <NavLink
-                    key={modulo.id}
+                    key={opcion.ruta}
                     to={opcion.ruta}
                     className={linkClassMobile}
                     end
                     onClick={closeMenus}
                   >
-                    <Icon className="size-[17px]"/>
+                    <span className="w-10 h-10 text-red-700 flex items-center justify-center rounded-xl bg-red-50">
+                      <Icon className="size-5" />
+                    </span>
                     {modulo.titulo}
                   </NavLink>
-                )
+                );
               }
 
-              return(
+              return (
                 <NavDropdownMobile
                   key={modulo.id}
                   titulo={modulo.titulo}
@@ -292,7 +282,7 @@ export default function Navbar({ modulo }) {
                   opciones={modulo.opciones}
                   onClose={closeMenus}
                 />
-              )
+              );
             })}
 
             <button
