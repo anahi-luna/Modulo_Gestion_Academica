@@ -60,7 +60,7 @@ export default function Navbar({ modulo }) {
         "Usuario";
 
   const linkClass =
-    "px-3 py-2 rounded-md text-sm font-semibold hover:bg-white/15 flex items-center gap-2 cursor-pointer";
+    "px-3.5 py-1.5 rounded-full text-sm font-medium hover:bg-white/15 flex items-center gap-2 cursor-pointer transition-colors";
 
   const linkClassMobile =
     "flex items-center gap-4 rounded-2xl bg-white border border-slate-200 px-4 py-4 font-bold text-slate-700 shadow-sm cursor-pointer";
@@ -106,7 +106,7 @@ export default function Navbar({ modulo }) {
       <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-3 text-left shrink-0">
         
-          <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/10 border border-white/25 flex items-center justify-center overflow-hidden shadow-sm">
             <img
               src={logo}
               alt="Logo Bomberos"
@@ -130,59 +130,8 @@ export default function Navbar({ modulo }) {
           <Bars3Icon className="size-[22px]" />
         </button>
 
-        <nav className="hidden lg:flex flex-1 min-w-0 items-center gap-1 overflow-x-auto">
-          <a
-            onClick={() => (window.location.href = PORTAL_URL)}
-            className={`${linkClass} shrink-0`}
-          >
-            <HomeIcon className="size-[17px]" />
-            Portal inicio
-          </a>
-
-          {esAlumno && (
-            <NavLink to="/mi-plan" className={`${linkClass} shrink-0`} end>
-              <AcademicCapIcon className="size-[17px]" />
-              Mi plan
-            </NavLink>
-          )}
-
-          {modulosVisibles.map((modulo)=> {
-            if(modulo.opciones.length === 1) {
-              const Icon = modulo.icon;
-              const opcion = modulo.opciones[0];
-
-              return(
-                <NavLink
-                  key={modulo.id}
-                  to={opcion.ruta}
-                  className={`${linkClass} shrink-0`}
-                  end
-                >
-                  <Icon className="size-[17px]"/>
-                  {modulo.titulo}
-                </NavLink>
-              )
-            }
-
-            return(
-              <NavDropdown
-                key={modulo.id}
-                titulo={modulo.titulo}
-                icon={modulo.icon}
-                opciones={modulo.opciones}
-              />
-            )
-          })}
-
-          {modulo && (
-            <span className="ml-1 shrink-0 text-xs bg-white/15 text-white px-3 py-1 rounded-full font-medium">
-              {modulo}
-            </span>
-          )}
-        </nav>
-
-        <div className="hidden lg:flex items-center gap-1 shrink-0">
-          <Menu as="div" className="relative ml-1">
+        <div className="hidden lg:flex items-center gap-2 shrink-0">
+          <Menu as="div" className="relative">
             <MenuButton className="relative flex items-center justify-center rounded-full cursor-pointer">
               <span className="sr-only">Menú usuario</span>
               <UserCircleIcon className="size-9 text-white/90" />
@@ -201,13 +150,74 @@ export default function Navbar({ modulo }) {
           <button
             type="button"
             onClick={handleLogout}
-            className={linkClass}
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-semibold border border-white/25 hover:bg-white/15 cursor-pointer"
           >
             <ArrowRightStartOnRectangleIcon className="size-[17px]" />
             Cerrar Sesión
           </button>
         </div>
       </div>
+
+      <nav className="hidden lg:block border-t border-white/10 bg-black/10">
+        <div className="max-w-7xl mx-auto px-5 py-2 flex flex-wrap items-center gap-1.5">
+          <a
+            onClick={() => (window.location.href = PORTAL_URL)}
+            className={linkClass}
+          >
+            <HomeIcon className="size-[16px]" />
+            Portal inicio
+          </a>
+
+          {esAlumno && (
+            <NavLink
+              to="/mi-plan"
+              className={({ isActive }) =>
+                `${linkClass} ${isActive ? "bg-white text-red-800 hover:bg-white" : ""}`
+              }
+              end
+            >
+              <AcademicCapIcon className="size-[16px]" />
+              Mi plan
+            </NavLink>
+          )}
+
+          {modulosVisibles.map((modulo)=> {
+            if(modulo.opciones.length === 1) {
+              const Icon = modulo.icon;
+              const opcion = modulo.opciones[0];
+
+              return(
+                <NavLink
+                  key={modulo.id}
+                  to={opcion.ruta}
+                  className={({ isActive }) =>
+                    `${linkClass} ${isActive ? "bg-white text-red-800 hover:bg-white" : ""}`
+                  }
+                  end
+                >
+                  <Icon className="size-[16px]"/>
+                  {modulo.titulo}
+                </NavLink>
+              )
+            }
+
+            return(
+              <NavDropdown
+                key={modulo.id}
+                titulo={modulo.titulo}
+                icon={modulo.icon}
+                opciones={modulo.opciones}
+              />
+            )
+          })}
+
+          {modulo && (
+            <span className="ml-auto text-xs bg-white/15 text-white px-3 py-1 rounded-full font-medium">
+              {modulo}
+            </span>
+          )}
+        </div>
+      </nav>
 
       {mobileOpen && (
         <div className="fixed inset-0 bg-slate-50 text-slate-800 z-[100] p-5 lg:hidden overflow-y-auto">

@@ -29,14 +29,16 @@ export default function NavDropdown({
 
             <button
                 onClick={() => setAbierto((v) => !v)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+                className={`flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium text-white hover:bg-white/15 transition-colors cursor-pointer ${
+                    abierto ? "bg-white/15" : ""
+                }`}
             >
-                {Icon && <Icon className="size-[17px]" />}
+                {Icon && <Icon className="size-[16px]" />}
 
                 <span>{titulo}</span>
 
                 <ChevronDownIcon
-                    className={`size-4 transition-transform ${
+                    className={`size-3.5 transition-transform ${
                         abierto ? "rotate-180" : ""
                     }`}
                 />
